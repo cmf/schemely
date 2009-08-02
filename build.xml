@@ -1,0 +1,220 @@
+<project name="Build Scheme plugin for IntelliJ IDEA" default="deploy.plugin">
+  <property file="scheme.properties"/>
+  <property name="project.dir" value="."/>
+  <property name="project.lib" value="${project.dir}/lib"/>
+  <property name="project.dest" value="${project.dir}/out/production/scheme-plugin"/>
+  <property name="test.dest" value="${project.dir}/out/test/scheme-plugin"/>
+  <property name="output" value="${project.dir}/dist"/>
+  <property name="idea.pack" value="${project.dir}/idea_pack"/>
+  <property name="tools.jar.dir" value="${java.home}/lib"/>
+
+  <path id="tools.path">
+    <fileset dir="${tools.jar.dir}">
+      <include name="**/*tools.jar"/>
+    </fileset>
+  </path>
+
+  <property name="0" value="unknown"/>
+  <property name="build.vcs.number.scheme_svn" value="unknown"/>
+  <property name="plugin.revision" value="${build.vcs.number.scheme_svn}"/>
+  <property name="plugin.version" value="${scheme.plugin.version}.${plugin.revision}"/>
+
+  <path id="jdk.classpath">
+    <fileset dir="${java.home}" id="jdk.fileset">
+      <include name="jre/lib/*.jar"/>
+    </fileset>
+  </path>
+
+  <path id="idea.classpath">
+    <fileset dir="${idea.home}/lib">
+      <include name="**/*.jar"/>
+      <exclude name="boot.jar"/>
+    </fileset>
+    <fileset dir="${idea.home}/plugins">
+      <include name="CSS/lib/*.jar"/>
+      <include name="**/JavascriptLanguage.jar"/>
+      <include name="**/JavaScriptLanguage/lib/resurces_en.jar"/>
+    </fileset>
+  </path>
+
+
+  <path id="scheme.plugin.classpath">
+    <path refid="jdk.classpath"/>
+    <path refid="idea.classpath"/>
+    <path refid="tools.path"/>
+    <fileset dir="${project.lib}">
+      <include name="**/scheme.jar"/>
+    </fileset>
+  </path>
+
+  <target name="unzip.last.successful.IDEA.build">
+    <mkdir dir="${idea.home}"/>
+    <unzip dest="${idea.home}">
+      <fileset dir="${idea.pack}">
+        <include name="*.zip"/>
+      </fileset>
+    </unzip>
+  </target>
+
+
+  <target name="init">
+    <mkdir dir="${project.dest}"/>
+  </target>
+
+  <target name="clean" depends="init">
+    <delete dir="build" includes="**/*"/>
+  </target>
+
+  <target name="make.lexer">
+    <java jar="${project.lib}/JFlex.jar" output="jflex.log" fork="true" maxmemory="512m">
+      <arg value="--charat"/>
+      <arg value="-skel"/>
+      <arg value="${project.lib}/idea-flex.skeleton"/>
+      <arg value="src/org/jetbrains/plugins/scheme/lexer/scheme.flex"/>
+    </java>
+
+  </target>
+
+  <target name="make.plugin" depends="make.lexer">
+    <!--Copy descriptor-->
+    <copy todir="${project.dest}/META-INF">
+      <fileset dir="${project.dir}/META-INF"/>
+    </copy>
+
+    <!--Copy resources-->
+    <copy todir="${project.dest}">
+      <fileset dir="${project.dir}/resources/"/>
+    </copy>
+
+    <!--Copy resource bundle-->
+    <copy file="${project.dir}/src/org/jetbrains/plugins/scheme/SchemeBundle.properties"
+          tofile="${project.dest}/org/jetbrains/plugins/scheme/SchemeBundle.properties"/>
+
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="idea.classpath"/>
+
+    <!--Compile project files-->
+    <javac2 srcdir="${project.dir}"
+            destdir="${project.dest}"
+            verbose="yes"
+            debug="true"
+            target="1.5">
+      <classpath refid="scheme.plugin.classpath"/>
+      <include name="src/**/*.java"/>
+      <include name="src/**/*.form"/>
+    </javac2>
+
+    <replace file="${project.dest}/META-INF/plugin.xml" token="VERSION" value="${plugin.version}"/>
+
+  </target>
+
+  <target name="deploy.plugin" depends="clean, make.plugin">
+
+    <mkdir dir="${project.dir}/tempjar/scheme-plugin/lib"/>
+
+    <jar destfile="${project.dir}/tempjar/scheme-plugin/lib/scheme-intellij-plugin.jar">
+      <fileset dir="${project.dest}" includes="**/*"/>
+
+      <manifest>
+        <attribute name="Revision" value="${plugin.revision}"/>
+        <attribute name="Build" value="${plugin.version}"/>
+      </manifest>
+    </jar>
+
+    <copy todir="${project.dir}/tempjar/scheme-plugin/lib">
+      <fileset dir="${project.lib}">
+        <include name="scheme.jar"/>
+      </fileset>
+    </copy>
+
+    <mkdir dir="${output}"/>
+
+    <zip destfile="${output}/scheme-intellij-bin-${plugin.version}.zip" basedir="${project.dir}/tempjar"/>
+    <delete dir="${project.dir}/tempjar"/>
+
+    <!-- Zip sources-->
+    <zip destfile="${output}/scheme-intellij-src-${plugin.version}.zip" basedir="${project.dir}"
+         includes="src/**/*.java,
+         src/**/*.properties,
+         src/**/*.flex,
+         src/**/*.jar,
+         src/**/*.skeleton,
+         src/**/*.form,
+         build.xml,
+         scheme.properties,
+         resources/**/*.png,
+         META-INF/**/*.xml,
+         lib/**/*,
+         test/**/*"
+        />
+  </target>
+
+
+  <target name="build.tests" depends="make.plugin">
+
+    <mkdir dir="${test.dest}"/>
+
+    <javac srcdir="${project.dir}"
+           destdir="${test.dest}"
+           debug="true">
+      <classpath refid="scheme.plugin.classpath"/>
+      <classpath>
+        <path location="${project.dest}"/>
+      </classpath>
+      <include name="test/**/*.java"/>
+    </javac>
+
+    <!--<copy toDir="${project.lib}/testdata">-->
+    <!--<fileset dir="${base.dir}/testdata"/>-->
+    <!--<fileset dir="${scalax.dir}/testdata"/>-->
+    <!--</copy>-->
+
+  </target>
+
+  <target name="run.tests" depends="build.tests">
+
+    <mkdir dir="${project.dir}/logs"/>
+    <mkdir dir="${output}/config"/>
+    <mkdir dir="${output}/system"/>
+
+    <junit fork="yes"
+           dir="${project.dir}"
+           printsummary="yes"
+           haltonfailure="no"
+           haltonerror="no">
+
+      <classpath>
+        <path location="${project.lib}"/>
+        <path location="${project.dest}"/>
+        <path location="${test.dest}"/>
+        <path refid="tools.path"/>
+        <path refid="scheme.plugin.classpath"/>
+      </classpath>
+
+      <jvmarg value="-Xbootclasspath/p:./lib/boot/boot.jar"/>
+      <jvmarg value="-Djava.awt.headless=true"/>
+      <jvmarg value="-Xmx256M"/>
+      <jvmarg value="-ea"/>
+      <jvmarg value="-Xdebug"/>
+      <jvmarg value="-Djava.compiler=NONE"/>
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5545"/>
+
+      <jvmarg value="-Didea.config.path=${output}/config"/>
+      <jvmarg value="-Didea.system.path=${output}/system"/>
+      <jvmarg value="-Didea.plugins.path=${project.dest}/.."/>
+
+      <jvmarg value="-Didea.load.plugins.id=org.intellij.scheme"/>
+
+      <formatter type="plain"/>
+
+      <batchtest todir="${project.dir}/logs">
+        <fileset dir="${test.dest}">
+          <include name="**/*Test.class"/>
+          <exclude name="**/*ActualTest.class"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <delete dir="${output}"/>
+  </target>
+
+</project>

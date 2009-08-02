@@ -1,0 +1,39 @@
+package org.jetbrains.plugins.scheme.config;
+
+import com.intellij.facet.*;
+import com.intellij.openapi.module.Module;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * @author ilyas
+ */
+public class SchemeFacet extends Facet<SchemeFacetConfiguration>
+{
+  public static final String FACET_TYPE_ID_STRING = "scheme";
+  public final static FacetTypeId<SchemeFacet> ID = new FacetTypeId<SchemeFacet>(FACET_TYPE_ID_STRING);
+
+  public SchemeFacet(@NotNull Module module)
+  {
+    this(FacetTypeRegistry.getInstance().findFacetType(FACET_TYPE_ID_STRING),
+         module,
+         "Scheme",
+         new SchemeFacetConfiguration(),
+         null);
+  }
+
+
+  public SchemeFacet(final FacetType facetType,
+                     final Module module,
+                     final String name,
+                     final SchemeFacetConfiguration configuration,
+                     final Facet underlyingFacet)
+  {
+    super(facetType, module, name, configuration, underlyingFacet);
+  }
+
+  public static SchemeFacet getInstance(@NotNull Module module)
+  {
+    return FacetManager.getInstance(module).getFacetByType(ID);
+  }
+
+}

@@ -1,0 +1,150 @@
+<!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
+<idea-plugin>
+  <module-components>
+    <component>
+      <implementation-class>org.jetbrains.plugins.scheme.config.SchemeFacetListener</implementation-class>
+    </component>
+  </module-components>
+
+  <name>La Scheme</name>
+  <id>org.intellij.scheme</id>
+  <description>Plugin for Scheme language support</description>
+  <category>Custom Languages</category>
+  <version>VERSION</version>
+  <vendor logo="/org/jetbrains/plugins/scheme/icons/scheme_icon_16x16.png" url="http://www.jetbrains.com">JetBrains
+    Inc.
+  </vendor>
+  <idea-version since-build="9100" until-build="9999"/>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
+    <fileTypeFactory implementation="org.jetbrains.plugins.scheme.file.SchemeFileTypeLoader"/>
+    <lang.braceMatcher language="Scheme"
+                       implementationClass="org.jetbrains.plugins.scheme.highlighter.SchemeBraceMatcher"/>
+    <syntaxHighlighter key="Scheme"
+                       implementationClass="org.jetbrains.plugins.scheme.highlighter.SchemeSyntaxHighlighter"/>
+    <colorSettingsPage implementation="org.jetbrains.plugins.scheme.highlighter.SchemeColorsAndFontsPage"/>
+    <lang.commenter language="Scheme"
+                    implementationClass="org.jetbrains.plugins.scheme.highlighter.SchemeCommenter"/>
+    <lang.parserDefinition language="Scheme"
+                           implementationClass="org.jetbrains.plugins.scheme.parser.SchemeParserDefinition"/>
+    <lang.foldingBuilder language="Scheme"
+                         implementationClass="org.jetbrains.plugins.scheme.SchemeFoldingBuilder"/>
+    <lang.psiStructureViewFactory language="Scheme"
+                                  implementationClass="org.jetbrains.plugins.scheme.structure.SchemeStructureViewBuilderFactory"/>
+    <lang.formatter language="Scheme"
+                    implementationClass="org.jetbrains.plugins.scheme.formatter.SchemeFormattingModelBuilder"/>
+    <codeStyleSettingsProvider language="Scheme"
+                               implementation="org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettingsProvider"/>
+    <lang.findUsagesProvider language="Scheme"
+                             implementationClass="org.jetbrains.plugins.scheme.findUsages.SchemeFindUsagesProvider"/>
+    <completion.contributor implementation="org.jetbrains.plugins.scheme.completion.SchemeCompletionContributor"/>
+    <fileTemplateGroup implementation="org.jetbrains.plugins.scheme.actions.SchemeTemplatesFactory"/>
+    <fileTypeIndentOptionsProvider
+      implementation="org.jetbrains.plugins.scheme.formatter.SchemeIndentOptionsProvider"/>
+    <quoteHandler fileType="Scheme" className="org.jetbrains.plugins.scheme.editor.SchemeQuoteHandler"/>
+    <annotator language="Scheme" implementationClass="org.jetbrains.plugins.scheme.annotator.SchemeAnnotator"/>
+
+    <gotoSymbolContributor implementation="org.jetbrains.plugins.scheme.gotoclass.SchemeGoToSymbolContributor"/>
+    <gotoClassContributor implementation="org.jetbrains.plugins.scheme.gotoclass.SchemeGoToClassContributor"/>
+
+    <stubElementTypeHolder class="org.jetbrains.plugins.scheme.parser.AST"/>
+
+    <stubIndex implementation="org.jetbrains.plugins.scheme.psi.stubs.index.ClDefNameIndex"/>
+    <stubIndex implementation="org.jetbrains.plugins.scheme.psi.stubs.index.SchemeClassNameIndex"/>
+    <stubIndex implementation="org.jetbrains.plugins.scheme.psi.stubs.index.SchemeFullScriptNameIndex"/>
+
+    <extendWordSelectionHandler
+      implementation="org.jetbrains.plugins.scheme.editor.selection.SchemeListSelectioner"/>
+    <extendWordSelectionHandler
+      implementation="org.jetbrains.plugins.scheme.editor.selection.SchemeLiteralSelectioner"/>
+
+    <frameworkSupport implementation="org.jetbrains.plugins.scheme.config.SchemeFacetSupportProvider"/>
+    <applicationService serviceInterface="org.jetbrains.plugins.scheme.settings.SchemeApplicationSettings"
+                        serviceImplementation="org.jetbrains.plugins.scheme.settings.SchemeApplicationSettings"/>
+
+    <projectService serviceInterface="org.jetbrains.plugins.scheme.psi.util.SchemePsiElementFactory"
+                    serviceImplementation="org.jetbrains.plugins.scheme.psi.util.SchemePsiElementFactoryImpl"/>
+
+  </extensions>
+
+  <application-components>
+    <component>
+      <implementation-class>org.jetbrains.plugins.scheme.SchemeLoader</implementation-class>
+    </component>
+    <component>
+      <implementation-class>org.jetbrains.plugins.scheme.config.SchemeFacetLoader</implementation-class>
+      <interface-class>org.jetbrains.plugins.scheme.config.SchemeFacetLoader</interface-class>
+    </component>
+  </application-components>
+
+  <project-components>
+    <component>
+      <implementation-class>org.jetbrains.plugins.scheme.psi.impl.javaView.SchemeClassFinder
+      </implementation-class>
+    </component>
+    <component>
+      <implementation-class>org.jetbrains.plugins.scheme.psi.impl.SchemePsiManager</implementation-class>
+    </component>
+    <!--<component>-->
+    <!--<implementation-class>org.jetbrains.plugins.scheme.repl.ReplToolWindow</implementation-class>-->
+    <!--</component>-->
+  </project-components>
+
+  <actions>
+    <!-- Create file actions -->
+    <action id="Scheme.SchemeFile" class="org.jetbrains.plugins.scheme.actions.NewSchemeFileAction"
+            text="Scheme File" description="Create new Scheme File">
+      <add-to-group group-id="NewGroup" anchor="last"/>
+    </action>
+
+
+    <!-- REPL-related actions -->
+    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.GoToReplAction"-->
+    <!--class="org.jetbrains.plugins.scheme.actions.repl.GoToReplAction" text="Go To REPL"-->
+    <!--description="Go to the last Scheme REPL">-->
+    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
+    <!--<keyboard-shortcut keymap="$default" first-keystroke="ctrl BACK_SLASH"/>-->
+    <!--</action>-->
+
+    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.RunSelectedTextAction"-->
+    <!--class="org.jetbrains.plugins.scheme.actions.repl.RunSelectedTextAction" text="Run selected in REPL"-->
+    <!--description="Run selected Scheme text in REPL">-->
+    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
+    <!--<keyboard-shortcut keymap="$default" first-keystroke="alt S"/>-->
+    <!--</action>-->
+
+    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.AddReplAction"-->
+    <!--class="org.jetbrains.plugins.scheme.actions.repl.AddReplAction" text="Add new Scheme REPL"-->
+    <!--description="Add REPL">-->
+    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
+    <!--<keyboard-shortcut keymap="$default" first-keystroke="ctrl alt A"/>-->
+    <!--</action>-->
+    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.RemoveReplAction"-->
+    <!--class="org.jetbrains.plugins.scheme.actions.repl.RemoveReplAction" text="Remove REPL"-->
+    <!--description="Remove current Scheme REPL">-->
+    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
+    <!--<keyboard-shortcut keymap="$default" first-keystroke="ctrl alt M"/>-->
+    <!--</action>-->
+    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.LoadCurrentfileInReplAction"-->
+    <!--class="org.jetbrains.plugins.scheme.actions.repl.LoadCurrentfileInReplAction" text="Load file to REPL"-->
+    <!--description="Load current file to REPL">-->
+    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
+    <!--<keyboard-shortcut keymap="$default" first-keystroke="alt L"/>-->
+    <!--</action>-->
+    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.RenameReplAction"-->
+    <!--class="org.jetbrains.plugins.scheme.actions.repl.RenameReplAction" text="Rename REPL"-->
+    <!--description="Renamce current Scheme REPL">-->
+    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
+    <!--<keyboard-shortcut keymap="$default" first-keystroke="ctrl alt SLASH"/>-->
+    <!--</action>-->
+
+    <!--<group id="SchemeReplActionGroup"-->
+    <!--class="org.jetbrains.plugins.scheme.repl.SchemeReplActionGroup" text="Scheme REPL" description="Scheme">-->
+    <!--</group>-->
+
+
+  </actions>
+
+
+</idea-plugin>
