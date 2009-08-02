@@ -49,11 +49,8 @@ public interface Tokens
 
   IElementType TRUE = new SchemeElementType("true");
   IElementType FALSE = new SchemeElementType("false");
-  TokenSet BOOLEAN_LITERAL = TokenSet.create(TRUE, FALSE);
 
   TokenSet LITERALS = TokenSet.create(STRING_LITERAL, NUMBER_LITERAL, CHAR_LITERAL, TRUE, FALSE);
-
-  TokenSet READABLE_TEXT = TokenSet.create(STRING_LITERAL, COMMENT);
 
   IElementType IDENTIFIER = new SchemeElementType("identifier");
 
@@ -102,4 +99,6 @@ public interface Tokens
     TokenSet.create(QUOTE, LAMBDA, IF, SET, BEGIN, COND, AND, OR, CASE, LET, LET_STAR, LETREC, DO, DELAY, QUASIQUOTE);
   TokenSet SYNTACTIC_EXTRA_KEYWORDS = TokenSet.create(ELSE, ARROW, DEFINE, UNQUOTE, UNQUOTE_SPLICING);
   TokenSet SYNTACTIC_KEYWORDS = TokenSet.orSet(EXPRESSION_KEYWORDS, SYNTACTIC_EXTRA_KEYWORDS);
+
+  TokenSet PREFIXES = TokenSet.create(QUOTE_MARK, BACKQUOTE, COMMA, COMMA_AT);
 }

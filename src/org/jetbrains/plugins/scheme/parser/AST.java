@@ -40,10 +40,7 @@ public interface AST extends Tokens
   final IElementType SYMBOL = new SchemeElementType("symbol");
   final IElementType KEYWORD = new SchemeElementType("key definition");
 
-  final IElementType BINDINGS = new SchemeElementType("bindings");
-
-  final IElementType QUOTED_FORM = new SchemeElementType("quoted expression");
-  final IElementType BACKQUOTED_EXPRESSION = new SchemeElementType("backquoted expression");
+  final IElementType ABBREVIATION = new SchemeElementType("abbreviation");
 
   TokenSet LIST_LIKE_FORMS = TokenSet.create(LIST, VECTOR, DEF, DEFMETHOD);
 

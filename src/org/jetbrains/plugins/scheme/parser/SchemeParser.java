@@ -61,6 +61,10 @@ public class SchemeParser implements PsiParser, Tokens
     {
       parseSymbol(builder);
     }
+    else if (PREFIXES.contains(token))
+    {
+      parseAbbreviation(builder);
+    }
     else
     {
       syntaxError(builder, SchemeBundle.message("expected.left.paren.symbol.or.literal"));
@@ -154,8 +158,21 @@ public class SchemeParser implements PsiParser, Tokens
     PsiBuilder.Marker marker = builder.mark();
     //    ParserUtils.getToken(builder, IDENTIFIER, "Expected identifier");
     // Currently using this for keywords too
+    // TODO fix this
     builder.advanceLexer();
     marker.done(AST.IDENTIFIER);
+  }
+
+  /**
+   * Enter: Lexer is pointed at abbreviation mark
+   * Exit: Lexer is pointed immediately after datum quoted by abbreviation mark
+   */
+  private void parseAbbreviation(PsiBuilder builder)
+  {
+    PsiBuilder.Marker marker = builder.mark();
+    builder.advanceLexer();
+    parseDatum(builder);
+    marker.done(AST.ABBREVIATION);
   }
 
   /**

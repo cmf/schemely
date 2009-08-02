@@ -91,16 +91,16 @@ public class SchemeBlockGenerator
           return true;
         }
         if (first != null &&
-            !applicationStart(first) &&
+//            !applicationStart(first) &&
             first.getTextRange().getEndOffset() <= child.getTextRange().getStartOffset())
         {
           return true;
         }
-        final PsiElement second = list.getSecondNonLeafElement();
-        if (second != null && second.getTextRange().getEndOffset() <= child.getTextRange().getStartOffset())
-        {
-          return true;
-        }
+//        final PsiElement second = list.getSecondNonLeafElement();
+//        if (second != null && second.getTextRange().getEndOffset() <= child.getTextRange().getStartOffset())
+//        {
+//          return true;
+//        }
       }
     }
 

@@ -182,18 +182,18 @@ public class ParserTest extends TestCase
     parseit("sexp2");
   }
 
-  //  @Test
-  //  public void testQuote()
-  //  {
-  //    parseit("quote");
-  //  }
-  //
-  //  @Test
-  //  public void testVector()
-  //  {
-  //    parseit("vector");
-  //  }
-  //
+  @Test
+  public void testQuote()
+  {
+    parseit("quote");
+  }
+
+  @Test
+  public void testVector()
+  {
+    parseit("vector");
+  }
+
   @Test
   public void testEmptyList()
   {

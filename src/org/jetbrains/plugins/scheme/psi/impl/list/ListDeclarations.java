@@ -8,7 +8,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.psi.SchemePsiElement;
 import org.jetbrains.plugins.scheme.psi.api.ClList;
-import org.jetbrains.plugins.scheme.psi.api.ClQuotedForm;
+import org.jetbrains.plugins.scheme.psi.api.ClAbbreviation;
 import org.jetbrains.plugins.scheme.psi.api.ClVector;
 import org.jetbrains.plugins.scheme.psi.api.defs.ClDef;
 import org.jetbrains.plugins.scheme.psi.api.symbols.ClSymbol;
@@ -26,7 +26,6 @@ public class ListDeclarations
   public static final String LOOP = "loop";
   public static final String DECLARE = "declare";
   public static final String FN = "fn";
-  public static final String NS = "ns";
   public static final String DEFN = "defn";
   public static final String IMPORT = "import";
   private static final String MEMFN = "memfn";
@@ -203,11 +202,11 @@ public class ListDeclarations
           return false;
         }
       }
-      else if (child instanceof ClQuotedForm)
+      else if (child instanceof ClAbbreviation)
       {
         // process import of form (import '(java.util List Set))
-        ClQuotedForm quotedForm = (ClQuotedForm) child;
-        final SchemePsiElement element = quotedForm.getQuotedElement();
+        ClAbbreviation abbreviation = (ClAbbreviation) child;
+        final SchemePsiElement element = abbreviation.getQuotedElement();
         if (element instanceof ClList)
         {
           ClList inner = (ClList) element;

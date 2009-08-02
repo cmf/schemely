@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scheme.psi.SchemePsiElement;
 /**
  * @author ilyas
  */
-public interface ClQuotedForm
+public interface ClAbbreviation
 {
   @Nullable
   SchemePsiElement getQuotedElement();

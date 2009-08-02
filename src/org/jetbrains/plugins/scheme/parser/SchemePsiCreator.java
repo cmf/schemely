@@ -26,9 +26,9 @@ public class SchemePsiCreator
     {
       return new ClVectorImpl(node);
     }
-    if (elementType == AST.QUOTED_FORM)
+    if (elementType == AST.ABBREVIATION)
     {
-      return new ClQuotedFormImpl(node);
+      return new ClAbbreviationImpl(node);
     }
     if (elementType == AST.IDENTIFIER)
     {
@@ -46,10 +46,6 @@ public class SchemePsiCreator
     {
       return new ClDefnMethodImpl(node);
     }
-    if (elementType == AST.BINDINGS)
-    {
-      return new ClBindings(node);
-    }
     if (elementType == AST.KEYWORD)
     {
       return new ClKeyImpl(node);
@@ -57,10 +53,6 @@ public class SchemePsiCreator
     if (elementType == AST.LITERAL)
     {
       return new ClLiteralImpl(node);
-    }
-    if (elementType == AST.BACKQUOTED_EXPRESSION)
-    {
-      return new ClBackQuotedExpression(node);
     }
 
     throw new Error("Unexpected ASTNode: " + node.getElementType());

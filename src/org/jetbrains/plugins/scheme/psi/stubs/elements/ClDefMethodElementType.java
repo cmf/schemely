@@ -11,9 +11,7 @@ import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.IndexSink;
-import com.intellij.psi.PsiElement;
 import com.intellij.util.io.StringRef;
-import com.intellij.lang.ASTNode;
 
 import java.io.IOException;
 
@@ -36,11 +34,6 @@ public class ClDefMethodElementType extends ClStubElementType<ClDefStub, ClDef>
   {
     StringRef ref = dataStream.readName();
     return new ClDefStubImpl(parentStub, ref, this);
-  }
-
-  public PsiElement createElement(ASTNode node)
-  {
-    return new ClDefnMethodImpl(node);
   }
 
   public ClDef createPsi(ClDefStub stub)
