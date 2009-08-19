@@ -101,6 +101,8 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
   @NotNull
   public ResolveResult[] multiResolve(boolean incomplete)
   {
+    // TODO this is only for debug
+    getManager().getResolveCache().clearResolveCaches(this);
     return getManager().getResolveCache().resolveWithCaching(this, RESOLVER, true, incomplete);
   }
 

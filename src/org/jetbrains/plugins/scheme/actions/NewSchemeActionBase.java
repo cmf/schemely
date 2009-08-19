@@ -82,7 +82,6 @@ public abstract class NewSchemeActionBase extends CreateElementActionBase
       presentation.setEnabled(true);
       presentation.setVisible(true);
     }
-
   }
 
   public static boolean isUnderSourceRoots(AnActionEvent e)

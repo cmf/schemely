@@ -1,21 +1,15 @@
 package org.jetbrains.plugins.scheme.parser;
 
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.impl.DebugUtil;
-import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
-import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
-import com.intellij.testFramework.fixtures.TestFixtureBuilder;
-import com.intellij.util.IncorrectOperationException;
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.jetbrains.plugins.scheme.psi.api.SchemeAbbreviation;
 import org.jetbrains.plugins.scheme.psi.api.SchemeList;
-import org.junit.Test;
+import org.jetbrains.plugins.scheme.psi.api.SchemeLiteral;
+import org.jetbrains.plugins.scheme.psi.api.SchemeVector;
+import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
+import org.testng.annotations.Test;
 
 
 /**
@@ -33,153 +27,116 @@ import org.junit.Test;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class ParserTest extends TestCase
+public class ParserTest extends ParserTestBase
 {
-  protected Project myProject;
-  protected Module myModule;
-  protected IdeaProjectTestFixture myFixture;
-
-  protected void setUp()
-  {
-    myFixture = createFixture();
-
-    try
-    {
-      myFixture.setUp();
-    }
-    catch (Exception e)
-    {
-      throw new Error(e);
-    }
-    myModule = myFixture.getModule();
-    myProject = myModule.getProject();
-  }
-
-  protected IdeaProjectTestFixture createFixture()
-  {
-    TestFixtureBuilder<IdeaProjectTestFixture>
-      fixtureBuilder =
-      IdeaTestFixtureFactory.getFixtureFactory().createLightFixtureBuilder();
-    return fixtureBuilder.getFixture();
-  }
-
-  protected void tearDown()
-  {
-    try
-    {
-      myFixture.tearDown();
-    }
-    catch (Exception e)
-    {
-      throw new Error(e);
-    }
-  }
-
-  private PsiFile createPseudoPhysicalFile(Project project, String fileName, String text) throws
-                                                                                          IncorrectOperationException
-  {
-    FileType fileType = FileTypeManager.getInstance().getFileTypeByFileName(fileName);
-    PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(project);
-    return psiFileFactory.createFileFromText(fileName, fileType, text);
-  }
-
   @Test
   public void testSchemeFileType()
   {
-    Assert.assertNotNull(FileTypeManager.getInstance().getFileTypeByFileName("foo.scm"));
-  }
-
-  public PsiFile parseit(String contents)
-  {
-    PsiFile psiFile = createPseudoPhysicalFile(myProject, "test.scm", contents);
-    String psiTree = DebugUtil.psiToString(psiFile, false);
-    System.out.println(contents);
-    System.out.println(psiTree);
-    return psiFile;
+    assert FileTypeManager.getInstance().getFileTypeByFileName("foo.scm") != FileTypes.UNKNOWN :
+      "Scheme file not recognised!";
   }
 
   @Test
   public void testSymbol()
   {
-    parseit("foo");
+    identifier("foo");
   }
 
   @Test
   public void testSymbol2()
   {
-    parseit("foo*");
+    identifier("foo*");
   }
 
   @Test
   public void testInteger()
   {
-    parseit("123");
+    literal("123");
   }
 
   @Test
   public void testFloat()
   {
-    parseit("123.123");
+    literal("123.123");
   }
 
   @Test
   public void testString()
   {
-    parseit("\"123.456\"");
+    literal("\"123.456\"");
   }
 
   public void testMultilineString()
   {
-    parseit("\"this is\n" +
-            "            a multiline\n" +
-            "            string\"");
+    literal("\"this is\n" + "            a multiline\n" + "            string\"");
   }
-
 
   @Test
   public void testSexp1()
   {
-    parseit("(a b)");
+    list("(a b)");
   }
+
 
   @Test
   public void testSexp2()
   {
-    parseit("(a b (c d))");
+    list("(a b (c d))");
   }
 
   @Test
   public void testQuote()
   {
-    parseit("'(a b (c d))");
+    element("'(a b (c d))", SchemeAbbreviation.class);
   }
 
   @Test
   public void testVector()
   {
-    parseit("#(a b (c d))");
+    element("#(a b (c d))", SchemeVector.class);
   }
 
   @Test
   public void testEmptyList()
   {
-    parseit("()");
+    list("()");
   }
 
   @Test
   public void testEmptyVector()
   {
-    parseit("#()");
+    element("#()", SchemeVector.class);
   }
 
   @Test
   public void testDottedList()
   {
-    PsiFile psiFile = parseit("(a b . c)");
+    assert list("(a b . c)").isImproper() : "Expected dotted list!";
+  }
+
+  private SchemeList list(String contents)
+  {
+    return element(contents, SchemeList.class);
+  }
+
+  private void literal(String contents)
+  {
+    element(contents, SchemeLiteral.class);
+  }
+
+  private void identifier(String contents)
+  {
+    element(contents, SchemeIdentifier.class);
+  }
+
+  private <T extends PsiElement> T element(String contents, Class<T> theClass)
+  {
+    PsiFile psiFile = parse(contents);
     PsiElement[] children = psiFile.getChildren();
     assert children.length == 1 : "Expecting 1 child, found " + children.length;
     PsiElement child = children[0];
-    assert child instanceof SchemeList : "Expected list, found " + child.getClass().getName();
-    assert ((SchemeList) child).isImproper() : "Expected dotted list!";
+    assert theClass.isAssignableFrom(child.getClass()) :
+      "Expected " + theClass.getName() + ", found " + child.getClass().getName();
+    return theClass.cast(child);
   }
 }
