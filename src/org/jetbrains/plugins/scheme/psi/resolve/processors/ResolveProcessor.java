@@ -41,10 +41,4 @@ public abstract class ResolveProcessor implements PsiScopeProcessor, NameHint, E
   public void handleEvent(Event event, Object o)
   {
   }
-
-  public boolean hasCandidates()
-  {
-    return myCandidates.size() > 0;
-  }
-
 }

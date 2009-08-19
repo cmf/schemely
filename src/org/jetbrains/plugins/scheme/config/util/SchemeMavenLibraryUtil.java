@@ -17,9 +17,9 @@ public class SchemeMavenLibraryUtil
   {
   }
 
-  public static LibraryInfo createJarDownloadInfo(final String jarName,
-                                                  final String version,
-                                                  final String... requiredClasses)
+  public static LibraryInfo createJarDownloadInfo(String jarName,
+                                                  String version,
+                                                  String... requiredClasses)
   {
     return new LibraryInfo(jarName, version, DOWNLOADING_URL + jarName, DOWNLOAD_JETBRAINS_COM, requiredClasses);
   }

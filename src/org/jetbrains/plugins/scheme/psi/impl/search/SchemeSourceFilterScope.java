@@ -16,13 +16,13 @@ public class SchemeSourceFilterScope extends GlobalSearchScope
   private final GlobalSearchScope myDelegate;
   private final ProjectFileIndex myIndex;
 
-  public SchemeSourceFilterScope(final GlobalSearchScope delegate, final Project project)
+  public SchemeSourceFilterScope(GlobalSearchScope delegate, Project project)
   {
     myDelegate = delegate;
     myIndex = ProjectRootManager.getInstance(project).getFileIndex();
   }
 
-  public boolean contains(final VirtualFile file)
+  public boolean contains(VirtualFile file)
   {
     if (myDelegate != null && !myDelegate.contains(file))
     {
@@ -32,12 +32,12 @@ public class SchemeSourceFilterScope extends GlobalSearchScope
     return myIndex.isInSourceContent(file) || myIndex.isInLibraryClasses(file);
   }
 
-  public int compare(final VirtualFile file1, final VirtualFile file2)
+  public int compare(VirtualFile file1, VirtualFile file2)
   {
     return myDelegate != null ? myDelegate.compare(file1, file2) : 0;
   }
 
-  public boolean isSearchInModuleContent(@NotNull final Module aModule)
+  public boolean isSearchInModuleContent(@NotNull Module aModule)
   {
     return myDelegate == null || myDelegate.isSearchInModuleContent(aModule);
   }

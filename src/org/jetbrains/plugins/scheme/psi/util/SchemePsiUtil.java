@@ -8,9 +8,8 @@ import com.intellij.util.containers.HashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.psi.SchemePsiElement;
-import org.jetbrains.plugins.scheme.psi.api.ClList;
-import org.jetbrains.plugins.scheme.psi.api.symbols.ClSymbol;
-import org.jetbrains.plugins.scheme.psi.impl.ClKeyImpl;
+import org.jetbrains.plugins.scheme.psi.api.SchemeList;
+import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,14 +34,14 @@ public class SchemePsiUtil
   }
 
   @Nullable
-  public static ClList findFormByName(SchemePsiElement container, @NotNull String name)
+  public static SchemeList findFormByName(SchemePsiElement container, @NotNull String name)
   {
     for (PsiElement element : container.getChildren())
     {
-      if (element instanceof ClList)
+      if (element instanceof SchemeList)
       {
-        ClList list = (ClList) element;
-        final ClSymbol first = list.getFirstSymbol();
+        SchemeList list = (SchemeList) element;
+        SchemeIdentifier first = list.getFirstIdentifier();
         if (first != null && name.equals(first.getNameString()))
         {
           return list;
@@ -53,14 +52,14 @@ public class SchemePsiUtil
   }
 
   @Nullable
-  public static ClList findFormByNameSet(SchemePsiElement container, @NotNull Set<String> names)
+  public static SchemeList findFormByNameSet(SchemePsiElement container, @NotNull Set<String> names)
   {
     for (PsiElement element : container.getChildren())
     {
-      if (element instanceof ClList)
+      if (element instanceof SchemeList)
       {
-        ClList list = (ClList) element;
-        final ClSymbol first = list.getFirstSymbol();
+        SchemeList list = (SchemeList) element;
+        SchemeIdentifier first = list.getFirstIdentifier();
         if (first != null && names.contains(first.getNameString()))
         {
           return list;
@@ -80,26 +79,26 @@ public class SchemePsiUtil
     return (T) next;
   }
 
-  public static ClKeyImpl findNamespaceKeyByName(ClList ns, String keyName)
-  {
-    final ClList list = ns.findFirstChildByClass(ClList.class);
-    if (list == null)
-    {
-      return null;
-    }
-    for (PsiElement element : list.getChildren())
-    {
-      if (element instanceof ClKeyImpl)
-      {
-        ClKeyImpl key = (ClKeyImpl) element;
-        if (keyName.equals(key.getText()))
-        {
-          return key;
-        }
-      }
-    }
-    return null;
-  }
+//  public static ClKeyImpl findNamespaceKeyByName(SchemeList ns, String keyName)
+//  {
+//    final SchemeList list = ns.findFirstChildByClass(SchemeList.class);
+//    if (list == null)
+//    {
+//      return null;
+//    }
+//    for (PsiElement element : list.getChildren())
+//    {
+//      if (element instanceof ClKeyImpl)
+//      {
+//        ClKeyImpl key = (ClKeyImpl) element;
+//        if (keyName.equals(key.getText()))
+//        {
+//          return key;
+//        }
+//      }
+//    }
+//    return null;
+//  }
 
   @Nullable
   public static PsiElement getNextNonWhiteSpace(PsiElement element)
@@ -120,8 +119,8 @@ public class SchemePsiUtil
     {
       return new Trinity<PsiElement, PsiElement, PsiElement>(element1, element1, element1);
     }
-    final PsiFile containingFile = element1.getContainingFile();
-    final PsiElement topLevel = containingFile == element2.getContainingFile() ? containingFile : null;
+    PsiFile containingFile = element1.getContainingFile();
+    PsiElement topLevel = containingFile == element2.getContainingFile() ? containingFile : null;
 
     ArrayList<PsiElement> parents1 = getParents(element1, topLevel);
     ArrayList<PsiElement> parents2 = getParents(element2, topLevel);
@@ -168,7 +167,7 @@ public class SchemePsiUtil
     return parents;
   }
 
-  private static boolean isParameterSymbol(ClSymbol symbol)
+  private static boolean isParameterSymbol(SchemeIdentifier symbol)
   {
     //todo implement me!
     return false;

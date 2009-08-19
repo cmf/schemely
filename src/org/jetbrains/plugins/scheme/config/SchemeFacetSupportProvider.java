@@ -28,7 +28,7 @@ public class SchemeFacetSupportProvider extends FacetTypeFrameworkSupportProvide
 
   @NotNull
   @NonNls
-  public String getLibraryName(final String name)
+  public String getLibraryName(String name)
   {
     return "scheme-" + name;
   }
@@ -64,7 +64,7 @@ public class SchemeFacetSupportProvider extends FacetTypeFrameworkSupportProvide
   }
 
   @NotNull
-  protected LibraryInfo[] getLibraries(final String selectedVersion)
+  protected LibraryInfo[] getLibraries(String selectedVersion)
   {
     SchemeVersion version = getVersion(selectedVersion);
     LOG.assertTrue(version != null);

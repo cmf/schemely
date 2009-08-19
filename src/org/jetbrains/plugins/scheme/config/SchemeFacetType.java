@@ -87,7 +87,7 @@ public class SchemeFacetType extends FacetType<SchemeFacet, SchemeFacetConfigura
 
   public static SchemeFacetType getInstance()
   {
-    final SchemeFacetType facetType = (SchemeFacetType) FacetTypeRegistry.getInstance().findFacetType(SchemeFacet.ID);
+    SchemeFacetType facetType = (SchemeFacetType) FacetTypeRegistry.getInstance().findFacetType(SchemeFacet.ID);
     assert facetType != null;
     return facetType;
   }

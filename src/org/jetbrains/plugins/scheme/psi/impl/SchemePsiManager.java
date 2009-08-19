@@ -78,8 +78,4 @@ public class SchemePsiManager implements ProjectComponent
     return myCache;
   }
 
-  public PsiFile getDummyFile()
-  {
-    return myDummyFile;
-  }
 }

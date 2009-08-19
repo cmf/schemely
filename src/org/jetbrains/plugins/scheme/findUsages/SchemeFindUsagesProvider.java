@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.lexer.SchemeFlexLexer;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
-import org.jetbrains.plugins.scheme.psi.api.defs.ClDef;
-import org.jetbrains.plugins.scheme.psi.api.symbols.ClSymbol;
+import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
 
 /**
  * @author ilyas
@@ -24,7 +23,7 @@ public class SchemeFindUsagesProvider implements FindUsagesProvider
 
   public boolean canFindUsagesFor(@NotNull PsiElement psiElement)
   {
-    return psiElement instanceof ClDef || psiElement instanceof ClSymbol;
+    return /* psiElement instanceof ClDef || */ psiElement instanceof SchemeIdentifier;
   }
 
   public String getHelpId(@NotNull PsiElement psiElement)
@@ -35,48 +34,48 @@ public class SchemeFindUsagesProvider implements FindUsagesProvider
   @NotNull
   public String getType(@NotNull PsiElement element)
   {
-    if (element instanceof ClSymbol)
+    if (element instanceof SchemeIdentifier)
     {
       return "symbol";
     }
-    if (element instanceof ClDef)
-    {
-      return "definition";
-    }
+//    if (element instanceof ClDef)
+//    {
+//      return "definition";
+//    }
     return "enitity";
   }
 
   @NotNull
   public String getDescriptiveName(@NotNull PsiElement element)
   {
-    if (element instanceof ClSymbol)
+    if (element instanceof SchemeIdentifier)
     {
-      ClSymbol symbol = (ClSymbol) element;
-      final String name = symbol.getText();
+      SchemeIdentifier symbol = (SchemeIdentifier) element;
+      String name = symbol.getText();
       return name == null ? symbol.getText() : name;
     }
-    if (element instanceof ClDef)
-    {
-      ClDef def = (ClDef) element;
-      return def.getPresentationText();
-    }
+//    if (element instanceof ClDef)
+//    {
+//      ClDef def = (ClDef) element;
+//      return def.getPresentationText();
+//    }
     return element.getText();
   }
 
   @NotNull
   public String getNodeText(@NotNull PsiElement element, boolean useFullName)
   {
-    if (element instanceof ClSymbol)
+    if (element instanceof SchemeIdentifier)
     {
-      ClSymbol symbol = (ClSymbol) element;
-      final String name = symbol.getReferenceName();
+      SchemeIdentifier symbol = (SchemeIdentifier) element;
+      String name = symbol.getReferenceName();
       return name == null ? symbol.getText() : name;
     }
-    if (element instanceof ClDef)
-    {
-      ClDef def = (ClDef) element;
-      return def.getDefinedName();
-    }
+//    if (element instanceof ClDef)
+//    {
+//      ClDef def = (ClDef) element;
+//      return def.getDefinedName();
+//    }
     return element.getText();
   }
 }

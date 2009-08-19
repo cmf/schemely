@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 %%
 
 %class _SchemeLexer
-%implements SchemeTokenTypes, FlexLexer
+%implements Tokens, FlexLexer
 %unicode
 %public
 %ignorecase
@@ -169,7 +169,7 @@ CommaAt = ",@"
 ////////// Strings /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-StringChar = "\\\"" | "\\\\" | [^\\\"]
+StringChar = "\\" . | [^\\\"]
 String = \" {StringChar}* \"
 
 Character = "#\\" . | "#\\newline" | "#\\space"

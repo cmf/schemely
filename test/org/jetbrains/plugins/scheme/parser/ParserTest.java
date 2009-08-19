@@ -1,25 +1,21 @@
 package org.jetbrains.plugins.scheme.parser;
 
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.impl.DebugUtil;
-import com.intellij.util.IncorrectOperationException;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.module.Module;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
-import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
-import org.junit.Test;
-import org.jetbrains.plugins.scheme.util.PathUtil;
-import junit.framework.TestCase;
+import com.intellij.testFramework.fixtures.TestFixtureBuilder;
+import com.intellij.util.IncorrectOperationException;
 import junit.framework.Assert;
-
-import java.io.File;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import junit.framework.TestCase;
+import org.jetbrains.plugins.scheme.psi.api.SchemeList;
+import org.junit.Test;
 
 
 /**
@@ -41,10 +37,7 @@ public class ParserTest extends TestCase
 {
   protected Project myProject;
   protected Module myModule;
-  private static final String DATA_PATH = PathUtil.getDataPath(ParserTest.class);
-
   protected IdeaProjectTestFixture myFixture;
-  private static final String TEST_FILE_EXT = ".test";
 
   protected void setUp()
   {
@@ -82,8 +75,8 @@ public class ParserTest extends TestCase
     }
   }
 
-  private PsiFile createPseudoPhysicalFile(final Project project, final String fileName, final String text) throws
-                                                                                                            IncorrectOperationException
+  private PsiFile createPseudoPhysicalFile(Project project, String fileName, String text) throws
+                                                                                          IncorrectOperationException
   {
     FileType fileType = FileTypeManager.getInstance().getFileTypeByFileName(fileName);
     PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(project);
@@ -96,213 +89,97 @@ public class ParserTest extends TestCase
     Assert.assertNotNull(FileTypeManager.getInstance().getFileTypeByFileName("foo.scm"));
   }
 
-  public void parseit(String fileName)
+  public PsiFile parseit(String contents)
   {
-    File file = new File(DATA_PATH + fileName + TEST_FILE_EXT);
-    Assert.assertTrue(file.exists());
-
-    StringBuilder contents = new StringBuilder();
-    try
-    {
-      BufferedReader input = new BufferedReader(new FileReader(file));
-      try
-      {
-        String line = null;
-        if ((line = input.readLine()) != null)
-        {
-          contents.append(line);
-        }
-        while ((line = input.readLine()) != null)
-        {
-          contents.append(System.getProperty("line.separator"));
-          contents.append(line);
-        }
-      }
-      finally
-      {
-        input.close();
-      }
-    }
-    catch (IOException ex)
-    {
-      ex.printStackTrace();
-    }
-
-    PsiFile psiFile = createPseudoPhysicalFile(myProject, "test.scm", contents.toString());
+    PsiFile psiFile = createPseudoPhysicalFile(myProject, "test.scm", contents);
     String psiTree = DebugUtil.psiToString(psiFile, false);
-    System.out.println(fileName);
+    System.out.println(contents);
     System.out.println(psiTree);
+    return psiFile;
   }
 
   @Test
   public void testSymbol()
   {
-    parseit("symbol");
+    parseit("foo");
   }
 
   @Test
   public void testSymbol2()
   {
-    parseit("symbol2");
+    parseit("foo*");
   }
 
   @Test
   public void testInteger()
   {
-    parseit("integer");
+    parseit("123");
   }
 
   @Test
   public void testFloat()
   {
-    parseit("float");
+    parseit("123.123");
   }
 
   @Test
   public void testString()
   {
-    parseit("string");
+    parseit("\"123.456\"");
   }
 
   public void testMultilineString()
   {
-    parseit("multiline_string");
+    parseit("\"this is\n" +
+            "            a multiline\n" +
+            "            string\"");
   }
 
 
   @Test
   public void testSexp1()
   {
-    parseit("sexp");
+    parseit("(a b)");
   }
 
   @Test
   public void testSexp2()
   {
-    parseit("sexp2");
+    parseit("(a b (c d))");
   }
 
   @Test
   public void testQuote()
   {
-    parseit("quote");
+    parseit("'(a b (c d))");
   }
 
   @Test
   public void testVector()
   {
-    parseit("vector");
+    parseit("#(a b (c d))");
   }
 
   @Test
   public void testEmptyList()
   {
-    parseit("empty_list");
+    parseit("()");
   }
 
   @Test
   public void testEmptyVector()
   {
-    parseit("empty_vector");
+    parseit("#()");
   }
 
   @Test
   public void testDottedList()
   {
-    parseit("dotted_list");
+    PsiFile psiFile = parseit("(a b . c)");
+    PsiElement[] children = psiFile.getChildren();
+    assert children.length == 1 : "Expecting 1 child, found " + children.length;
+    PsiElement child = children[0];
+    assert child instanceof SchemeList : "Expected list, found " + child.getClass().getName();
+    assert ((SchemeList) child).isImproper() : "Expected dotted list!";
   }
-
-  @Test
-  public void testTest()
-  {
-    parseit("test");
-  }
-
-  //  @Test
-  //  public void testLet()
-  //  {
-  //    parseit("let");
-  //  }
-  //
-  //  @Test
-  //  public void testFn()
-  //  {
-  //    parseit("fn");
-  //  }
-  //
-  //  @Test
-  //  public void testSexp3()
-  //  {
-  //    parseit("sexp3");
-  //  }
-  //
-  //  @Test
-  //  public void testSexp4()
-  //  {
-  //    parseit("sexp4");
-  //  }
-  //
-  //  @Test
-  //  public void testSexp45()
-  //  {
-  //    parseit("sexp45");
-  //  }
-  //
-  //  @Test
-  //  public void testDefn()
-  //  {
-  //    parseit("defn");
-  //  }
-  //
-  //  @Test
-  //  public void testDefn2()
-  //  {
-  //    parseit("defn2");
-  //  }
-  //
-  //  public void testDefn3()
-  //  {
-  //    parseit("defn3");
-  //  }
-  //
-  //  public void testString1()
-  //  {
-  //    parseit("str1");
-  //  }
-  //
-  //  public void testString2()
-  //  {
-  //    parseit("uncompl");
-  //  }
-  //
-  //  public void testString4()
-  //  {
-  //    parseit("str4");
-  //  }
-  //
-  //  public void testSym1()
-  //  {
-  //    parseit("symbols/sym1");
-  //  }
-  //
-  //  public void testSym2()
-  //  {
-  //    parseit("symbols/sym2");
-  //  }
-  //
-  //  public void testSym3()
-  //  {
-  //    parseit("symbols/sym3");
-  //  }
-  //
-  //  public void testSym4()
-  //  {
-  //    parseit("symbols/sym4");
-  //  }
-  //
-  //  public void testSym5()
-  //  {
-  //    parseit("symbols/sym5");
-  //  }
-
 }

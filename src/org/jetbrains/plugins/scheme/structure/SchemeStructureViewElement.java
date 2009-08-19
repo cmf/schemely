@@ -1,15 +1,14 @@
 package org.jetbrains.plugins.scheme.structure;
 
+import com.intellij.ide.structureView.StructureViewTreeElement;
+import com.intellij.navigation.ItemPresentation;
+import com.intellij.navigation.NavigationItem;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.util.Iconable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiNamedElement;
-import com.intellij.ide.structureView.StructureViewTreeElement;
-import com.intellij.navigation.NavigationItem;
-import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.util.Iconable;
 import org.jetbrains.plugins.scheme.psi.SchemePsiElement;
-import org.jetbrains.plugins.scheme.psi.api.defs.ClDef;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -76,7 +75,7 @@ public class SchemeStructureViewElement implements StructureViewTreeElement
 
   private boolean isBrowsableElement(PsiElement element)
   {
-    return element instanceof ClDef && ((ClDef) element).getNameSymbol() != null;
+    return false; // element instanceof ClDef && ((ClDef) element).getNameSymbol() != null;
   }
 
   public ItemPresentation getPresentation()
@@ -85,10 +84,10 @@ public class SchemeStructureViewElement implements StructureViewTreeElement
     {
       public String getPresentableText()
       {
-        if (myElement instanceof ClDef)
-        {
-          return ((ClDef) myElement).getPresentationText();
-        }
+//        if (myElement instanceof ClDef)
+//        {
+//          return ((ClDef) myElement).getPresentationText();
+//        }
         return ((PsiNamedElement) myElement).getName();
       }
 

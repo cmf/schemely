@@ -26,7 +26,6 @@ public class SchemeTemplatesFactory implements FileTemplateGroupDescriptorFactor
 
   public FileTemplateGroupDescriptor getFileTemplatesDescriptor()
   {
-    final
     FileTemplateGroupDescriptor
       group =
       new FileTemplateGroupDescriptor(SchemeBundle.message("file.template.group.title.scheme"),
@@ -35,13 +34,13 @@ public class SchemeTemplatesFactory implements FileTemplateGroupDescriptorFactor
     return group;
   }
 
-  public static PsiFile createFromTemplate(final PsiDirectory directory,
-                                           final String name,
+  public static PsiFile createFromTemplate(PsiDirectory directory,
+                                           String name,
                                            String fileName,
                                            String templateName,
                                            @NonNls String... parameters) throws IncorrectOperationException
   {
-    final FileTemplate template = FileTemplateManager.getInstance().getInternalTemplate(templateName);
+    FileTemplate template = FileTemplateManager.getInstance().getInternalTemplate(templateName);
     Properties properties = new Properties(FileTemplateManager.getInstance().getDefaultProperties());
     JavaTemplateUtil.setPackageNameAttribute(properties, directory);
     properties.setProperty(NAME_TEMPLATE_PROPERTY, name);
@@ -61,8 +60,8 @@ public class SchemeTemplatesFactory implements FileTemplateGroupDescriptorFactor
                                  FileTemplateManager.getInstance().internalTemplateToSubject(templateName), e);
     }
 
-    final PsiFileFactory factory = PsiFileFactory.getInstance(directory.getProject());
-    final PsiFile file = factory.createFileFromText(fileName, text);
+    PsiFileFactory factory = PsiFileFactory.getInstance(directory.getProject());
+    PsiFile file = factory.createFileFromText(fileName, text);
     return (PsiFile) directory.add(file);
   }
 

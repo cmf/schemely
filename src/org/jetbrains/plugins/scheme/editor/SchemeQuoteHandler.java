@@ -13,7 +13,7 @@ public class SchemeQuoteHandler implements QuoteHandler
 {
   public boolean isClosingQuote(HighlighterIterator iterator, int offset)
   {
-    final IElementType tokenType = iterator.getTokenType();
+    IElementType tokenType = iterator.getTokenType();
 
     if (tokenType == Tokens.STRING_LITERAL)
     {
@@ -26,7 +26,7 @@ public class SchemeQuoteHandler implements QuoteHandler
 
   public boolean isOpeningQuote(HighlighterIterator iterator, int offset)
   {
-    final IElementType tokenType = iterator.getTokenType();
+    IElementType tokenType = iterator.getTokenType();
 
     // TODO CMF
     if (/*tokenType == Tokens.WRONG_STRING_LITERAL || */tokenType == Tokens.STRING_LITERAL)
@@ -44,7 +44,7 @@ public class SchemeQuoteHandler implements QuoteHandler
 
   public boolean isInsideLiteral(HighlighterIterator iterator)
   {
-    final IElementType tokenType = iterator.getTokenType();
+    IElementType tokenType = iterator.getTokenType();
     return tokenType == Tokens.STRING_LITERAL;
   }
 }

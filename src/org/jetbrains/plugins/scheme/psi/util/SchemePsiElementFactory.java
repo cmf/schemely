@@ -17,5 +17,4 @@ public abstract class SchemePsiElementFactory
 
   public abstract ASTNode createSymbolNodeFromText(@NotNull String newName);
 
-  public abstract boolean hasSyntacticalErrors(@NotNull String text);
 }

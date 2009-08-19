@@ -1,0 +1,35 @@
+package org.jetbrains.plugins.scheme.psi.impl.list;
+
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.stubs.NamedStub;
+import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.PsiElement;
+import org.jetbrains.plugins.scheme.psi.api.SchemeList;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * @author ilyas
+ */
+public class SchemeListImpl extends SchemeListBaseImpl<NamedStub> implements SchemeList
+{
+  public SchemeListImpl(ASTNode node)
+  {
+    super(node);
+  }
+
+  @Override
+  public String toString()
+  {
+    return "SchemeList";
+  }
+
+  @Override
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor,
+                                     @NotNull ResolveState state,
+                                     PsiElement lastParent,
+                                     @NotNull PsiElement place)
+  {
+    return ListDeclarations.get(processor, lastParent, place, this, getHeadText());
+  }
+}

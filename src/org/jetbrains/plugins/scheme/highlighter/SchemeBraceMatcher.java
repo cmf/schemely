@@ -36,8 +36,8 @@ public class SchemeBraceMatcher implements PairedBraceMatcher
     return PAIRS;
   }
 
-  public boolean isPairedBracesAllowedBeforeType(@NotNull final IElementType lbraceType,
-                                                 @Nullable final IElementType tokenType)
+  public boolean isPairedBracesAllowedBeforeType(@NotNull IElementType lbraceType,
+                                                 @Nullable IElementType tokenType)
   {
     return tokenType == null ||
            Tokens.WHITESPACE_SET.contains(tokenType) ||

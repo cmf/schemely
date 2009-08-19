@@ -137,8 +137,8 @@ public class SchemeConfigUtil
     {
       return new Library[0];
     }
-    final LibraryTable table = ProjectLibraryTable.getInstance(project);
-    final List<Library> all = ContainerUtil.findAll(table.getLibraries(), SCHEME_LIB_CONDITION);
+    LibraryTable table = ProjectLibraryTable.getInstance(project);
+    List<Library> all = ContainerUtil.findAll(table.getLibraries(), SCHEME_LIB_CONDITION);
     return all.toArray(new Library[all.size()]);
   }
 
@@ -185,7 +185,7 @@ public class SchemeConfigUtil
     return "";
   }
 
-  public static Library[] getSchemeSdkLibrariesByModule(final Module module)
+  public static Library[] getSchemeSdkLibrariesByModule(Module module)
   {
     return LibrariesUtil.getLibrariesByCondition(module, SCHEME_LIB_CONDITION);
   }
@@ -202,7 +202,7 @@ public class SchemeConfigUtil
     {
       return "";
     }
-    final Library library = libraries[0];
+    Library library = libraries[0];
     return getSchemeJarPathForLibrary(library);
   }
 
@@ -212,7 +212,7 @@ public class SchemeConfigUtil
   }
 
 
-  public static boolean isSchemeConfigured(final Module module)
+  public static boolean isSchemeConfigured(Module module)
   {
     ModuleRootManager manager = ModuleRootManager.getInstance(module);
     for (OrderEntry entry : manager.getOrderEntries())

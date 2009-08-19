@@ -21,19 +21,19 @@ public class SchemeGoToClassContributor implements ChooseByNameContributor
 {
   public String[] getNames(Project project, boolean includeNonProjectItems)
   {
-    final Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY);
+    Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY);
     return classNames.toArray(new String[classNames.size()]);
   }
 
   public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems)
   {
-    final GlobalSearchScope scope = includeNonProjectItems ? null : GlobalSearchScope.projectScope(project);
+    GlobalSearchScope scope = includeNonProjectItems ? null : GlobalSearchScope.projectScope(project);
     Collection<SchemeFile> files = StubIndex.getInstance().get(SchemeClassNameIndex.KEY, name, project, scope);
     List<PsiClass> scriptClasses = ContainerUtil.map(files, new Function<SchemeFile, PsiClass>()
     {
       public PsiClass fun(SchemeFile schemeFile)
       {
-        assert schemeFile.isClassDefiningFile();
+        assert false;
         return schemeFile.getDefinedClass();
       }
     });

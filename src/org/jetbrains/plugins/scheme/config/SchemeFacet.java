@@ -22,11 +22,11 @@ public class SchemeFacet extends Facet<SchemeFacetConfiguration>
   }
 
 
-  public SchemeFacet(final FacetType facetType,
-                     final Module module,
-                     final String name,
-                     final SchemeFacetConfiguration configuration,
-                     final Facet underlyingFacet)
+  public SchemeFacet(FacetType facetType,
+                     Module module,
+                     String name,
+                     SchemeFacetConfiguration configuration,
+                     Facet underlyingFacet)
   {
     super(facetType, module, name, configuration, underlyingFacet);
   }

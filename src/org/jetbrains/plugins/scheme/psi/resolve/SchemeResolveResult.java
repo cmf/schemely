@@ -8,6 +8,4 @@ import com.intellij.psi.ResolveResult;
 public interface SchemeResolveResult extends ResolveResult
 {
   public SchemeResolveResult[] EMPTY_ARRAY = new SchemeResolveResult[0];
-
-  boolean isAccessible();
 }

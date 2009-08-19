@@ -27,7 +27,7 @@ public class SchemeFacetListener extends FacetManagerAdapter implements ModuleCo
     myConnection = myModule.getMessageBus().connect();
     myConnection.subscribe(FacetManager.FACETS_TOPIC, new FacetManagerAdapter()
     {
-      public void facetAdded(@NotNull final Facet facet)
+      public void facetAdded(@NotNull Facet facet)
       {
       }
 

@@ -40,7 +40,7 @@ public abstract class NewSchemeActionBase extends CreateElementActionBase
   }
 
   @NotNull
-  protected final PsiElement[] invokeDialog(final Project project, final PsiDirectory directory)
+  protected final PsiElement[] invokeDialog(Project project, PsiDirectory directory)
   {
     MyInputValidator validator = new MyInputValidator(project, directory);
     Messages.showInputDialog(project, getDialogPrompt(), getDialogTitle(), Messages.getQuestionIcon(), "", validator);
@@ -52,11 +52,11 @@ public abstract class NewSchemeActionBase extends CreateElementActionBase
 
   protected abstract String getDialogTitle();
 
-  public void update(final AnActionEvent event)
+  public void update(AnActionEvent event)
   {
     super.update(event);
-    final Presentation presentation = event.getPresentation();
-    final DataContext context = event.getDataContext();
+    Presentation presentation = event.getPresentation();
+    DataContext context = event.getDataContext();
     Module module = (Module) context.getData(DataKeys.MODULE.getName());
 
     if (module == null)
@@ -66,8 +66,8 @@ public abstract class NewSchemeActionBase extends CreateElementActionBase
       return;
     }
 
-    final FacetManager manager = FacetManager.getInstance(module);
-    final SchemeFacet facet = manager.getFacetByType(SchemeFacetType.INSTANCE.getId());
+    FacetManager manager = FacetManager.getInstance(module);
+    SchemeFacet facet = manager.getFacetByType(SchemeFacetType.INSTANCE.getId());
 
     if (facet == null ||
         !SchemeUtils.isSuitableModule(module) ||
@@ -85,16 +85,16 @@ public abstract class NewSchemeActionBase extends CreateElementActionBase
 
   }
 
-  public static boolean isUnderSourceRoots(final AnActionEvent e)
+  public static boolean isUnderSourceRoots(AnActionEvent e)
   {
-    final DataContext context = e.getDataContext();
+    DataContext context = e.getDataContext();
     Module module = (Module) context.getData(DataKeys.MODULE.getName());
     if (!SchemeUtils.isSuitableModule(module))
     {
       return false;
     }
-    final IdeView view = (IdeView) context.getData(DataKeys.IDE_VIEW.getName());
-    final Project project = (Project) context.getData(DataKeys.PROJECT.getName());
+    IdeView view = (IdeView) context.getData(DataKeys.IDE_VIEW.getName());
+    Project project = (Project) context.getData(DataKeys.PROJECT.getName());
     if (view != null && project != null)
     {
       ProjectFileIndex projectFileIndex = ProjectRootManager.getInstance(project).getFileIndex();
@@ -121,7 +121,7 @@ public abstract class NewSchemeActionBase extends CreateElementActionBase
   @NotNull
   protected abstract PsiElement[] doCreate(String newName, PsiDirectory directory) throws Exception;
 
-  protected static PsiFile createFileFromTemplate(final PsiDirectory directory,
+  protected static PsiFile createFileFromTemplate(PsiDirectory directory,
                                                   String className,
                                                   @NonNls String templateName,
                                                   @NonNls String... parameters) throws IncorrectOperationException

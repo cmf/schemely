@@ -50,7 +50,6 @@
 
     <stubElementTypeHolder class="org.jetbrains.plugins.scheme.parser.AST"/>
 
-    <stubIndex implementation="org.jetbrains.plugins.scheme.psi.stubs.index.ClDefNameIndex"/>
     <stubIndex implementation="org.jetbrains.plugins.scheme.psi.stubs.index.SchemeClassNameIndex"/>
     <stubIndex implementation="org.jetbrains.plugins.scheme.psi.stubs.index.SchemeFullScriptNameIndex"/>
 

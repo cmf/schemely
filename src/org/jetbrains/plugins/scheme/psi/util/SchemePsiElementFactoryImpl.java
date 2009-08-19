@@ -26,21 +26,10 @@ public class SchemePsiElementFactoryImpl extends SchemePsiElementFactory
 
   public ASTNode createSymbolNodeFromText(@NotNull String newName)
   {
-    final String text = "(" + newName + ")";
-    final SchemeFile dummyFile = createSchemeFileFromText(text);
-    final ASTNode newNode = dummyFile.getFirstChild().getFirstChild().getNextSibling().getNode();
+    String text = "(" + newName + ")";
+    SchemeFile dummyFile = createSchemeFileFromText(text);
+    ASTNode newNode = dummyFile.getFirstChild().getFirstChild().getNextSibling().getNode();
     return newNode;
-  }
-
-  @Override
-  public boolean hasSyntacticalErrors(@NotNull String text)
-  {
-    final
-    SchemeFile
-      schemeFile =
-      (SchemeFile) PsiFileFactory.getInstance(getProject())
-        .createFileFromText(DUMMY + SchemeFileType.SCHEME_FILE_TYPE.getDefaultExtension(), text);
-    return hasErrorElement(schemeFile);
   }
 
   private static boolean hasErrorElement(PsiElement element)

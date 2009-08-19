@@ -53,13 +53,13 @@ public class SchemeParser implements PsiParser, Tokens
     {
       parseLiteral(builder);
     }
+    else if (SYNTACTIC_KEYWORDS.contains(token))
+    {
+      parseKeyword(builder);
+    }
     else if (IDENTIFIER == token)
     {
       parseIdentifier(builder);
-    }
-    else if (SYNTACTIC_KEYWORDS.contains(token))
-    {
-      parseSymbol(builder);
     }
     else if (PREFIXES.contains(token))
     {
@@ -127,11 +127,11 @@ public class SchemeParser implements PsiParser, Tokens
    *
    * @param builder
    */
-  private void parseSymbol(PsiBuilder builder)
+  private void parseKeyword(PsiBuilder builder)
   {
-    final PsiBuilder.Marker marker = builder.mark();
+    PsiBuilder.Marker marker = builder.mark();
     builder.advanceLexer(); // eat atom
-    marker.done(AST.SYMBOL);
+    marker.done(AST.IDENTIFIER);
   }
 
   /**

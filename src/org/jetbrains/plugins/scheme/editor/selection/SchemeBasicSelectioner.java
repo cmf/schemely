@@ -16,7 +16,7 @@ public abstract class SchemeBasicSelectioner implements ExtendWordSelectionHandl
 {
   public List<TextRange> select(PsiElement e, CharSequence editorText, int cursorOffset, Editor editor)
   {
-    final TextRange originalRange = e.getTextRange();
+    TextRange originalRange = e.getTextRange();
     List<TextRange> ranges = expandToWholeLine(editorText, originalRange, true);
 
     if (ranges.size() == 1 && ranges.contains(originalRange))

@@ -15,7 +15,7 @@ public class SchemeIndentOptionsProvider implements FileTypeIndentOptionsProvide
 {
   public CodeStyleSettings.IndentOptions createIndentOptions()
   {
-    final CodeStyleSettings.IndentOptions indentOptions = new CodeStyleSettings.IndentOptions();
+    CodeStyleSettings.IndentOptions indentOptions = new CodeStyleSettings.IndentOptions();
     indentOptions.INDENT_SIZE = 2;
     indentOptions.TAB_SIZE = 2;
     return indentOptions;
@@ -52,7 +52,7 @@ public class SchemeIndentOptionsProvider implements FileTypeIndentOptionsProvide
            "(time (run 1000 1000))";
   }
 
-  public void prepareForReformat(final PsiFile psiFile)
+  public void prepareForReformat(PsiFile psiFile)
   {
   }
 }

@@ -28,7 +28,7 @@ public class SchemeFullScriptNameIndex extends IntStubIndexExtension<SchemeFile>
     return KEY;
   }
 
-  public Collection<SchemeFile> get(final Integer integer, final Project project, final GlobalSearchScope scope)
+  public Collection<SchemeFile> get(Integer integer, Project project, GlobalSearchScope scope)
   {
     return super.get(integer, project, new SchemeSourceFilterScope(scope, project));
   }

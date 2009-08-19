@@ -2,17 +2,15 @@ package org.jetbrains.plugins.scheme.psi.impl.list;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.psi.SchemePsiElement;
-import org.jetbrains.plugins.scheme.psi.api.ClList;
-import org.jetbrains.plugins.scheme.psi.api.ClAbbreviation;
-import org.jetbrains.plugins.scheme.psi.api.ClVector;
-import org.jetbrains.plugins.scheme.psi.api.defs.ClDef;
-import org.jetbrains.plugins.scheme.psi.api.symbols.ClSymbol;
-import org.jetbrains.plugins.scheme.psi.impl.symbols.ClSymbolImpl;
+import org.jetbrains.plugins.scheme.psi.api.SchemeAbbreviation;
+import org.jetbrains.plugins.scheme.psi.api.SchemeList;
+import org.jetbrains.plugins.scheme.psi.api.SchemeVector;
+import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
 import org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil;
 
 /**
@@ -20,69 +18,250 @@ import org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil;
  */
 public class ListDeclarations
 {
+  public static final String LAMBDA = "lambda";
+  public static final String DEFINE = "define";
   public static final String LET = "let";
-  public static final String WHEN_LET = "when-let";
-  public static final String IF_LET = "if-let";
-  public static final String LOOP = "loop";
-  public static final String DECLARE = "declare";
-  public static final String FN = "fn";
-  public static final String DEFN = "defn";
-  public static final String IMPORT = "import";
-  private static final String MEMFN = "memfn";
-  private static final String DOT = ".";
+  public static final String LET_STAR = "let*";
+  public static final String LETREC = "letrec";
 
   public static boolean get(PsiScopeProcessor processor,
-                            ResolveState state,
                             PsiElement lastParent,
                             PsiElement place,
-                            ClList list,
+                            SchemeList list,
                             @Nullable String headText)
   {
     if (headText == null)
     {
       return true;
     }
-    if (headText.equals(FN))
+    if (headText.equals(LAMBDA))
     {
-      return processFnDeclaration(processor, list, place, lastParent);
+      return processLambdaDeclaration(processor, list, place, lastParent);
     }
-    if (headText.equals(IMPORT))
+    else if (isDefinitionText(headText))
     {
-      return processImportDeclaration(processor, list, place);
+      return processDefineDeclaration(processor, list, place, lastParent);
     }
-    if (headText.equals(MEMFN))
+    else if (headText.equals(LET))
     {
-      return processMemFnDeclaration(processor, list, place);
-    }
-    if (headText.equals(DOT))
-    {
-      return processDotDeclaration(processor, list, place, lastParent);
-    }
-    if (headText.equals(LET) || headText.equals(WHEN_LET))
-    {
-      return processLetDeclaration(processor, list, place);
-    }
-    if (headText.equals(LOOP))
-    {
-      return processLoopDeclaration(processor, list, place, lastParent);
-    }
-    if (headText.equals(DECLARE))
-    {
-      return processDeclareDeclaration(processor, list, place, lastParent);
+      return processLetDeclaration(processor, list, place, lastParent);
     }
 
     return true;
   }
 
+  private static boolean processLambdaDeclaration(PsiScopeProcessor processor,
+                                                  SchemeList lambda,
+                                                  PsiElement place,
+                                                  PsiElement lastParent)
+  {
+    if (PsiTreeUtil.findCommonParent(place, lambda) != lambda)
+    {
+      return true;
+    }
+
+    PsiElement second = lambda.getSecondNonLeafElement();
+    if (second == null)
+    {
+      return true;
+    }
+
+    // Lambda formals are not references
+    if (PsiTreeUtil.findCommonParent(place, second) == second)
+    {
+      return false;
+    }
+
+    // Process internal definitions first to get shadowing
+    if (!processInternalDefinitions(processor, second, place, lastParent))
+    {
+      return false;
+    }
+
+    if (second instanceof SchemeIdentifier)
+    {
+      // (lambda x (head x))
+      if ((place != second) && !ResolveUtil.processElement(processor, (SchemeIdentifier) second))
+      {
+        return false;
+      }
+    }
+    else if (second instanceof SchemeList)
+    {
+      // (lambda (x) (+ x 3))
+      if (PsiTreeUtil.findCommonParent(place, lambda) == lambda)
+      {
+        SchemeList args = (SchemeList) second;
+
+        for (SchemeIdentifier arg : args.getAllSymbols())
+        {
+          if (!ResolveUtil.processElement(processor, arg))
+          {
+            return false;
+          }
+        }
+
+        return true;
+      }
+    }
+
+    return true;
+  }
+
+  private static boolean processDefineDeclaration(PsiScopeProcessor processor,
+                                                  SchemeList define,
+                                                  PsiElement place,
+                                                  PsiElement lastParent)
+  {
+    PsiElement formals = define.getSecondNonLeafElement();
+    if (formals == null)
+    {
+      return true;
+    }
+
+    PsiElement body = ResolveUtil.getNextNonLeafElement(formals);
+    
+    if ((PsiTreeUtil.findCommonParent(place, define) != define.getParent()) &&
+        (PsiTreeUtil.findCommonParent(place, body) != body))
+    {
+      return true;
+    }
+
+    // Define variables are not references
+    if ((PsiTreeUtil.findCommonParent(place, formals) == formals))
+    {
+      return false;
+    }
+
+    if (formals instanceof SchemeIdentifier)
+    {
+      // (define x 3)
+      if ((place != formals) && !ResolveUtil.processElement(processor, (SchemeIdentifier) formals))
+      {
+        return false;
+      }
+    }
+    else if (formals instanceof SchemeList)
+    {
+      // (define (plus3 x) (+ x 3))
+      if (PsiTreeUtil.findCommonParent(place, define) == define)
+      {
+        SchemeList args = (SchemeList) formals;
+
+        for (SchemeIdentifier arg : args.getAllSymbols())
+        {
+          if (!ResolveUtil.processElement(processor, arg))
+          {
+            return false;
+          }
+        }
+
+        return true;
+      }
+    }
+
+    return true;
+  }
+
+  private static boolean processLetDeclaration(PsiScopeProcessor processor,
+                                               SchemeList declaration,
+                                               PsiElement place,
+                                               PsiElement lastParent)
+  {
+    if (PsiTreeUtil.findCommonParent(place, declaration) != declaration)
+    {
+      return true;
+    }
+
+    PsiElement second = declaration.getSecondNonLeafElement();
+    if (second == null)
+    {
+      return true;
+    }
+
+    if ((PsiTreeUtil.findCommonParent(place, second) == second))
+    {
+      // place is either a let-bound variable or its value.
+      PsiElement placeParent = place.getParent();
+      if ((placeParent instanceof SchemeList) && (placeParent.getParent() == second))
+      {
+        // If place is the first identifier in a list which is a sub-list of the let vars, it's a let-bound variable
+        // so it's not a reference
+        SchemeList parentList = (SchemeList) placeParent;
+        if (place == parentList.getFirstIdentifier())
+        {
+          return false;
+        }
+      }
+
+      // It's part of a value for a let-bound variable, nothing in the let is in scope but we should
+      // keep searching
+      return true;
+    }
+
+    // Process internal definitions first to get shadowing
+    if (!processInternalDefinitions(processor, second, place, lastParent))
+    {
+      return false;
+    }
+
+    // TODO named let
+    //    if (second instanceof SchemeIdentifier)
+    //    {
+    //      // (define x 3)
+    //      if ((place != second) && !ResolveUtil.processElement(processor, (SchemeIdentifier) second))
+    //      {
+    //        return false;
+    //      }
+    //    }
+    //    else
+    if (second instanceof SchemeList)
+    {
+      // (let ((x 3) (y 4)) (+ x y))
+      SchemeList args = (SchemeList) second;
+
+      for (SchemeList arg : args.getSubLists())
+      {
+        SchemeIdentifier firstIdentifier = arg.getFirstIdentifier();
+        if (firstIdentifier != null)
+        {
+          if (!ResolveUtil.processElement(processor, firstIdentifier))
+          {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  private static boolean processInternalDefinitions(PsiScopeProcessor processor,
+                                                    PsiElement second,
+                                                    PsiElement place,
+                                                    PsiElement lastParent)
+  {
+    PsiElement next = ResolveUtil.getNextNonLeafElement(second);
+    while ((next != null) && isDefinition(next))
+    {
+      if (!processDefineDeclaration(processor, (SchemeList) next, place, lastParent))
+      {
+        return false;
+      }
+      next = ResolveUtil.getNextNonLeafElement(next);
+    }
+    return true;
+  }
+
   private static boolean processDeclareDeclaration(PsiScopeProcessor processor,
-                                                   ClList list,
+                                                   SchemeList list,
                                                    PsiElement place,
                                                    PsiElement lastParent)
   {
-    final ClVector paramVector = list.findFirstChildByClass(ClVector.class);
+    SchemeVector paramVector = list.findFirstChildByClass(SchemeVector.class);
     if (paramVector != null)
     {
-      for (ClSymbol symbol : paramVector.getOddSymbols())
+      for (SchemeIdentifier symbol : paramVector.getOddSymbols())
       {
         if (!ResolveUtil.processElement(processor, symbol))
         {
@@ -94,16 +273,16 @@ public class ListDeclarations
   }
 
   private static boolean processLoopDeclaration(PsiScopeProcessor processor,
-                                                ClList list,
+                                                SchemeList list,
                                                 PsiElement place,
                                                 PsiElement lastParent)
   {
     if (lastParent != null && lastParent.getParent() == list)
     {
-      final ClVector paramVector = list.findFirstChildByClass(ClVector.class);
+      SchemeVector paramVector = list.findFirstChildByClass(SchemeVector.class);
       if (paramVector != null)
       {
-        for (ClSymbol symbol : paramVector.getOddSymbols())
+        for (SchemeIdentifier symbol : paramVector.getOddSymbols())
         {
           if (!ResolveUtil.processElement(processor, symbol))
           {
@@ -116,106 +295,38 @@ public class ListDeclarations
     return true;
   }
 
-
-  private static boolean processDotDeclaration(PsiScopeProcessor processor,
-                                               ClList list,
-                                               PsiElement place,
-                                               PsiElement lastParent)
+  private static boolean processImportDeclaration(PsiScopeProcessor processor, SchemeList list, PsiElement place)
   {
-    final PsiElement parent = place.getParent();
-    if (parent == null || list == parent)
-    {
-      return true;
-    }
-
-    final PsiElement second = list.getSecondNonLeafElement();
-    if (second instanceof ClSymbol && place != second)
-    {
-      ClSymbol symbol = (ClSymbol) second;
-      for (ResolveResult result : symbol.multiResolve(false))
-      {
-        final PsiElement element = result.getElement();
-        if (element instanceof PsiNamedElement && !ResolveUtil.processElement(processor, (PsiNamedElement) element))
-        {
-          return false;
-        }
-      }
-
-      if (lastParent == null || lastParent == list)
-      {
-        return true;
-      }
-      if (parent.getParent() == list)
-      {
-        if (place instanceof ClSymbol && ((ClSymbol) place).getQualifierSymbol() == null)
-        {
-          ClSymbol symbol2 = (ClSymbol) place;
-          ResolveResult[] results = ClSymbolImpl.MyResolver.resolveJavaMethodReference(symbol2, list, true);
-          for (ResolveResult result : results)
-          {
-            final PsiElement element = result.getElement();
-            if (element instanceof PsiNamedElement && !ResolveUtil.processElement(processor, (PsiNamedElement) element))
-            {
-              return false;
-            }
-          }
-        }
-      }
-    }
-    return true;
-  }
-
-  private static boolean processMemFnDeclaration(PsiScopeProcessor processor, ClList list, PsiElement place)
-  {
-    if (place instanceof ClSymbol && place.getParent() == list && ((ClSymbol) place).getQualifierSymbol() == null)
-    {
-      ClSymbol symbol = (ClSymbol) place;
-      ResolveResult[] results = ClSymbolImpl.MyResolver.resolveJavaMethodReference(symbol, list.getParent(), true);
-      for (ResolveResult result : results)
-      {
-        final PsiElement element = result.getElement();
-        if (element instanceof PsiNamedElement && !ResolveUtil.processElement(processor, (PsiNamedElement) element))
-        {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  private static boolean processImportDeclaration(PsiScopeProcessor processor, ClList list, PsiElement place)
-  {
-    final PsiElement[] children = list.getChildren();
-    final Project project = list.getProject();
-    final JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
+    PsiElement[] children = list.getChildren();
+    Project project = list.getProject();
+    JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
 
     for (PsiElement child : children)
     {
-      if (child instanceof ClSymbol)
+      if (child instanceof SchemeIdentifier)
       {
-        ClSymbol symbol = (ClSymbol) child;
-        final String symbolName = symbol.getNameString();
-        final PsiClass clazz = facade.findClass(symbolName, GlobalSearchScope.allScope(project));
+        SchemeIdentifier symbol = (SchemeIdentifier) child;
+        String symbolName = symbol.getNameString();
+        PsiClass clazz = facade.findClass(symbolName, GlobalSearchScope.allScope(project));
         if (clazz != null && !ResolveUtil.processElement(processor, clazz))
         {
           return false;
         }
       }
-      else if (child instanceof ClAbbreviation)
+      else if (child instanceof SchemeAbbreviation)
       {
         // process import of form (import '(java.util List Set))
-        ClAbbreviation abbreviation = (ClAbbreviation) child;
-        final SchemePsiElement element = abbreviation.getQuotedElement();
-        if (element instanceof ClList)
+        SchemeAbbreviation abbreviation = (SchemeAbbreviation) child;
+        SchemePsiElement element = abbreviation.getQuotedElement();
+        if (element instanceof SchemeList)
         {
-          ClList inner = (ClList) element;
-          final PsiElement first = inner.getFirstNonLeafElement();
-          if (first instanceof ClSymbol)
+          SchemeList inner = (SchemeList) element;
+          PsiElement first = inner.getFirstNonLeafElement();
+          if (first instanceof SchemeIdentifier)
           {
-            final ClSymbol packSym = (ClSymbol) first;
+            SchemeIdentifier packSym = (SchemeIdentifier) first;
 
-            final PsiPackage pack = facade.findPackage(packSym.getNameString());
+            PsiPackage pack = facade.findPackage(packSym.getNameString());
             if (pack != null)
             {
               if (place.getParent() == inner && place != packSym)
@@ -227,10 +338,9 @@ public class ListDeclarations
                 PsiElement next = packSym.getNextSibling();
                 while (next != null)
                 {
-                  if (next instanceof ClSymbol)
+                  if (next instanceof SchemeIdentifier)
                   {
-                    ClSymbol clazzSym = (ClSymbol) next;
-                    final
+                    SchemeIdentifier clazzSym = (SchemeIdentifier) next;
                     PsiClass
                       clazz =
                       facade.findClass(pack.getQualifiedName() + "." + clazzSym.getNameString(),
@@ -254,99 +364,28 @@ public class ListDeclarations
     return true;
   }
 
-  private static boolean processLetDeclaration(PsiScopeProcessor processor, ClList list, PsiElement place)
-  {
-    if (PsiTreeUtil.findCommonParent(place, list) == list)
-    {
-      final ClVector paramVector = list.findFirstChildByClass(ClVector.class);
-      if (paramVector != null)
-      {
-        for (ClSymbol symbol : paramVector.getOddSymbols())
-        {
-          if (!ResolveUtil.processElement(processor, symbol))
-          {
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-    return true;
-  }
-
-  private static boolean processFnDeclaration(PsiScopeProcessor processor,
-                                              ClList list,
-                                              PsiElement place,
-                                              PsiElement lastParent)
-  {
-    final PsiElement second = list.getSecondNonLeafElement();
-    if ((second instanceof ClSymbol) && place != second && !ResolveUtil.processElement(processor, ((ClSymbol) second)))
-    {
-      return false;
-    }
-
-    if (PsiTreeUtil.findCommonParent(place, list) == list)
-    {
-      ClVector paramVector = list.findFirstChildByClass(ClVector.class);
-      if (paramVector == null && lastParent instanceof ClList)
-      {
-        paramVector = ((ClList) lastParent).findFirstChildByClass(ClVector.class);
-      }
-
-      if (paramVector != null)
-      {
-        for (ClSymbol symbol : paramVector.getAllSymbols())
-        {
-          if (!ResolveUtil.processElement(processor, symbol))
-          {
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-    return true;
-
-  }
-
   public static boolean isLocal(PsiElement element)
   {
-    if (element instanceof ClSymbol)
+    if (element instanceof SchemeIdentifier)
     {
-      ClSymbol symbol = (ClSymbol) element;
-      final PsiElement parent = symbol.getParent();
+      SchemeIdentifier symbol = (SchemeIdentifier) element;
+      PsiElement parent = symbol.getParent();
 
-      if (parent instanceof ClList)
+      if (isDefinition(parent))
       {
-        ClList list = (ClList) parent;
-        if (FN.equals(list.getHeadText()))
-        {
-          return true;
-        }
+        return true;
       }
-      else if (parent instanceof ClVector)
+      else if (parent != null)
       {
-        final PsiElement par = parent.getParent();
-        if (par instanceof ClDef && ((ClDef) par).getSecondNonLeafElement() == element)
+        PsiElement grandparent = parent.getParent();
+        if (isDefinition(grandparent))
         {
           return true;
         }
-        if (par instanceof ClList)
+        else if (grandparent != null)
         {
-          final String ht = ((ClList) par).getHeadText();
-          if (LET.equals(ht))
-          {
-            return true;
-          }
-          if (WHEN_LET.equals(ht))
-          {
-            return true;
-          }
-          if (IF_LET.equals(ht))
-          {
-            return true;
-          }
-          if (LOOP.equals(ht))
+          PsiElement greatGrandparent = grandparent.getParent();
+          if (isLet(greatGrandparent))
           {
             return true;
           }
@@ -355,5 +394,40 @@ public class ListDeclarations
     }
 
     return false;
+  }
+
+  public static boolean isDefinition(PsiElement element)
+  {
+    // Handles null
+    if (!(element instanceof SchemeList))
+    {
+      return false;
+    }
+
+    SchemeList list = (SchemeList) element;
+    String head = list.getHeadText();
+    return isDefinitionText(head);
+  }
+
+  private static boolean isDefinitionText(String headText)
+  {
+    return DEFINE.equals(headText) || LAMBDA.equals(headText);
+  }
+
+  public static boolean isLet(PsiElement element)
+  {
+    if (!(element instanceof SchemeList))
+    {
+      return false;
+    }
+
+    SchemeList list = (SchemeList) element;
+    String head = list.getHeadText();
+    return isLetText(head);
+  }
+
+  private static boolean isLetText(String headText)
+  {
+    return LET.equals(headText) || LET_STAR.equals(headText) || LETREC.equals(headText);
   }
 }

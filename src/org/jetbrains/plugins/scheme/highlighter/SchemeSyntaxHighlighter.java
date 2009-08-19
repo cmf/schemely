@@ -109,7 +109,7 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
     TextAttributesKey.createTextAttributesKey(CHAR_ID, SyntaxHighlighterColors.STRING.getDefaultAttributes());
     TextAttributesKey.createTextAttributesKey(BAD_CHARACTER_ID, HighlighterColors.BAD_CHARACTER.getDefaultAttributes());
 
-    final Color deepBlue = SyntaxHighlighterColors.KEYWORD.getDefaultAttributes().getForegroundColor();
+    Color deepBlue = SyntaxHighlighterColors.KEYWORD.getDefaultAttributes().getForegroundColor();
     ATOM_ATTRIB.setForegroundColor(deepBlue);
     TextAttributesKey.createTextAttributesKey(ATOM_ID, ATOM_ATTRIB);
   }

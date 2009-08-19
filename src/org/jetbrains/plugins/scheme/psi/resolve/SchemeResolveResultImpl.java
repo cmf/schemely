@@ -8,14 +8,11 @@ import com.intellij.psi.PsiElement;
 public class SchemeResolveResultImpl implements SchemeResolveResult
 {
   private final PsiElement myElement;
-  private final boolean myIsAccessible;
 
-  public SchemeResolveResultImpl(PsiElement myElement, boolean myIsAccessible)
+  public SchemeResolveResultImpl(PsiElement myElement)
   {
     this.myElement = myElement;
-    this.myIsAccessible = myIsAccessible;
   }
-
 
   public PsiElement getElement()
   {
@@ -24,13 +21,6 @@ public class SchemeResolveResultImpl implements SchemeResolveResult
 
   public boolean isValidResult()
   {
-    return isAccessible();
+    return true;
   }
-
-  public boolean isAccessible()
-  {
-    return myIsAccessible;
-  }
-
-
 }

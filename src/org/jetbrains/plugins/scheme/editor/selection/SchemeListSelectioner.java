@@ -15,18 +15,18 @@ public class SchemeListSelectioner extends SchemeBasicSelectioner
 {
   public boolean canSelect(PsiElement e)
   {
-    return e instanceof ClList || e instanceof ClVector;
+    return e instanceof SchemeList || e instanceof SchemeVector;
   }
 
   @Override
   public List<TextRange> select(PsiElement element, CharSequence editorText, int cursorOffset, Editor editor)
   {
     List<TextRange> result = super.select(element, editorText, cursorOffset, editor);
-    if (element instanceof ClBraced)
+    if (element instanceof SchemeBraced)
     {
-      ClBraced list = (ClBraced) element;
-      final PsiElement left = list.getFirstBrace();
-      final PsiElement right = list.getLastBrace();
+      SchemeBraced list = (SchemeBraced) element;
+      PsiElement left = list.getFirstBrace();
+      PsiElement right = list.getLastBrace();
       if (right != null)
       {
         result.add(new TextRange(left.getTextRange().getStartOffset(), right.getTextRange().getEndOffset()));
@@ -38,11 +38,11 @@ public class SchemeListSelectioner extends SchemeBasicSelectioner
     }
     if (element instanceof SchemePsiElement)
     {
-      final SchemePsiElement psi = (SchemePsiElement) element;
-      final PsiElement fst = psi.getFirstNonLeafElement();
-      final PsiElement lst = psi.getLastNonLeafElement();
-      final int start = fst != null ? fst.getTextRange().getStartOffset() : psi.getTextRange().getStartOffset();
-      final int end = lst != null ? lst.getTextRange().getEndOffset() : psi.getTextRange().getEndOffset();
+      SchemePsiElement psi = (SchemePsiElement) element;
+      PsiElement fst = psi.getFirstNonLeafElement();
+      PsiElement lst = psi.getLastNonLeafElement();
+      int start = fst != null ? fst.getTextRange().getStartOffset() : psi.getTextRange().getStartOffset();
+      int end = lst != null ? lst.getTextRange().getEndOffset() : psi.getTextRange().getEndOffset();
       result.add(new TextRange(start, end));
     }
 

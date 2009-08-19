@@ -1,14 +1,13 @@
 package org.jetbrains.plugins.scheme.editor.selection;
 
-import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiElement;
+import org.jetbrains.plugins.scheme.lexer.Tokens;
+import org.jetbrains.plugins.scheme.psi.api.SchemeLiteral;
 
 import java.util.List;
-
-import org.jetbrains.plugins.scheme.psi.api.ClLiteral;
-import org.jetbrains.plugins.scheme.lexer.Tokens;
 
 /**
  * @author ilyas
@@ -23,7 +22,7 @@ public class SchemeLiteralSelectioner extends SchemeBasicSelectioner
 
   private static boolean isStringLiteral(PsiElement element)
   {
-    if (!(element instanceof ClLiteral))
+    if (!(element instanceof SchemeLiteral))
     {
       return false;
     }

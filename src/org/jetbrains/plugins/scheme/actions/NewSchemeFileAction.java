@@ -50,7 +50,7 @@ public class NewSchemeFileAction extends NewSchemeActionBase
   {
     PsiFile file = createFileFromTemplate(directory, newName, "SchemeFile.scm");
     PsiElement lastChild = file.getLastChild();
-    final Project project = directory.getProject();
+    Project project = directory.getProject();
     if (lastChild != null && lastChild.getNode() != null && lastChild.getNode().getElementType() != Tokens.WHITESPACE)
     {
       file.add(createWhiteSpace(project));

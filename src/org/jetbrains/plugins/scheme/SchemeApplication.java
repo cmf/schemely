@@ -29,7 +29,7 @@ public class SchemeApplication implements ApplicationComponent
     {
       public void run()
       {
-        FileTypeManager.getInstance().registerFileType(new SchemeFileType(), "ss", "scm");
+        FileTypeManager.getInstance().registerFileType(new SchemeFileType(), "ss", "sch");
       }
     });
   }

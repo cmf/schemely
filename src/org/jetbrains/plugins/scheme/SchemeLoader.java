@@ -36,7 +36,7 @@ public class SchemeLoader implements ApplicationComponent
   {
     ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter()
     {
-      public void projectOpened(final Project project)
+      public void projectOpened(Project project)
       {
       }
     });

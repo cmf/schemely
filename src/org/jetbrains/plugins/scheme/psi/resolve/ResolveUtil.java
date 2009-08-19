@@ -1,14 +1,12 @@
 package org.jetbrains.plugins.scheme.psi.resolve;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.ResolveState;
 import com.intellij.psi.PsiNamedElement;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.NameHint;
-import org.jetbrains.plugins.scheme.psi.api.symbols.ClSymbol;
-import org.jetbrains.plugins.scheme.psi.api.ClList;
-import org.jetbrains.plugins.scheme.psi.impl.list.ListDeclarations;
+import com.intellij.psi.scope.PsiScopeProcessor;
+import org.jetbrains.annotations.NotNull;
+import static org.jetbrains.plugins.scheme.psi.SchemeBaseElementImpl.isWrongElement;
 
 /**
  * @author ilyas
@@ -32,26 +30,6 @@ public abstract class ResolveUtil
     return true;
   }
 
-  public static boolean processChildren(PsiElement element,
-                                        PsiScopeProcessor processor,
-                                        ResolveState substitutor,
-                                        PsiElement lastParent,
-                                        PsiElement place)
-  {
-    PsiElement run = lastParent == null ? element.getLastChild() : lastParent.getPrevSibling();
-    while (run != null)
-    {
-      if (PsiTreeUtil.findCommonParent(place, run) != run &&
-          !run.processDeclarations(processor, substitutor, null, place))
-      {
-        return false;
-      }
-      run = run.getPrevSibling();
-    }
-
-    return true;
-  }
-
   public static boolean processElement(PsiScopeProcessor processor, PsiNamedElement namedElement)
   {
     if (namedElement == null)
@@ -60,7 +38,7 @@ public abstract class ResolveUtil
     }
     NameHint nameHint = processor.getHint(NameHint.class);
     String name = nameHint == null ? null : nameHint.getName(ResolveState.initial());
-    if (name == null || name.equals(namedElement.getName()))
+    if ((name == null) || name.equals(namedElement.getName()))
     {
       return processor.execute(namedElement, ResolveState.initial());
     }
@@ -78,5 +56,23 @@ public abstract class ResolveUtil
     return elements;
   }
 
+  public static PsiElement getNextNonLeafElement(@NotNull PsiElement element)
+  {
+    PsiElement next = element.getNextSibling();
+    while ((next != null) && isWrongElement(next))
+    {
+      next = next.getNextSibling();
+    }
+    return next;
+  }
 
+  public static PsiElement getPrevNonLeafElement(@NotNull PsiElement element)
+  {
+    PsiElement next = element.getPrevSibling();
+    while ((next != null) && isWrongElement(next))
+    {
+      next = next.getPrevSibling();
+    }
+    return next;
+  }
 }

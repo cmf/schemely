@@ -6,8 +6,8 @@ import com.intellij.lang.annotation.Annotator;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.HashSet;
 import org.jetbrains.plugins.scheme.highlighter.SchemeSyntaxHighlighter;
-import org.jetbrains.plugins.scheme.psi.api.ClList;
-import org.jetbrains.plugins.scheme.psi.api.symbols.ClSymbol;
+import org.jetbrains.plugins.scheme.psi.api.SchemeList;
+import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
 
 import java.util.Set;
 import java.util.Arrays;
@@ -26,15 +26,15 @@ public class SchemeAnnotator implements Annotator
 
   public void annotate(PsiElement element, AnnotationHolder holder)
   {
-    if (element instanceof ClList)
+    if (element instanceof SchemeList)
     {
-      annotateList((ClList) element, holder);
+      annotateList((SchemeList) element, holder);
     }
   }
 
-  private void annotateList(ClList list, AnnotationHolder holder)
+  private void annotateList(SchemeList list, AnnotationHolder holder)
   {
-    final ClSymbol first = list.getFirstSymbol();
+    SchemeIdentifier first = list.getFirstIdentifier();
     if (first != null && first.multiResolve(false).length > 0 || IMPLICIT_NAMES.contains(list.getHeadText()))
     {
       Annotation annotation = holder.createInfoAnnotation(first, null);

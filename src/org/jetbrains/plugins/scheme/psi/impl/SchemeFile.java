@@ -7,14 +7,15 @@ import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.impl.source.PsiFileWithStubSupport;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.scheme.file.SchemeFileType;
 import org.jetbrains.plugins.scheme.psi.SchemePsiElement;
-import org.jetbrains.plugins.scheme.psi.api.ClList;
-import org.jetbrains.plugins.scheme.psi.api.symbols.ClSymbol;
-import org.jetbrains.plugins.scheme.psi.impl.synthetic.ClSyntheticClassImpl;
-import org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil;
+import org.jetbrains.plugins.scheme.psi.api.SchemeList;
+import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
+import org.jetbrains.plugins.scheme.psi.impl.synthetic.SchemeSyntheticClassImpl;
+import org.jetbrains.plugins.scheme.psi.impl.list.ListDeclarations;
 import org.jetbrains.plugins.scheme.psi.util.SchemePsiUtil;
 import org.jetbrains.plugins.scheme.psi.util.SchemeTextUtil;
 
@@ -65,7 +66,7 @@ public class SchemeFile extends PsiFileBase implements SchemePsiElement, PsiFile
     {
       if (isScript())
       {
-        myClass = new ClSyntheticClassImpl(this);
+        myClass = new SchemeSyntheticClassImpl(this);
       }
 
       myScriptClassInitialized = true;
@@ -76,7 +77,7 @@ public class SchemeFile extends PsiFileBase implements SchemePsiElement, PsiFile
 
   protected PsiFileImpl clone()
   {
-    final SchemeFile clone = (SchemeFile) super.clone();
+    SchemeFile clone = (SchemeFile) super.clone();
     clone.myContext = myContext;
     return clone;
   }
@@ -155,40 +156,19 @@ public class SchemeFile extends PsiFileBase implements SchemePsiElement, PsiFile
     }
   }
 
-  public boolean isClassDefiningFile()
-  {
-    final ClList ns = SchemePsiUtil.findFormByName(this, "ns");
-    if (ns == null)
-    {
-      return false;
-    }
-    final ClSymbol first = ns.findFirstChildByClass(ClSymbol.class);
-    if (first == null)
-    {
-      return false;
-    }
-    final ClSymbol snd = SchemePsiUtil.findNextSiblingByClass(first, ClSymbol.class);
-    if (snd == null)
-    {
-      return false;
-    }
-
-    return SchemePsiUtil.findNamespaceKeyByName(ns, SchemePsiUtil.GEN_CLASS) != null;
-  }
-
   public String getNamespace()
   {
-    final ClList ns = getNamespaceElement();
+    SchemeList ns = getNamespaceElement();
     if (ns == null)
     {
       return null;
     }
-    final ClSymbol first = ns.findFirstChildByClass(ClSymbol.class);
+    SchemeIdentifier first = ns.findFirstChildByClass(SchemeIdentifier.class);
     if (first == null)
     {
       return null;
     }
-    final ClSymbol snd = SchemePsiUtil.findNextSiblingByClass(first, ClSymbol.class);
+    SchemeIdentifier snd = SchemePsiUtil.findNextSiblingByClass(first, SchemeIdentifier.class);
     if (snd == null)
     {
       return null;
@@ -197,7 +177,7 @@ public class SchemeFile extends PsiFileBase implements SchemePsiElement, PsiFile
     return snd.getNameString();
   }
 
-  public ClList getNamespaceElement()
+  public SchemeList getNamespaceElement()
   {
     // TODO CMF
     return null; //SchemePsiUtil.findFormByNameSet(this, SchemeParser.NS_TOKENS);
@@ -220,29 +200,15 @@ public class SchemeFile extends PsiFileBase implements SchemePsiElement, PsiFile
                                      PsiElement lastParent,
                                      @NotNull PsiElement place)
   {
-    //Process precedent read forms
-    ResolveUtil.processChildren(this, processor, state, lastParent, place);
-
-    final JavaPsiFacade facade = JavaPsiFacade.getInstance(getProject());
-
-    // Add all java.lang classes
-    final PsiPackage javaLang = facade.findPackage(SchemePsiUtil.JAVA_LANG);
-    if (javaLang != null)
+    PsiElement next = getFirstChild();
+    while (next != null)
     {
-      for (PsiClass clazz : javaLang.getClasses())
+      if ((PsiTreeUtil.findCommonParent(place, next) != next) && ListDeclarations.isDefinition(next))
       {
-        if (!ResolveUtil.processElement(processor, clazz))
-        {
-          return false;
-        }
+        next.processDeclarations(processor, state, null, place);
       }
-    }
 
-    //Add top-level package names
-    final PsiPackage rootPackage = JavaPsiFacade.getInstance(getProject()).findPackage("");
-    if (rootPackage != null)
-    {
-      rootPackage.processDeclarations(processor, state, null, place);
+      next = next.getNextSibling();
     }
 
     return super.processDeclarations(processor, state, lastParent, place);

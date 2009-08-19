@@ -15,7 +15,7 @@ import com.intellij.lang.ASTNode;
 public abstract class SchemeBaseElementImpl<T extends StubElement> extends StubBasedPsiElementBase<T> implements
                                                                                                       SchemePsiElement
 {
-  protected boolean isWrongElement(PsiElement element)
+  public static boolean isWrongElement(PsiElement element)
   {
     return element == null ||
            (element instanceof LeafPsiElement || element instanceof PsiWhiteSpace || element instanceof PsiComment);
@@ -48,7 +48,7 @@ public abstract class SchemeBaseElementImpl<T extends StubElement> extends StubB
     {
       element = element.getNextSibling();
     }
-    return (T) element;
+    return aClass.cast(element);
   }
 
   public SchemeBaseElementImpl(T stub, @org.jetbrains.annotations.NotNull IStubElementType nodeType)
@@ -60,5 +60,4 @@ public abstract class SchemeBaseElementImpl<T extends StubElement> extends StubB
   {
     super(node);
   }
-
 }

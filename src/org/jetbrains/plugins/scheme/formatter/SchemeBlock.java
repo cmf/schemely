@@ -33,11 +33,11 @@ public class SchemeBlock implements Block, AST
   protected List<Block> mySubBlocks = null;
 
 
-  public SchemeBlock(@NotNull final ASTNode node,
-                     @Nullable final Alignment alignment,
-                     @NotNull final Indent indent,
-                     @Nullable final Wrap wrap,
-                     final CodeStyleSettings settings)
+  public SchemeBlock(@NotNull ASTNode node,
+                     @Nullable Alignment alignment,
+                     @NotNull Indent indent,
+                     @Nullable Wrap wrap,
+                     CodeStyleSettings settings)
   {
     myNode = node;
     myAlignment = alignment;
@@ -70,7 +70,7 @@ public class SchemeBlock implements Block, AST
   {
     if (mySubBlocks == null)
     {
-      mySubBlocks = SchemeBlockGenerator.generateSubBlocks(myNode, myAlignment, myWrap, mySettings, this);
+      mySubBlocks = SchemeBlockGenerator.generateSubBlocks(myNode, myWrap, mySettings, this);
     }
     return mySubBlocks;
   }
@@ -99,7 +99,7 @@ public class SchemeBlock implements Block, AST
   }
 
   @NotNull
-  public ChildAttributes getChildAttributes(final int newChildIndex)
+  public ChildAttributes getChildAttributes(int newChildIndex)
   {
     return getAttributesByParent();
   }
@@ -107,7 +107,7 @@ public class SchemeBlock implements Block, AST
   private ChildAttributes getAttributesByParent()
   {
     ASTNode astNode = getNode();
-    final PsiElement psiParent = astNode.getPsi();
+    PsiElement psiParent = astNode.getPsi();
     if (psiParent instanceof SchemeFile)
     {
       return new ChildAttributes(Indent.getNoneIndent(), null);
@@ -129,7 +129,7 @@ public class SchemeBlock implements Block, AST
    * @param node Tree node
    * @return true if node is incomplete
    */
-  public boolean isIncomplete(@NotNull final ASTNode node)
+  public boolean isIncomplete(@NotNull ASTNode node)
   {
     if (node.getElementType() instanceof IChameleonElementType)
     {

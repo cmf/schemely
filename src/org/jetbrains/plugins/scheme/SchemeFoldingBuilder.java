@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.plugins.scheme.parser.AST;
 import static org.jetbrains.plugins.scheme.parser.AST.*;
-import org.jetbrains.plugins.scheme.psi.api.ClList;
+import org.jetbrains.plugins.scheme.psi.api.SchemeList;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
 
 import java.util.ArrayList;
@@ -33,11 +33,11 @@ public class SchemeFoldingBuilder implements FoldingBuilder
 {
   public String getPlaceholderText(ASTNode node)
   {
-    final IElementType type = node.getElementType();
-    final PsiElement psi = node.getPsi();
-    if (psi instanceof ClList)
+    IElementType type = node.getElementType();
+    PsiElement psi = node.getPsi();
+    if (psi instanceof SchemeList)
     {
-      final String text = ((ClList) psi).getPresentableText();
+      String text = ((SchemeList) psi).getPresentableText();
       return "(" + (text != null ? text + " " : "") + "...)";
     }
     throw new Error("Unexpected node: " + type + "-->" + node.getText());
@@ -69,7 +69,7 @@ public class SchemeFoldingBuilder implements FoldingBuilder
     }
   }
 
-  private void appendDescriptors(final ASTNode node, final List<FoldingDescriptor> descriptors)
+  private void appendDescriptors(ASTNode node, List<FoldingDescriptor> descriptors)
   {
     if (isFoldableNode(node))
     {
@@ -86,16 +86,16 @@ public class SchemeFoldingBuilder implements FoldingBuilder
 
   private boolean isFoldableNode(ASTNode node)
   {
-    final PsiElement element = node.getPsi();
-    final IElementType type = node.getElementType();
+    PsiElement element = node.getPsi();
+    IElementType type = node.getElementType();
     if (type == LIST &&
         element.getParent() instanceof SchemeFile &&
         node.getText().contains("\n") &&
-        element instanceof ClList)
+        element instanceof SchemeList)
     {
       return true;
     }
 
-    return (type == DEF || type == DEFMETHOD) && node.getText().contains("\n");
+    return false; // (type == DEF || type == DEFMETHOD) && node.getText().contains("\n");
   }
 }

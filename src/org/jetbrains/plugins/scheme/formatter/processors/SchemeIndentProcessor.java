@@ -16,7 +16,7 @@ public class SchemeIndentProcessor implements AST
   public static Indent getChildIndent(SchemeBlock parent, ASTNode prevChildNode, ASTNode child)
   {
     ASTNode astNode = parent.getNode();
-    final PsiElement psiParent = astNode.getPsi();
+    PsiElement psiParent = astNode.getPsi();
 
     // For Groovy file
     if (psiParent instanceof SchemeFile)
@@ -25,7 +25,7 @@ public class SchemeIndentProcessor implements AST
     }
 
     ASTNode node = parent.getNode();
-    final TokenSet L_BRACES = TokenSet.create(LEFT_CURLY, LEFT_PAREN, LEFT_SQUARE);
+    TokenSet L_BRACES = TokenSet.create(LEFT_CURLY, LEFT_PAREN, LEFT_SQUARE);
     if (LIST_LIKE_FORMS.contains(node.getElementType()))
     {
       if (L_BRACES.contains(child.getElementType()))

@@ -95,7 +95,7 @@ public class SchemeCodeStylePanel extends CodeStyleAbstractPanel
     //todo add more
   }
 
-  private static void setValue(final JCheckBox box, final boolean value)
+  private static void setValue(JCheckBox box, boolean value)
   {
     box.setSelected(value);
   }

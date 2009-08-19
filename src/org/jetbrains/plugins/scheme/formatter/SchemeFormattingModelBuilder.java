@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class SchemeFormattingModelBuilder implements FormattingModelBuilder
 {
   @NotNull
-  public FormattingModel createModel(final PsiElement element, final CodeStyleSettings settings)
+  public FormattingModel createModel(PsiElement element, CodeStyleSettings settings)
   {
     ASTNode node = element.getNode();
     assert node != null;

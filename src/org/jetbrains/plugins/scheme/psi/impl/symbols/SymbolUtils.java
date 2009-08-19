@@ -1,14 +1,11 @@
 package org.jetbrains.plugins.scheme.psi.impl.symbols;
 
-import org.jetbrains.plugins.scheme.psi.api.symbols.ClSymbol;
-import org.jetbrains.plugins.scheme.psi.api.ClList;
-
-import javax.swing.*;
-
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import static org.jetbrains.plugins.scheme.psi.impl.list.ListDeclarations.*;
-import org.jetbrains.plugins.scheme.SchemeIcons;
+import org.jetbrains.plugins.scheme.psi.api.SchemeList;
+import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
+
+import javax.swing.*;
 
 /**
  * @author ilyas
@@ -16,30 +13,30 @@ import org.jetbrains.plugins.scheme.SchemeIcons;
 public class SymbolUtils
 {
 
-  public static Icon getIcon(ClSymbol symbol, int flags)
+  public static Icon getIcon(SchemeIdentifier symbol, int flags)
   {
-    final PsiElement parent = PsiTreeUtil.getParentOfType(symbol, ClList.class);
-    if (parent instanceof ClList)
+    PsiElement parent = PsiTreeUtil.getParentOfType(symbol, SchemeList.class);
+    if (parent instanceof SchemeList)
     {
-      ClList list = (ClList) parent;
+      SchemeList list = (SchemeList) parent;
 
       // Functions and defs
       if (symbol == list.getSecondNonLeafElement())
       {
-        final PsiElement fst = list.getFirstNonLeafElement();
-        if (fst instanceof ClSymbol)
+        PsiElement fst = list.getFirstNonLeafElement();
+        if (fst instanceof SchemeIdentifier)
         {
-          ClSymbol lstSym = (ClSymbol) fst;
-          final String nameString = lstSym.getNameString();
+          SchemeIdentifier lstSym = (SchemeIdentifier) fst;
+          String nameString = lstSym.getNameString();
 
-          if (FN.equals(nameString))
-          {
-            return SchemeIcons.FUNCTION;
-          }
-          if (DEFN.equals(nameString))
-          {
-            return SchemeIcons.FUNCTION;
-          }
+//          if (FN.equals(nameString))
+//          {
+//            return SchemeIcons.FUNCTION;
+//          }
+//          if (DEFN.equals(nameString))
+//          {
+//            return SchemeIcons.FUNCTION;
+//          }
         }
       }
 

@@ -53,17 +53,17 @@ public class SchemeClassFinder implements ProjectComponent, PsiElementFinder
   public PsiClass[] getClasses(@NotNull PsiPackage psiPackage, @NotNull GlobalSearchScope scope)
   {
     List<PsiClass> result = new ArrayList<PsiClass>();
-    for (final PsiDirectory dir : psiPackage.getDirectories(scope))
+    for (PsiDirectory dir : psiPackage.getDirectories(scope))
     {
-      for (final PsiFile file : dir.getFiles())
+      for (PsiFile file : dir.getFiles())
       {
         if (file instanceof SchemeFile)
         {
           SchemeFile schemeFile = (SchemeFile) file;
-          if (schemeFile.isClassDefiningFile() && schemeFile.getPackageName().equals(psiPackage.getQualifiedName()))
-          {
-            result.add(schemeFile.getDefinedClass());
-          }
+//          if (false && schemeFile.getPackageName().equals(psiPackage.getQualifiedName()))
+//          {
+//            result.add(schemeFile.getDefinedClass());
+//          }
         }
       }
     }

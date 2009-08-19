@@ -85,20 +85,20 @@ public class SchemeShortNamesCache implements PsiShortNamesCache
     {
       public boolean value(SchemeFile schemeFile)
       {
-        return schemeFile.isClassDefiningFile();
+        return false;
       }
     });
     return ContainerUtil.map(files, new Function<SchemeFile, PsiClass>()
     {
       public PsiClass fun(SchemeFile schemeFile)
       {
-        assert schemeFile.isClassDefiningFile();
+        assert false;
         return schemeFile.getDefinedClass();
       }
     });
   }
 
-  private Collection<PsiClass> getScriptClassesByFQName(final String name, final GlobalSearchScope scope)
+  private Collection<PsiClass> getScriptClassesByFQName(final String name, GlobalSearchScope scope)
   {
     Collection<SchemeFile>
       scripts =
@@ -106,15 +106,15 @@ public class SchemeShortNamesCache implements PsiShortNamesCache
 
     scripts = ContainerUtil.findAll(scripts, new Condition<SchemeFile>()
     {
-      public boolean value(final SchemeFile schemeFile)
+      public boolean value(SchemeFile schemeFile)
       {
-        final PsiClass clazz = schemeFile.getDefinedClass();
-        return schemeFile.isClassDefiningFile() && clazz != null && name.equals(clazz.getQualifiedName());
+        PsiClass clazz = schemeFile.getDefinedClass();
+        return false && clazz != null && name.equals(clazz.getQualifiedName());
       }
     });
     return ContainerUtil.map(scripts, new Function<SchemeFile, PsiClass>()
     {
-      public PsiClass fun(final SchemeFile schemeFile)
+      public PsiClass fun(SchemeFile schemeFile)
       {
         return schemeFile.getDefinedClass();
       }
@@ -129,7 +129,7 @@ public class SchemeShortNamesCache implements PsiShortNamesCache
       return new String[0];
     }
 
-    final Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY);
+    Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY);
     return classNames.toArray(new String[classNames.size()]);
   }
 
@@ -140,7 +140,7 @@ public class SchemeShortNamesCache implements PsiShortNamesCache
       return;
     }
 
-    final Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY);
+    Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY);
     dest.addAll(classNames);
   }
 
@@ -152,7 +152,7 @@ public class SchemeShortNamesCache implements PsiShortNamesCache
       return null;
     }
 
-    final Collection<PsiClass> scriptClasses = getScriptClassesByFQName(name, scope);
+    Collection<PsiClass> scriptClasses = getScriptClassesByFQName(name, scope);
     for (PsiClass clazz : scriptClasses)
     {
       if (name.equals(clazz.getQualifiedName()))
@@ -171,7 +171,7 @@ public class SchemeShortNamesCache implements PsiShortNamesCache
       return PsiClass.EMPTY_ARRAY;
     }
 
-    final Collection<PsiClass> result = getScriptClassesByFQName(fqn, scope);
+    Collection<PsiClass> result = getScriptClassesByFQName(fqn, scope);
     ArrayList<PsiClass> filtered = new ArrayList<PsiClass>();
     for (PsiClass clazz : result)
     {
