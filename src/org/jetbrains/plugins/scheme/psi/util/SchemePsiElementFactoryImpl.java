@@ -28,8 +28,7 @@ public class SchemePsiElementFactoryImpl extends SchemePsiElementFactory
   {
     String text = "(" + newName + ")";
     SchemeFile dummyFile = createSchemeFileFromText(text);
-    ASTNode newNode = dummyFile.getFirstChild().getFirstChild().getNextSibling().getNode();
-    return newNode;
+    return dummyFile.getFirstChild().getFirstChild().getNextSibling().getNode();
   }
 
   private static boolean hasErrorElement(PsiElement element)

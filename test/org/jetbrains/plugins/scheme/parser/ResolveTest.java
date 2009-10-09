@@ -141,4 +141,81 @@ public class ResolveTest extends ParserTestBase
     assert doesNotResolve(second(file, "x"));
     assert resolvesTo(third(file, "x"), second(file, "x"));
   }
+
+  @Test
+  public void testEmbeddedLet()
+  {
+    PsiFile file = parse("(let ((x (let ((y 5)) y)) (y 3)) (* x y))");
+    assert doesNotResolve(first(file, "x"));
+    assert doesNotResolve(first(file, "y"));
+    assert resolvesTo(second(file, "y"), first(file, "y"));
+    assert doesNotResolve(third(file, "y"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(fourth(file, "y"), third(file, "y"));
+  }
+
+  @Test
+  public void testBasicLetStar()
+  {
+    PsiFile file = parse("(let* ((x 2) (y 3)) (* x y))");
+    assert doesNotResolve(first(file, "x"));
+    assert doesNotResolve(first(file, "y"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(second(file, "y"), first(file, "y"));
+  }
+
+  @Test
+  public void testLetStarSeesPreviousBindings()
+  {
+    PsiFile file = parse("(let* ((x 2) (y x)) (* x y))");
+    assert doesNotResolve(first(file, "x"));
+    assert doesNotResolve(first(file, "y"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(third(file, "x"), first(file, "x"));
+    assert resolvesTo(second(file, "y"), first(file, "y"));
+  }
+
+  @Test
+  public void testLetStarDoesntSeeLaterBindings()
+  {
+    PsiFile file = parse("(let* ((x y) (y 3)) (* x y))");
+    assert doesNotResolve(first(file, "x"));
+    assert doesNotResolve(first(file, "y"));
+    assert doesNotResolve(second(file, "y"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(third(file, "y"), second(file, "y"));
+  }
+
+
+  @Test
+  public void testBasicLetRec()
+  {
+    PsiFile file = parse("(letrec ((x 2) (y 3)) (* x y))");
+    assert doesNotResolve(first(file, "x"));
+    assert doesNotResolve(first(file, "y"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(second(file, "y"), first(file, "y"));
+  }
+
+  @Test
+  public void testLetRecSeesPreviousBindings()
+  {
+    PsiFile file = parse("(letrec ((x 2) (y x)) (* x y))");
+    assert doesNotResolve(first(file, "x"));
+    assert doesNotResolve(first(file, "y"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(third(file, "x"), first(file, "x"));
+    assert resolvesTo(second(file, "y"), first(file, "y"));
+  }
+
+  @Test
+  public void testLetRecSeesLaterBindings()
+  {
+    PsiFile file = parse("(letrec ((x y) (y 3)) (* x y))");
+    assert doesNotResolve(first(file, "x"));
+    assert doesNotResolve(second(file, "y"));
+    assert resolvesTo(first(file, "y"), second(file, "y"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(third(file, "y"), second(file, "y"));
+  }
 }

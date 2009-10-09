@@ -17,7 +17,6 @@ import com.intellij.lang.ASTNode;
  */
 public abstract class SchemeListBaseImpl<T extends NamedStub> extends SchemeBaseElementImpl<T> implements SchemeList
 {
-
   public SchemeListBaseImpl(ASTNode node)
   {
     super(node);

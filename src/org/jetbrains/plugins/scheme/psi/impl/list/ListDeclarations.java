@@ -37,9 +37,9 @@ public class ListDeclarations
     {
       return processDefineDeclaration(processor, list, place, lastParent);
     }
-    else if (headText.equals(LET))
+    else if (headText.equals(LET) || headText.equals(LET_STAR) || headText.equals(LETREC))
     {
-      return processLetDeclaration(processor, list, place, lastParent);
+      return processLetDeclaration(processor, list, place, lastParent, headText);
     }
 
     return true;
@@ -155,7 +155,8 @@ public class ListDeclarations
   private static boolean processLetDeclaration(PsiScopeProcessor processor,
                                                SchemeList declaration,
                                                PsiElement place,
-                                               PsiElement lastParent)
+                                               PsiElement lastParent,
+                                               String style)
   {
     if (PsiTreeUtil.findCommonParent(place, declaration) != declaration)
     {
@@ -183,9 +184,58 @@ public class ListDeclarations
         }
       }
 
-      // It's part of a value for a let-bound variable, nothing in the let is in scope but we should
-      // keep searching
-      return true;
+      if (style.equals(LET))
+      {
+        // It's part of a value for a let-bound variable, nothing in the let is in scope but we should
+        // keep searching
+        return true;
+      }
+      else if (style.equals(LET_STAR))
+      {
+        if (vars instanceof SchemeList)
+        {
+          // (let ((x 3) (y 4)) (+ x y))
+          SchemeList args = (SchemeList) vars;
+          SchemeList[] bindings = args.getSubLists();
+
+          // Skip later bindings
+          int i = bindings.length - 1;
+          while ((i >= 0) && !PsiTreeUtil.isAncestor(bindings[i], place, true))
+          {
+            i--;
+          }
+          // bindings[i] is now our containing binding list - skip it
+          i--;
+
+          // process all remaining bindings
+          while (i >= 0)
+          {
+            if (!processFirstIdentifier(processor, bindings[i]))
+            {
+              return false;
+            }
+            i--;
+          }
+        }
+        return true;
+      }
+      else if (style.equals(LETREC))
+      {
+        if (vars instanceof SchemeList)
+        {
+          // (let ((x 3) (y 4)) (+ x y))
+          SchemeList args = (SchemeList) vars;
+          SchemeList[] bindings = args.getSubLists();
+          for (SchemeList binding : bindings)
+          {
+            if (!processFirstIdentifier(processor, binding))
+            {
+              return false;
+            }
+          }
+        }
+        return true;
+      }
     }
 
     // Process internal definitions first to get shadowing
@@ -195,15 +245,6 @@ public class ListDeclarations
     }
 
     // TODO named let
-    //    if (vars instanceof SchemeIdentifier)
-    //    {
-    //      // (define x 3)
-    //      if ((place != vars) && !ResolveUtil.processElement(processor, (SchemeIdentifier) vars))
-    //      {
-    //        return false;
-    //      }
-    //    }
-    //    else
     if (vars instanceof SchemeList)
     {
       // (let ((x 3) (y 4)) (+ x y))
@@ -211,17 +252,26 @@ public class ListDeclarations
 
       for (SchemeList arg : args.getSubLists())
       {
-        SchemeIdentifier firstIdentifier = arg.getFirstIdentifier();
-        if (firstIdentifier != null)
+        if (!processFirstIdentifier(processor, arg))
         {
-          if (!ResolveUtil.processElement(processor, firstIdentifier))
-          {
-            return false;
-          }
+          return false;
         }
       }
     }
 
+    return true;
+  }
+
+  private static boolean processFirstIdentifier(PsiScopeProcessor processor, SchemeList arg)
+  {
+    SchemeIdentifier firstIdentifier = arg.getFirstIdentifier();
+    if (firstIdentifier != null)
+    {
+      if (!ResolveUtil.processElement(processor, firstIdentifier))
+      {
+        return false;
+      }
+    }
     return true;
   }
 

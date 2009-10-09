@@ -103,7 +103,10 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
   {
     // TODO this is only for debug
     getManager().getResolveCache().clearResolveCaches(this);
-    return getManager().getResolveCache().resolveWithCaching(this, RESOLVER, true, incomplete);
+    ResolveResult[] results = getManager().getResolveCache().resolveWithCaching(this, RESOLVER, true, incomplete);
+    System.out.println("MultiResolve");
+    dumpResults(results);
+    return results;
   }
 
   public PsiElement setName(@NotNull @NonNls String newName) throws IncorrectOperationException
@@ -230,8 +233,21 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
   {
     // TODO this is only for debug
     getManager().getResolveCache().clearResolveCaches(this);
+
     ResolveResult[] results = getManager().getResolveCache().resolveWithCaching(this, RESOLVER, false, false);
+    System.out.println("resolve()");
+    dumpResults(results);
     return results.length == 1 ? results[0].getElement() : null;
+  }
+
+  private void dumpResults(ResolveResult[] results)
+  {
+    for (ResolveResult result : results)
+    {
+      System.out.println(System.identityHashCode(this) + " -> " + System.identityHashCode(result.getElement()));
+      System.out.println(this.getContext());
+      System.out.println(result.getElement().getContext());
+    }
   }
 
   public String getCanonicalText()
@@ -260,7 +276,9 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
 
   public boolean isReferenceTo(PsiElement element)
   {
-    return resolve() == element;
+    PsiElement resolved = resolve();
+    System.out.println("is reference (" + (resolved == null ? "null" : System.identityHashCode(resolved)) + ") equal to " + System.identityHashCode(element));
+    return resolved == element;
   }
 
   public Object[] getVariants()
@@ -278,5 +296,4 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
   {
     return getText();
   }
-
 }

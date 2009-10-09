@@ -18,12 +18,15 @@ public class SchemeFindUsagesProvider implements FindUsagesProvider
   @Nullable
   public WordsScanner getWordsScanner()
   {
+    System.out.println("getWordsScanner");
     return new DefaultWordsScanner(new SchemeFlexLexer(), Tokens.IDENTIFIERS, Tokens.COMMENTS, Tokens.STRINGS);
   }
 
   public boolean canFindUsagesFor(@NotNull PsiElement psiElement)
   {
-    return /* psiElement instanceof ClDef || */ psiElement instanceof SchemeIdentifier;
+    boolean ret = psiElement instanceof SchemeIdentifier;
+    System.out.println("canFindUsagesFor " + System.identityHashCode(psiElement) + ": " + ret);
+    return ret;
   }
 
   public String getHelpId(@NotNull PsiElement psiElement)
@@ -42,7 +45,7 @@ public class SchemeFindUsagesProvider implements FindUsagesProvider
 //    {
 //      return "definition";
 //    }
-    return "enitity";
+    return "entity";
   }
 
   @NotNull
@@ -54,11 +57,7 @@ public class SchemeFindUsagesProvider implements FindUsagesProvider
       String name = symbol.getText();
       return name == null ? symbol.getText() : name;
     }
-//    if (element instanceof ClDef)
-//    {
-//      ClDef def = (ClDef) element;
-//      return def.getPresentationText();
-//    }
+
     return element.getText();
   }
 
@@ -71,11 +70,7 @@ public class SchemeFindUsagesProvider implements FindUsagesProvider
       String name = symbol.getReferenceName();
       return name == null ? symbol.getText() : name;
     }
-//    if (element instanceof ClDef)
-//    {
-//      ClDef def = (ClDef) element;
-//      return def.getDefinedName();
-//    }
+
     return element.getText();
   }
 }
