@@ -18,20 +18,6 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * User: peter
- * Date: Dec 8, 2008
- * Time: 9:00:27 AM
- * Copyright 2007, 2008, 2009 Red Shark Technology
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements Tokens
 {
   private static final Map<IElementType, TextAttributesKey> ATTRIBUTES = new HashMap<IElementType, TextAttributesKey>();
@@ -39,8 +25,6 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
   static final TokenSet sNUMBERS = TokenSet.create(NUMBER_LITERAL);
 
   static final TokenSet sLINE_COMMENTS = TokenSet.create(Tokens.COMMENT);
-
-  static final TokenSet sBAD_CHARACTERS = TokenSet.create(Tokens.BAD_CHARACTER);
 
   static final TokenSet sLITERALS = TokenSet.create(Tokens.TRUE, Tokens.FALSE);
 

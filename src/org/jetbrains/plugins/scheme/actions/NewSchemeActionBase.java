@@ -26,9 +26,7 @@ import org.jetbrains.plugins.scheme.config.SchemeFacet;
 
 import javax.swing.*;
 
-/**
- * @author ilyas
- */
+
 public abstract class NewSchemeActionBase extends CreateElementActionBase
 {
   @NonNls

@@ -2,16 +2,12 @@ package org.jetbrains.plugins.scheme.psi.util;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiFileFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.scheme.file.SchemeFileType;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
 
-/**
- * @author ilyas
- */
+
 public class SchemePsiElementFactoryImpl extends SchemePsiElementFactory
 {
   private final Project myProject;
@@ -29,22 +25,6 @@ public class SchemePsiElementFactoryImpl extends SchemePsiElementFactory
     String text = "(" + newName + ")";
     SchemeFile dummyFile = createSchemeFileFromText(text);
     return dummyFile.getFirstChild().getFirstChild().getNextSibling().getNode();
-  }
-
-  private static boolean hasErrorElement(PsiElement element)
-  {
-    if (element instanceof PsiErrorElement)
-    {
-      return true;
-    }
-    for (PsiElement child : element.getChildren())
-    {
-      if (hasErrorElement(child))
-      {
-        return true;
-      }
-    }
-    return false;
   }
 
   private SchemeFile createSchemeFileFromText(String text)

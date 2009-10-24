@@ -13,9 +13,7 @@ import org.jetbrains.plugins.scheme.psi.stubs.index.SchemeFullScriptNameIndex;
 
 import java.io.IOException;
 
-/**
- * @author ilyas
- */
+
 public class SchemeStubFileElementType extends IStubFileElementType<SchemeFileStub>
 {
   private static final int CACHES_VERSION = 10;

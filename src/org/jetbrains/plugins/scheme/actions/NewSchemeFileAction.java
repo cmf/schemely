@@ -11,9 +11,7 @@ import org.jetbrains.plugins.scheme.SchemeIcons;
 import org.jetbrains.plugins.scheme.file.SchemeFileType;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
 
-/**
- * @author ilyas
- */
+
 public class NewSchemeFileAction extends NewSchemeActionBase
 {
   private static final String DUMMY = "dummy.";

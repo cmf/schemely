@@ -7,9 +7,7 @@ import com.intellij.psi.tree.IElementType;
 import org.jetbrains.plugins.scheme.formatter.SchemeBlock;
 import org.jetbrains.plugins.scheme.parser.AST;
 
-/**
- * @author ilyas
- */
+
 public class SchemeSpacingProcessor implements AST
 {
   private static final Spacing NO_SPACING = Spacing.createSpacing(0, 0, 0, false, 0);

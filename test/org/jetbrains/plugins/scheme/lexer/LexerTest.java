@@ -52,7 +52,7 @@ public class LexerTest extends TestCase
     for (LexerTestCase testCase : cases)
     {
       SchemeFlexLexer lexer = new SchemeFlexLexer();
-      lexer.start(testCase.testData.toCharArray());
+      lexer.start(testCase.testData);
 
       assertEquals("Expected initial whitespace", WHITESPACE, lexer.getTokenType());
       lexer.advance();
@@ -74,7 +74,7 @@ public class LexerTest extends TestCase
     for (LexerTestCase badCase : badCases)
     {
       SchemeFlexLexer lexer = new SchemeFlexLexer();
-      lexer.start(badCase.testData.toCharArray());
+      lexer.start(badCase.testData);
       for (int i = 0; i < badCase.types.length; i++)
       {
         IElementType expected = badCase.types[i];

@@ -13,9 +13,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jdom.Element;
 import org.jetbrains.plugins.scheme.config.ui.SchemeFacetTab;
 
-/**
- * @author ilyas
- */
+
 @State(
   name = "SchemeFacetConfiguration",
   storages = {@Storage(
@@ -26,14 +24,9 @@ public class SchemeFacetConfiguration implements FacetConfiguration,
 {
   private final SchemeLibrariesConfiguration mySchemeLibrariesConfiguration = new SchemeLibrariesConfiguration();
 
-  public String getDisplayName()
-  {
-    return "Scheme";
-  }
-
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager)
   {
-    return new FacetEditorTab[]{new SchemeFacetTab(editorContext, validatorsManager, mySchemeLibrariesConfiguration)};
+    return new FacetEditorTab[]{new SchemeFacetTab(editorContext, mySchemeLibrariesConfiguration)};
   }
 
   public void readExternal(Element element) throws InvalidDataException
@@ -42,11 +35,6 @@ public class SchemeFacetConfiguration implements FacetConfiguration,
 
   public void writeExternal(Element element) throws WriteExternalException
   {
-  }
-
-  public SchemeLibrariesConfiguration getMySchemeLibrariesConfiguration()
-  {
-    return mySchemeLibrariesConfiguration;
   }
 
   public SchemeLibrariesConfiguration getState()

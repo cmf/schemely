@@ -1,17 +1,16 @@
 package org.jetbrains.plugins.scheme.psi.impl.list;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.scheme.psi.api.SchemeList;
-import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
+import org.jetbrains.plugins.scheme.psi.resolve.ResolveResult;
 import org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil;
 
-/**
- * @author ilyas
- */
-public class ListDeclarations
+
+public class SchemeList extends SchemeListBase
 {
   public static final String LAMBDA = "lambda";
   public static final String DEFINE = "define";
@@ -19,66 +18,81 @@ public class ListDeclarations
   public static final String LET_STAR = "let*";
   public static final String LETREC = "letrec";
 
-  public static boolean get(PsiScopeProcessor processor,
-                            PsiElement lastParent,
-                            PsiElement place,
-                            SchemeList list,
-                            @Nullable String headText)
+  public SchemeList(@NotNull ASTNode astNode)
   {
+    super(astNode, "SchemeList");
+  }
+
+  @Override
+  public String toString()
+  {
+    return getText();
+  }
+
+  @NotNull
+  @Override
+  public ResolveResult resolve(SchemeIdentifier place)
+  {
+    String headText = getHeadText();
     if (headText == null)
     {
-      return true;
+      return ResolveResult.CONTINUE;
     }
     if (headText.equals(LAMBDA))
     {
-      return processLambdaDeclaration(processor, list, place, lastParent);
+      return processLambdaDeclaration(this, place);
     }
     else if (isDefinitionText(headText))
     {
-      return processDefineDeclaration(processor, list, place, lastParent);
+      return processDefineDeclaration(this, place);
     }
     else if (headText.equals(LET) || headText.equals(LET_STAR) || headText.equals(LETREC))
     {
-      return processLetDeclaration(processor, list, place, lastParent, headText);
+      return processLetDeclaration(this, place, headText);
     }
 
-    return true;
+    return ResolveResult.CONTINUE;
   }
 
-  private static boolean processLambdaDeclaration(PsiScopeProcessor processor,
-                                                  SchemeList lambda,
-                                                  PsiElement place,
-                                                  PsiElement lastParent)
+  @NotNull
+  private static ResolveResult processLambdaDeclaration(SchemeList lambda, SchemeIdentifier place)
   {
     if (PsiTreeUtil.findCommonParent(place, lambda) != lambda)
     {
-      return true;
+      return ResolveResult.CONTINUE;
     }
 
     PsiElement formals = lambda.getSecondNonLeafElement();
     if (formals == null)
     {
-      return true;
+      return ResolveResult.CONTINUE;
     }
 
     // Lambda formals are not references
     if (PsiTreeUtil.findCommonParent(place, formals) == formals)
     {
-      return false;
+      return ResolveResult.NONE;
     }
 
     // Process internal definitions first to get shadowing
-    if (!processInternalDefinitions(processor, formals, place, lastParent))
+    ResolveResult identifier = processInternalDefinitions((SchemePsiElementBase) formals, place);
+    if (identifier.isDone())
     {
-      return false;
+      return identifier;
     }
 
     if (formals instanceof SchemeIdentifier)
     {
       // (lambda x (head x))
-      if ((place != formals) && !ResolveUtil.processElement(processor, (SchemeIdentifier) formals))
+      if (place == formals)
       {
-        return false;
+        return ResolveResult.NONE;
+      }
+
+      SchemeIdentifier arg = (SchemeIdentifier) formals;
+      if (place.couldReference(arg))
+      {
+        return ResolveResult.of(arg);
       }
     }
     else if (formals instanceof SchemeList)
@@ -88,33 +102,30 @@ public class ListDeclarations
 
       for (SchemeIdentifier arg : args.getAllSymbols())
       {
-        if (!ResolveUtil.processElement(processor, arg))
+        if (place.couldReference(arg))
         {
-          return false;
+          return ResolveResult.of(arg);
         }
       }
-
-      return true;
     }
 
-    return true;
+    return ResolveResult.CONTINUE;
   }
 
-  private static boolean processDefineDeclaration(PsiScopeProcessor processor,
-                                                  SchemeList define,
-                                                  PsiElement place,
-                                                  PsiElement lastParent)
+  @NotNull
+  public static ResolveResult processDefineDeclaration(SchemeList define, SchemeIdentifier place)
   {
     PsiElement formals = define.getSecondNonLeafElement();
     if (formals == null)
     {
-      return true;
+      return ResolveResult.CONTINUE;
     }
 
     // Define variables are not references
     if ((PsiTreeUtil.findCommonParent(place, formals) == formals))
     {
-      return false;
+      // TODO check this
+      return ResolveResult.of(place);
     }
 
     PsiElement body = ResolveUtil.getNextNonLeafElement(formals);
@@ -122,15 +133,17 @@ public class ListDeclarations
     if ((PsiTreeUtil.findCommonParent(place, define) != define.getParent()) &&
         (PsiTreeUtil.findCommonParent(place, body) != body))
     {
-      return true;
+      return ResolveResult.CONTINUE;
     }
 
-    if (formals instanceof SchemeIdentifier)
+    if ((place != formals) && (formals instanceof SchemeIdentifier))
     {
+      SchemeIdentifier identifier = (SchemeIdentifier) formals;
+
       // (define x 3)
-      if ((place != formals) && !ResolveUtil.processElement(processor, (SchemeIdentifier) formals))
+      if (place.couldReference(identifier))
       {
-        return false;
+        return ResolveResult.of(identifier);
       }
     }
     else if (formals instanceof SchemeList)
@@ -140,33 +153,28 @@ public class ListDeclarations
 
       for (SchemeIdentifier arg : args.getAllSymbols())
       {
-        if (!ResolveUtil.processElement(processor, arg))
+        if (place.couldReference(arg))
         {
-          return false;
+          return ResolveResult.of(arg);
         }
       }
-
-      return true;
     }
 
-    return true;
+    return ResolveResult.CONTINUE;
   }
 
-  private static boolean processLetDeclaration(PsiScopeProcessor processor,
-                                               SchemeList declaration,
-                                               PsiElement place,
-                                               PsiElement lastParent,
-                                               String style)
+  @NotNull
+  private static ResolveResult processLetDeclaration(SchemeList declaration, SchemeIdentifier place, String style)
   {
     if (PsiTreeUtil.findCommonParent(place, declaration) != declaration)
     {
-      return true;
+      return ResolveResult.CONTINUE;
     }
 
     PsiElement vars = declaration.getSecondNonLeafElement();
     if (vars == null)
     {
-      return true;
+      return ResolveResult.CONTINUE;
     }
 
     if ((PsiTreeUtil.findCommonParent(place, vars) == vars))
@@ -180,7 +188,7 @@ public class ListDeclarations
         SchemeList parentList = (SchemeList) placeParent;
         if (place == parentList.getFirstIdentifier())
         {
-          return false;
+          return ResolveResult.NONE;
         }
       }
 
@@ -188,7 +196,7 @@ public class ListDeclarations
       {
         // It's part of a value for a let-bound variable, nothing in the let is in scope but we should
         // keep searching
-        return true;
+        return ResolveResult.CONTINUE;
       }
       else if (style.equals(LET_STAR))
       {
@@ -210,14 +218,15 @@ public class ListDeclarations
           // process all remaining bindings
           while (i >= 0)
           {
-            if (!processFirstIdentifier(processor, bindings[i]))
+            ResolveResult result = processFirstIdentifier(bindings[i], place);
+            if (result.isDone())
             {
-              return false;
+              return result;
             }
             i--;
           }
         }
-        return true;
+        return ResolveResult.CONTINUE;
       }
       else if (style.equals(LETREC))
       {
@@ -228,20 +237,22 @@ public class ListDeclarations
           SchemeList[] bindings = args.getSubLists();
           for (SchemeList binding : bindings)
           {
-            if (!processFirstIdentifier(processor, binding))
+            ResolveResult result = processFirstIdentifier(binding, place);
+            if (result.isDone())
             {
-              return false;
+              return result;
             }
           }
         }
-        return true;
+        return ResolveResult.CONTINUE;
       }
     }
 
     // Process internal definitions first to get shadowing
-    if (!processInternalDefinitions(processor, vars, place, lastParent))
+    ResolveResult result = processInternalDefinitions((SchemePsiElementBase) vars, place);
+    if (result.isDone())
     {
-      return false;
+      return result;
     }
 
     // TODO named let
@@ -252,44 +263,41 @@ public class ListDeclarations
 
       for (SchemeList arg : args.getSubLists())
       {
-        if (!processFirstIdentifier(processor, arg))
+        result = processFirstIdentifier(arg, place);
+        if (result.isDone())
         {
-          return false;
+          return result;
         }
       }
     }
 
-    return true;
+    return ResolveResult.CONTINUE;
   }
 
-  private static boolean processFirstIdentifier(PsiScopeProcessor processor, SchemeList arg)
+  @NotNull
+  private static ResolveResult processFirstIdentifier(SchemeList arg, SchemeIdentifier place)
   {
     SchemeIdentifier firstIdentifier = arg.getFirstIdentifier();
-    if (firstIdentifier != null)
+    if ((firstIdentifier != null) && place.couldReference(firstIdentifier))
     {
-      if (!ResolveUtil.processElement(processor, firstIdentifier))
-      {
-        return false;
-      }
+      return ResolveResult.of(firstIdentifier);
     }
-    return true;
+    return ResolveResult.CONTINUE;
   }
 
-  private static boolean processInternalDefinitions(PsiScopeProcessor processor,
-                                                    PsiElement second,
-                                                    PsiElement place,
-                                                    PsiElement lastParent)
+  private static ResolveResult processInternalDefinitions(SchemePsiElementBase after, SchemeIdentifier place)
   {
-    PsiElement next = ResolveUtil.getNextNonLeafElement(second);
+    PsiElement next = ResolveUtil.getNextNonLeafElement(after);
     while ((next != null) && isDefinition(next))
     {
-      if (!processDefineDeclaration(processor, (SchemeList) next, place, lastParent))
+      ResolveResult result = processDefineDeclaration((SchemeList) next, place);
+      if (result.isDone())
       {
-        return false;
+        return result;
       }
       next = ResolveUtil.getNextNonLeafElement(next);
     }
-    return true;
+    return ResolveResult.CONTINUE;
   }
 
   public static boolean isLocal(PsiElement element)

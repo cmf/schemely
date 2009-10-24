@@ -13,17 +13,15 @@ import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettings;
 import org.jetbrains.plugins.scheme.formatter.processors.SchemeIndentProcessor;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
-import org.jetbrains.plugins.scheme.psi.api.SchemeList;
-import org.jetbrains.plugins.scheme.psi.api.SchemeLiteral;
-import org.jetbrains.plugins.scheme.psi.api.SchemeVector;
-import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeLiteral;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeVector;
+import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author ilyas
- */
+
 public class SchemeBlockGenerator
 {
   private static final TokenSet RIGHT_BRACES = TokenSet.create(Tokens.RIGHT_CURLY, Tokens.RIGHT_SQUARE);
@@ -63,7 +61,7 @@ public class SchemeBlockGenerator
 
     if (settings.ALIGN_SCHEME_FORMS)
     {
-      if (blockPsi instanceof SchemeList /* && !(blockPsi instanceof ClDef) */ )
+      if (blockPsi instanceof SchemeList /* && !(blockPsi instanceof ClDef) */)
       {
         SchemeList list = (SchemeList) blockPsi;
         PsiElement first = list.getFirstNonLeafElement();

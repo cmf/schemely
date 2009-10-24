@@ -11,9 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.scheme.psi.stubs.SchemeShortNamesCache;
 import org.jetbrains.plugins.scheme.file.SchemeFileType;
 
-/**
- * @author ilyas
- */
+
 public class SchemePsiManager implements ProjectComponent
 {
   private final Project myProject;

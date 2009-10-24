@@ -18,39 +18,24 @@ package org.jetbrains.plugins.scheme.config.ui;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
-import com.intellij.facet.ui.FacetValidatorsManager;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.plugins.scheme.config.SchemeLibrariesConfiguration;
 import org.jetbrains.plugins.scheme.SchemeBundle;
+import org.jetbrains.plugins.scheme.config.SchemeLibrariesConfiguration;
 
 import javax.swing.*;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFacetTab extends FacetEditorTab
 {
-  public static final Logger LOG = Logger.getInstance("org.jetbrains.plugins.scheme.config.ui.SchemeFacetTab");
-
-  private Module myModule;
   private JPanel myPanel;
   private JCheckBox myCompilerExcludeCb;
   private JCheckBox myLibraryExcludeCb;
-  private FacetEditorContext myEditorContext;
-  private FacetValidatorsManager myValidatorsManager;
   private final SchemeLibrariesConfiguration myConfiguration;
 
-  public SchemeFacetTab(FacetEditorContext editorContext,
-                        FacetValidatorsManager validatorsManager,
-                        SchemeLibrariesConfiguration configuration)
+  public SchemeFacetTab(FacetEditorContext editorContext, SchemeLibrariesConfiguration configuration)
   {
-    myModule = editorContext.getModule();
-    myEditorContext = editorContext;
-    myValidatorsManager = validatorsManager;
 
     myConfiguration = configuration;
 
@@ -106,6 +91,4 @@ public class SchemeFacetTab extends FacetEditorTab
   private void createUIComponents()
   {
   }
-
-
 }

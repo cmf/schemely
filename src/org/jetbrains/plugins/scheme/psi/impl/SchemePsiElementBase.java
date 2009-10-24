@@ -1,20 +1,27 @@
-package org.jetbrains.plugins.scheme.psi;
+package org.jetbrains.plugins.scheme.psi.impl;
 
-import com.intellij.psi.stubs.StubElement;
-import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
-import com.intellij.psi.PsiComment;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
-import com.intellij.lang.ASTNode;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.scheme.psi.api.SchemePsiElement;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
+import org.jetbrains.plugins.scheme.psi.resolve.ResolveResult;
 
-/**
- * @author ilyas
- */
-public abstract class SchemeBaseElementImpl<T extends StubElement> extends StubBasedPsiElementBase<T> implements
-                                                                                                      SchemePsiElement
+
+public abstract class SchemePsiElementBase extends ASTWrapperPsiElement implements SchemePsiElement
 {
+  final private String myName;
+
+  public SchemePsiElementBase(@NotNull ASTNode astNode, String myName)
+  {
+    super(astNode);
+    this.myName = myName;
+  }
+
   public static boolean isWrongElement(PsiElement element)
   {
     return element == null ||
@@ -51,13 +58,15 @@ public abstract class SchemeBaseElementImpl<T extends StubElement> extends StubB
     return aClass.cast(element);
   }
 
-  public SchemeBaseElementImpl(T stub, @org.jetbrains.annotations.NotNull IStubElementType nodeType)
+  @Override
+  public String toString()
   {
-    super(stub, nodeType);
+    return myName == null ? super.toString() : myName;
   }
 
-  public SchemeBaseElementImpl(ASTNode node)
+  @NotNull
+  public ResolveResult resolve(SchemeIdentifier place)
   {
-    super(node);
+    return ResolveResult.CONTINUE;
   }
 }

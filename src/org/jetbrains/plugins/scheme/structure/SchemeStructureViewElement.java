@@ -8,15 +8,13 @@ import com.intellij.openapi.util.Iconable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiNamedElement;
-import org.jetbrains.plugins.scheme.psi.SchemePsiElement;
+import org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author ilyas
- */
+
 public class SchemeStructureViewElement implements StructureViewTreeElement
 {
   private PsiElement myElement;
@@ -48,14 +46,14 @@ public class SchemeStructureViewElement implements StructureViewTreeElement
 
   public StructureViewTreeElement[] getChildren()
   {
-    final List<SchemePsiElement> childrenElements = new ArrayList<SchemePsiElement>();
+    final List<SchemePsiElementBase> childrenElements = new ArrayList<SchemePsiElementBase>();
     myElement.acceptChildren(new PsiElementVisitor()
     {
       public void visitElement(PsiElement element)
       {
         if (isBrowsableElement(element))
         {
-          childrenElements.add((SchemePsiElement) element);
+          childrenElements.add((SchemePsiElementBase) element);
         }
         else
         {
@@ -84,10 +82,10 @@ public class SchemeStructureViewElement implements StructureViewTreeElement
     {
       public String getPresentableText()
       {
-//        if (myElement instanceof ClDef)
-//        {
-//          return ((ClDef) myElement).getPresentationText();
-//        }
+        //        if (myElement instanceof ClDef)
+        //        {
+        //          return ((ClDef) myElement).getPresentationText();
+        //        }
         return ((PsiNamedElement) myElement).getName();
       }
 

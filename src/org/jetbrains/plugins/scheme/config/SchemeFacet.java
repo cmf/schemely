@@ -4,9 +4,7 @@ import com.intellij.facet.*;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFacet extends Facet<SchemeFacetConfiguration>
 {
   public static final String FACET_TYPE_ID_STRING = "scheme";

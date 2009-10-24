@@ -1,48 +1,30 @@
 package org.jetbrains.plugins.scheme.psi.resolve;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNamedElement;
-import com.intellij.psi.ResolveState;
-import com.intellij.psi.scope.NameHint;
-import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
-import static org.jetbrains.plugins.scheme.psi.SchemeBaseElementImpl.isWrongElement;
+import org.jetbrains.plugins.scheme.psi.api.SchemePsiElement;
+import static org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase.isWrongElement;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
-/**
- * @author ilyas
- */
+
 public abstract class ResolveUtil
 {
-  public static boolean treeWalkUp(PsiElement place, PsiScopeProcessor processor)
+  public static PsiElement treeWalkUp(SchemeIdentifier place)
   {
-    PsiElement lastParent = null;
-    PsiElement run = place;
-    while (run != null)
+    PsiElement element = place;
+    ResolveResult result = ResolveResult.CONTINUE;
+    while ((element != null) && !result.isDone())
     {
-      if (!run.processDeclarations(processor, ResolveState.initial(), lastParent, place))
+      if (element instanceof SchemePsiElement)
       {
-        return false;
+        SchemePsiElement schemePsiElement = (SchemePsiElement) element;
+        result = schemePsiElement.resolve(place);
       }
-      lastParent = run;
-      run = run.getContext(); //same as getParent
+
+      element = element.getContext(); //getParent
     }
 
-    return true;
-  }
-
-  public static boolean processElement(PsiScopeProcessor processor, PsiNamedElement namedElement)
-  {
-    if (namedElement == null)
-    {
-      return true;
-    }
-    NameHint nameHint = processor.getHint(NameHint.class);
-    String name = nameHint == null ? null : nameHint.getName(ResolveState.initial());
-    if ((name == null) || name.equals(namedElement.getName()))
-    {
-      return processor.execute(namedElement, ResolveState.initial());
-    }
-    return true;
+    return result.getResult();
   }
 
   public static PsiElement[] mapToElements(SchemeResolveResult[] candidates)

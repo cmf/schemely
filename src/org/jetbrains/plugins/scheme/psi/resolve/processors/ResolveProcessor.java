@@ -6,9 +6,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.util.containers.HashSet;
 import org.jetbrains.plugins.scheme.psi.resolve.SchemeResolveResult;
 
-/**
- * @author ilyas
- */
+
 public abstract class ResolveProcessor implements PsiScopeProcessor, NameHint, ElementClassHint
 {
   protected HashSet<SchemeResolveResult> myCandidates = new HashSet<SchemeResolveResult>();

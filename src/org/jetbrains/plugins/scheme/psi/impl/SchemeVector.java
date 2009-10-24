@@ -2,22 +2,19 @@ package org.jetbrains.plugins.scheme.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import org.jetbrains.plugins.scheme.psi.SchemePsiElementImpl;
-import org.jetbrains.plugins.scheme.psi.SchemePsiElement;
-import org.jetbrains.plugins.scheme.psi.api.SchemeVector;
-import org.jetbrains.plugins.scheme.psi.api.SchemeList;
-import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
-import org.jetbrains.plugins.scheme.lexer.Tokens;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.scheme.lexer.Tokens;
+import org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase;
+import org.jetbrains.plugins.scheme.psi.api.SchemePsiElement;
+import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
 import java.util.ArrayList;
 
-/**
- * @author ilyas
- */
-public class SchemeVectorImpl extends SchemePsiElementImpl implements SchemeVector
+
+public class SchemeVector extends SchemePsiElementBase
 {
-  public SchemeVectorImpl(ASTNode node)
+  public SchemeVector(ASTNode node)
   {
     super(node, "SchemeVector");
   }
@@ -47,7 +44,7 @@ public class SchemeVectorImpl extends SchemePsiElementImpl implements SchemeVect
 
   public SchemeIdentifier[] getOddSymbols()
   {
-    SchemePsiElement[] elems = findChildrenByClass(SchemePsiElement.class);
+    SchemePsiElementBase[] elems = findChildrenByClass(SchemePsiElementBase.class);
     ArrayList<SchemeIdentifier> res = new ArrayList<SchemeIdentifier>();
     for (int i = 0; i < elems.length; i++)
     {

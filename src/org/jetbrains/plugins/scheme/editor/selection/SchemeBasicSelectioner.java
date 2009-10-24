@@ -9,9 +9,7 @@ import com.intellij.codeInsight.editorActions.ExtendWordSelectionHandler;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * @author ilyas
- */
+
 public abstract class SchemeBasicSelectioner implements ExtendWordSelectionHandler
 {
   public List<TextRange> select(PsiElement e, CharSequence editorText, int cursorOffset, Editor editor)

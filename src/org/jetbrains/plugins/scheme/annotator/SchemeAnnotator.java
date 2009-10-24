@@ -6,15 +6,13 @@ import com.intellij.lang.annotation.Annotator;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.HashSet;
 import org.jetbrains.plugins.scheme.highlighter.SchemeSyntaxHighlighter;
-import org.jetbrains.plugins.scheme.psi.api.SchemeList;
-import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
+import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
-import java.util.Set;
 import java.util.Arrays;
+import java.util.Set;
 
-/**
- * @author ilyas
- */
+
 public class SchemeAnnotator implements Annotator
 {
   public static final Set<String> IMPLICIT_NAMES = new HashSet<String>();
@@ -35,7 +33,7 @@ public class SchemeAnnotator implements Annotator
   private void annotateList(SchemeList list, AnnotationHolder holder)
   {
     SchemeIdentifier first = list.getFirstIdentifier();
-    if (first != null && first.multiResolve(false).length > 0 || IMPLICIT_NAMES.contains(list.getHeadText()))
+    if (((first != null) && (first.resolve() != null)) || IMPLICIT_NAMES.contains(list.getHeadText()))
     {
       Annotation annotation = holder.createInfoAnnotation(first, null);
       annotation.setTextAttributes(SchemeSyntaxHighlighter.DEF);

@@ -33,7 +33,6 @@ public class SchemeFileType extends LanguageFileType
 {
   public static final SchemeFileType SCHEME_FILE_TYPE = new SchemeFileType();
   public static final Language SCHEME_LANGUAGE = SCHEME_FILE_TYPE.getLanguage();
-  public static final Icon SCHEME_LOGO = SchemeIcons.SCHEME_ICON_16x16;
   @NonNls
   public static final String SCHEME_DEFAULT_EXTENSION = "scm";
 

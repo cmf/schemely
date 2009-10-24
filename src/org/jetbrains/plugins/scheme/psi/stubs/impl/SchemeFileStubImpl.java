@@ -7,9 +7,7 @@ import org.jetbrains.plugins.scheme.parser.AST;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
 import org.jetbrains.plugins.scheme.psi.stubs.api.SchemeFileStub;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFileStubImpl extends PsiFileStubImpl<SchemeFile> implements SchemeFileStub
 {
   private final StringRef myPackageName;

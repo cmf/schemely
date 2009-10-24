@@ -5,9 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import org.jetbrains.plugins.scheme.lexer.SchemeFlexLexer;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
 
-/**
- * @author ilyas
- */
+
 public class SchemeNamesUtil
 {
   public static boolean isIdentifier(String text)

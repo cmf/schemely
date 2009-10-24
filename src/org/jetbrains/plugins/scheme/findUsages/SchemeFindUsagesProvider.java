@@ -8,24 +8,22 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.lexer.SchemeFlexLexer;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
-import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
+import static org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier.id;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFindUsagesProvider implements FindUsagesProvider
 {
   @Nullable
   public WordsScanner getWordsScanner()
   {
-    System.out.println("getWordsScanner");
     return new DefaultWordsScanner(new SchemeFlexLexer(), Tokens.IDENTIFIERS, Tokens.COMMENTS, Tokens.STRINGS);
   }
 
   public boolean canFindUsagesFor(@NotNull PsiElement psiElement)
   {
     boolean ret = psiElement instanceof SchemeIdentifier;
-    System.out.println("canFindUsagesFor " + System.identityHashCode(psiElement) + ": " + ret);
+    System.out.println("canFindUsagesFor " + id(psiElement) + ": " + ret);
     return ret;
   }
 
@@ -41,10 +39,10 @@ public class SchemeFindUsagesProvider implements FindUsagesProvider
     {
       return "symbol";
     }
-//    if (element instanceof ClDef)
-//    {
-//      return "definition";
-//    }
+    //    if (element instanceof ClDef)
+    //    {
+    //      return "definition";
+    //    }
     return "entity";
   }
 

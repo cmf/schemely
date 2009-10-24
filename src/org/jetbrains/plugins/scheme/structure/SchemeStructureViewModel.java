@@ -8,9 +8,7 @@ import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author ilyas
- */
+
 public class SchemeStructureViewModel extends TextEditorBasedStructureViewModel
 {
   private PsiFile myFile;
@@ -53,6 +51,6 @@ public class SchemeStructureViewModel extends TextEditorBasedStructureViewModel
   @NotNull
   protected Class[] getSuitableClasses()
   {
-    return new Class[]{ /*ClDef.class*/ };
+    return new Class[]{ /*ClDef.class*/};
   }
 }

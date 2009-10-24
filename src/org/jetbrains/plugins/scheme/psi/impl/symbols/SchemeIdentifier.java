@@ -5,9 +5,9 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.*;
-import com.intellij.psi.impl.source.resolve.ResolveCache;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NonNls;
@@ -16,24 +16,18 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.SchemeIcons;
 import org.jetbrains.plugins.scheme.lexer.TokenSets;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
-import org.jetbrains.plugins.scheme.psi.SchemePsiElementImpl;
-import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
+import org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase;
 import org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil;
-import org.jetbrains.plugins.scheme.psi.resolve.SchemeResolveResult;
-import org.jetbrains.plugins.scheme.psi.resolve.processors.ResolveProcessor;
-import org.jetbrains.plugins.scheme.psi.resolve.processors.SymbolResolveProcessor;
 import org.jetbrains.plugins.scheme.psi.util.SchemePsiElementFactory;
 
 import javax.swing.*;
 
-/**
- * @author ilyas
- */
-public class SchemeIdentifierImpl extends SchemePsiElementImpl implements SchemeIdentifier
+
+public class SchemeIdentifier extends SchemePsiElementBase implements PsiReference, PsiNamedElement
 {
-  public SchemeIdentifierImpl(ASTNode node)
+  public SchemeIdentifier(ASTNode node)
   {
-    super(node);
+    super(node, "Identifier");
   }
 
   @Override
@@ -45,7 +39,21 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
   @Override
   public String toString()
   {
-    return "SchemeIdentifier";
+    return "SchemeIdentifier: " + getReferenceName();
+  }
+
+  public boolean couldReference(SchemeIdentifier place)
+  {
+    if ((this != place))
+    {
+      String targetName = place.getReferenceName();
+      if (targetName != null && targetName.equals(getReferenceName()))
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public PsiElement getElement()
@@ -98,17 +106,6 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
     return null;
   }
 
-  @NotNull
-  public ResolveResult[] multiResolve(boolean incomplete)
-  {
-    // TODO this is only for debug
-    getManager().getResolveCache().clearResolveCaches(this);
-    ResolveResult[] results = getManager().getResolveCache().resolveWithCaching(this, RESOLVER, true, incomplete);
-    System.out.println("MultiResolve");
-    dumpResults(results);
-    return results;
-  }
-
   public PsiElement setName(@NotNull @NonNls String newName) throws IncorrectOperationException
   {
     ASTNode newNode = SchemePsiElementFactory.getInstance(getProject()).createSymbolNodeFromText(newName);
@@ -148,7 +145,7 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
       @Nullable
       public Icon getIcon(boolean open)
       {
-        return SchemeIdentifierImpl.this.getIcon(Iconable.ICON_FLAG_VISIBILITY | Iconable.ICON_FLAG_READ_STATUS);
+        return SchemeIdentifier.this.getIcon(Iconable.ICON_FLAG_VISIBILITY | Iconable.ICON_FLAG_READ_STATUS);
       }
 
       @Nullable
@@ -159,63 +156,6 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
     };
   }
 
-
-  public static class MyResolver implements ResolveCache.PolyVariantResolver<SchemeIdentifier>
-  {
-    public ResolveResult[] resolve(SchemeIdentifier symbol, boolean incompleteCode)
-    {
-      String name = symbol.getReferenceName();
-      if (name == null)
-      {
-        return null;
-      }
-
-      String myName = StringUtil.trimEnd(name, ".");
-      ResolveProcessor processor = new SymbolResolveProcessor(myName, symbol);
-
-      SchemeIdentifier qualifier = symbol.getQualifierSymbol();
-      if (qualifier == null)
-      {
-        ResolveUtil.treeWalkUp(symbol, processor);
-      }
-      //      else
-      //      {
-      //        for (ResolveResult result : qualifier.multiResolve(false))
-      //        {
-      //          final PsiElement element = result.getElement();
-      //          if (element != null)
-      //          {
-      //            final PsiElement sep = symbol.getSeparatorToken();
-      //            if (sep != null)
-      //            {
-      //              if ("/".equals(sep.getText()))
-      //              {
-      //                //get class elemets
-      //                if (element instanceof PsiClass)
-      //                {
-      //                  element.processDeclarations(processor, ResolveState.initial(), null, symbol);
-      //                }
-      //              }
-      //              else if (".".equals(sep.getText()))
-      //              {
-      //                element.processDeclarations(processor, ResolveState.initial(), null, symbol);
-      //              }
-      //            }
-      //          }
-      //        }
-      //      }
-
-      SchemeResolveResult[] candidates = processor.getCandidates();
-      if (candidates.length > 0)
-      {
-        return candidates;
-      }
-
-      return SchemeResolveResult.EMPTY_ARRAY;
-    }
-
-  }
-
   public SchemeIdentifier getQualifierSymbol()
   {
     return findChildByClass(SchemeIdentifier.class);
@@ -224,30 +164,53 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
   @Override
   public String getName()
   {
+    System.out.println("Returning name string " + getNameString() + " for " + id(this));
     return getNameString();
   }
 
-  private static final MyResolver RESOLVER = new MyResolver();
-
   public PsiElement resolve()
   {
-    // TODO this is only for debug
-    getManager().getResolveCache().clearResolveCaches(this);
+    String name = getReferenceName();
+    if (name == null)
+    {
+      return null;
+    }
 
-    ResolveResult[] results = getManager().getResolveCache().resolveWithCaching(this, RESOLVER, false, false);
-    System.out.println("resolve()");
-    dumpResults(results);
-    return results.length == 1 ? results[0].getElement() : null;
+    PsiElement element = ResolveUtil.treeWalkUp(this);
+    System.out.println("Resolving " + id(this) + " to " + id(element));
+    return element;
+
+    //      else
+    //      {
+    //        for (ResolveResult result : qualifier.multiResolve(false))
+    //        {
+    //          final PsiElement element = result.getElement();
+    //          if (element != null)
+    //          {
+    //            final PsiElement sep = symbol.getSeparatorToken();
+    //            if (sep != null)
+    //            {
+    //              if ("/".equals(sep.getText()))
+    //              {
+    //                //get class elemets
+    //                if (element instanceof PsiClass)
+    //                {
+    //                  element.processDeclarations(processor, ResolveState.initial(), null, symbol);
+    //                }
+    //              }
+    //              else if (".".equals(sep.getText()))
+    //              {
+    //                element.processDeclarations(processor, ResolveState.initial(), null, symbol);
+    //              }
+    //            }
+    //          }
+    //        }
+    //      }
   }
 
-  private void dumpResults(ResolveResult[] results)
+  public static String id(Object object)
   {
-    for (ResolveResult result : results)
-    {
-      System.out.println(System.identityHashCode(this) + " -> " + System.identityHashCode(result.getElement()));
-      System.out.println(this.getContext());
-      System.out.println(result.getElement().getContext());
-    }
+    return object == null ? "null" : Integer.toString(System.identityHashCode(object));
   }
 
   public String getCanonicalText()
@@ -277,7 +240,7 @@ public class SchemeIdentifierImpl extends SchemePsiElementImpl implements Scheme
   public boolean isReferenceTo(PsiElement element)
   {
     PsiElement resolved = resolve();
-    System.out.println("is reference (" + (resolved == null ? "null" : System.identityHashCode(resolved)) + ") equal to " + System.identityHashCode(element));
+    System.out.println(id(this) + " resolves to " + id(resolved) + ", comparing to " + id(element));
     return resolved == element;
   }
 

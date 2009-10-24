@@ -12,22 +12,16 @@ import org.jetbrains.plugins.scheme.highlighter.SchemeEditorHighlighter;
 
 import javax.swing.*;
 
-/**
- * @author ilyas
- */
+
 public class SchemeCodeStylePanel extends CodeStyleAbstractPanel
 {
-  private final CodeStyleSettings mySettings;
   private JPanel myPanel;
   private JCheckBox alignCheckBox;
-  private JTabbedPane myTabbedPane;
-  private JPanel myAlignPanel;
   private JPanel myPreviewPanel;
 
   protected SchemeCodeStylePanel(CodeStyleSettings settings)
   {
     super(settings);
-    mySettings = settings;
     SchemeCodeStyleSettings css = settings.getCustomSettings(SchemeCodeStyleSettings.class);
     setSettings(css);
     installPreviewPanel(myPreviewPanel);

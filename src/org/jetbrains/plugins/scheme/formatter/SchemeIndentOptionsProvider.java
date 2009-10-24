@@ -8,9 +8,7 @@ import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.FileTypeIndentOptionsProvider;
 import org.jetbrains.plugins.scheme.file.SchemeFileType;
 
-/**
- * @author ilyas
- */
+
 public class SchemeIndentOptionsProvider implements FileTypeIndentOptionsProvider
 {
   public CodeStyleSettings.IndentOptions createIndentOptions()

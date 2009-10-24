@@ -8,9 +8,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFacetListener extends FacetManagerAdapter implements ModuleComponent
 {
   private MessageBusConnection myConnection;

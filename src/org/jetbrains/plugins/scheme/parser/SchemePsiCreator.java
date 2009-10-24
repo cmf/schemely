@@ -3,15 +3,13 @@ package org.jetbrains.plugins.scheme.parser;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import org.jetbrains.plugins.scheme.psi.impl.SchemeAbbreviationImpl;
-import org.jetbrains.plugins.scheme.psi.impl.SchemeLiteralImpl;
-import org.jetbrains.plugins.scheme.psi.impl.SchemeVectorImpl;
-import org.jetbrains.plugins.scheme.psi.impl.list.SchemeListImpl;
-import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifierImpl;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeAbbreviation;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeLiteral;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeVector;
+import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
-/**
- * @author ilyas
- */
+
 public class SchemePsiCreator
 {
   public static PsiElement createElement(ASTNode node)
@@ -20,23 +18,23 @@ public class SchemePsiCreator
 
     if (elementType == AST.LIST)
     {
-      return new SchemeListImpl(node);
+      return new SchemeList(node);
     }
     if (elementType == AST.VECTOR)
     {
-      return new SchemeVectorImpl(node);
+      return new SchemeVector(node);
     }
     if (elementType == AST.ABBREVIATION)
     {
-      return new SchemeAbbreviationImpl(node);
+      return new SchemeAbbreviation(node);
     }
     if (elementType == AST.IDENTIFIER)
     {
-      return new SchemeIdentifierImpl(node);
+      return new SchemeIdentifier(node);
     }
     if (elementType == AST.LITERAL)
     {
-      return new SchemeLiteralImpl(node);
+      return new SchemeLiteral(node);
     }
 
     throw new Error("Unexpected ASTNode: " + node.getElementType());

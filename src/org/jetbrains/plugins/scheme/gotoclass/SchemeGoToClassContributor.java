@@ -14,14 +14,12 @@ import org.jetbrains.plugins.scheme.psi.stubs.index.SchemeClassNameIndex;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author ilyas
- */
+
 public class SchemeGoToClassContributor implements ChooseByNameContributor
 {
   public String[] getNames(Project project, boolean includeNonProjectItems)
   {
-    Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY);
+    Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY, project);
     return classNames.toArray(new String[classNames.size()]);
   }
 

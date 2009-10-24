@@ -8,9 +8,7 @@ import org.jetbrains.plugins.scheme.formatter.SchemeBlock;
 import org.jetbrains.plugins.scheme.parser.AST;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
 
-/**
- * @author ilyas
- */
+
 public class SchemeIndentProcessor implements AST
 {
   public static Indent getChildIndent(SchemeBlock parent, ASTNode prevChildNode, ASTNode child)

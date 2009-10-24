@@ -6,9 +6,7 @@ import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
 
-/**
- * @author ilyas
- */
+
 public class SchemeQuoteHandler implements QuoteHandler
 {
   public boolean isClosingQuote(HighlighterIterator iterator, int offset)

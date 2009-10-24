@@ -1,25 +1,21 @@
 package org.jetbrains.plugins.scheme.psi.impl.list;
 
-import org.jetbrains.plugins.scheme.psi.SchemeBaseElementImpl;
-import org.jetbrains.plugins.scheme.psi.util.SchemePsiUtil;
-import org.jetbrains.plugins.scheme.psi.api.SchemeList;
-import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
-import org.jetbrains.plugins.scheme.lexer.Tokens;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.NotNull;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.stubs.NamedStub;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.scheme.lexer.Tokens;
+import org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
+import org.jetbrains.plugins.scheme.psi.util.SchemePsiUtil;
 
-/**
- * @author ilyas
- */
-public abstract class SchemeListBaseImpl<T extends NamedStub> extends SchemeBaseElementImpl<T> implements SchemeList
+
+public abstract class SchemeListBase extends SchemePsiElementBase
 {
-  public SchemeListBaseImpl(ASTNode node)
+  public SchemeListBase(@NotNull ASTNode astNode, String myName)
   {
-    super(node);
+    super(astNode, myName);
   }
 
   @Nullable
@@ -74,14 +70,6 @@ public abstract class SchemeListBaseImpl<T extends NamedStub> extends SchemeBase
     return null;
   }
 
-  @NotNull
-  public PsiElement getFirstBrace()
-  {
-    PsiElement element = findChildByType(Tokens.LEFT_PAREN);
-    assert element != null;
-    return element;
-  }
-
   public PsiElement getSecondNonLeafElement()
   {
     PsiElement first = getFirstChild();
@@ -89,6 +77,11 @@ public abstract class SchemeListBaseImpl<T extends NamedStub> extends SchemeBase
     {
       first = first.getNextSibling();
     }
+    if (first == null)
+    {
+      return null;
+    }
+
     PsiElement second = first.getNextSibling();
     while (second != null && isWrongElement(second))
     {
@@ -96,12 +89,6 @@ public abstract class SchemeListBaseImpl<T extends NamedStub> extends SchemeBase
     }
     return second;
   }
-
-  public PsiElement getLastBrace()
-  {
-    return findChildByType(Tokens.RIGHT_PAREN);
-  }
-
 
   public SchemeIdentifier[] getAllSymbols()
   {

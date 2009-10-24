@@ -1,17 +1,14 @@
 package org.jetbrains.plugins.scheme.formatter.codeStyle;
 
-import com.intellij.openapi.options.Configurable;
-import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.application.options.CodeStyleAbstractConfigurable;
 import com.intellij.application.options.CodeStyleAbstractPanel;
+import com.intellij.psi.codeStyle.CodeStyleSettings;
 import org.jetbrains.plugins.scheme.SchemeBundle;
 import org.jetbrains.plugins.scheme.SchemeIcons;
 
 import javax.swing.*;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFormatConfigurable extends CodeStyleAbstractConfigurable
 {
   public SchemeFormatConfigurable(CodeStyleSettings settings, CodeStyleSettings cloneSettings)

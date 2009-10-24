@@ -9,9 +9,7 @@ import org.jetbrains.plugins.scheme.psi.impl.search.SchemeSourceFilterScope;
 
 import java.util.Collection;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFullScriptNameIndex extends IntStubIndexExtension<SchemeFile>
 {
   public static final StubIndexKey<Integer, SchemeFile> KEY = StubIndexKey.createIndexKey("scm.script.fqn");

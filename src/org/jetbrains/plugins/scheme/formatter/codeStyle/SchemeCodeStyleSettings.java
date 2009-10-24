@@ -1,12 +1,9 @@
 package org.jetbrains.plugins.scheme.formatter.codeStyle;
 
-import com.intellij.psi.codeStyle.CustomCodeStyleSettings;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
-import org.jetbrains.annotations.NonNls;
+import com.intellij.psi.codeStyle.CustomCodeStyleSettings;
 
-/**
- * @author ilyas
- */
+
 public class SchemeCodeStyleSettings extends CustomCodeStyleSettings
 {
   public boolean ALIGN_SCHEME_FORMS = false;

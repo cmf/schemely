@@ -11,9 +11,7 @@ import org.jetbrains.plugins.scheme.SchemeIcons;
 
 import java.util.Properties;
 
-/**
- * @author ilyas
- */
+
 public class SchemeTemplatesFactory implements FileTemplateGroupDescriptorFactory
 {
   @NonNls

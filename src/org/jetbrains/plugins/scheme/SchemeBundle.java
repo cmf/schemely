@@ -8,9 +8,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.ResourceBundle;
 
-/**
- * @author ilyas
- */
+
 public class SchemeBundle
 {
   private static Reference<ResourceBundle> ourBundle;

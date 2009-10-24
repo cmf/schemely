@@ -9,16 +9,13 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.HashMap;
 import com.intellij.util.containers.HashSet;
 import org.jetbrains.plugins.scheme.SchemeIcons;
-import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
 import org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil;
 import org.jetbrains.plugins.scheme.psi.resolve.SchemeResolveResult;
 import org.jetbrains.plugins.scheme.psi.resolve.completion.CompletionProcessor;
 
 import java.util.*;
 
-/**
- * @author ilyas
- */
+
 public class CompleteSymbol
 {
   public static Object[] getVariants(SchemeIdentifier symbol)
@@ -27,32 +24,32 @@ public class CompleteSymbol
 
     SchemeIdentifier qualifier = symbol.getQualifierSymbol();
     CompletionProcessor processor = new CompletionProcessor(symbol);
-    if (qualifier == null)
-    {
-      ResolveUtil.treeWalkUp(symbol, processor);
-    }
-    else
-    {
-//      for (ResolveResult result : qualifier.multiResolve(false))
-//      {
-//        final PsiElement element = result.getElement();
-//        if (element != null)
-//        {
-//          final PsiElement sep = symbol.getSeparatorToken();
-//          if (sep != null)
-//          {
-//            if ("/".equals(sep.getText()) && isNamespaceLike(element))
-//            {
-//              element.processDeclarations(processor, ResolveState.initial(), null, symbol);
-//            }
-//            else if (".".equals(sep.getText()))
-//            {
-//              element.processDeclarations(processor, ResolveState.initial(), null, symbol);
-//            }
-//          }
-//        }
-//      }
-    }
+    //    if (qualifier == null)
+    //    {
+    //      ResolveUtil.treeWalkUp(symbol, processor);
+    //    }
+    //    else
+    //    {
+    //      for (ResolveResult result : qualifier.multiResolve(false))
+    //      {
+    //        final PsiElement element = result.getElement();
+    //        if (element != null)
+    //        {
+    //          final PsiElement sep = symbol.getSeparatorToken();
+    //          if (sep != null)
+    //          {
+    //            if ("/".equals(sep.getText()) && isNamespaceLike(element))
+    //            {
+    //              element.processDeclarations(processor, ResolveState.initial(), null, symbol);
+    //            }
+    //            else if (".".equals(sep.getText()))
+    //            {
+    //              element.processDeclarations(processor, ResolveState.initial(), null, symbol);
+    //            }
+    //          }
+    //        }
+    //      }
+    //    }
 
     SchemeResolveResult[] candidates = processor.getCandidates();
     if (candidates.length == 0)
@@ -98,13 +95,13 @@ public class CompleteSymbol
                                      element instanceof PsiNamedElement ?
                                      ((PsiNamedElement) element).getName() :
                                      element.toString());
-//        if (element instanceof ClDef)
-//        {
-//          ClDef def = (ClDef) element;
-//          item.setTailType(TailType.SPACE);
-//          item.setAttribute(LookupItem.TAIL_TEXT_ATTR, " " + def.getParameterString());
-//          item.setAttribute(LookupItem.TYPE_TEXT_ATTR, def.getContainingFile().getName());
-//        }
+        //        if (element instanceof ClDef)
+        //        {
+        //          ClDef def = (ClDef) element;
+        //          item.setTailType(TailType.SPACE);
+        //          item.setAttribute(LookupItem.TAIL_TEXT_ATTR, " " + def.getParameterString());
+        //          item.setAttribute(LookupItem.TYPE_TEXT_ATTR, def.getContainingFile().getName());
+        //        }
         return item;
       }
     });

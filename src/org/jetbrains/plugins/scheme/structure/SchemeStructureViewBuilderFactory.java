@@ -7,9 +7,7 @@ import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author ilyas
- */
+
 public class SchemeStructureViewBuilderFactory implements PsiStructureViewFactory
 {
   public StructureViewBuilder getStructureViewBuilder(final PsiFile psiFile)

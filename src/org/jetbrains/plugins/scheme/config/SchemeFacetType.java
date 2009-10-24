@@ -23,9 +23,7 @@ import org.jetbrains.plugins.scheme.file.SchemeFileType;
 import javax.swing.*;
 import java.util.Collection;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFacetType extends FacetType<SchemeFacet, SchemeFacetConfiguration>
 {
   public static final SchemeFacetType INSTANCE = new SchemeFacetType();

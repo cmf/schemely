@@ -6,9 +6,7 @@ import com.intellij.psi.codeStyle.CustomCodeStyleSettings;
 import com.intellij.openapi.options.Configurable;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author ilyas
- */
+
 public class SchemeCodeStyleSettingsProvider extends CodeStyleSettingsProvider
 {
   @NotNull

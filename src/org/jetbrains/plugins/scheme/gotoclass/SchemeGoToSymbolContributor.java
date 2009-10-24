@@ -10,15 +10,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author ilyas
- */
+
 public class SchemeGoToSymbolContributor implements ChooseByNameContributor
 {
   public String[] getNames(Project project, boolean includeNonProjectItems)
   {
     Set<String> symbols = new HashSet<String>();
-//    symbols.addAll(StubIndex.getInstance().getAllKeys(ClDefNameIndex.KEY));
+    //    symbols.addAll(StubIndex.getInstance().getAllKeys(ClDefNameIndex.KEY));
     return symbols.toArray(new String[symbols.size()]);
 
   }
@@ -28,7 +26,7 @@ public class SchemeGoToSymbolContributor implements ChooseByNameContributor
     GlobalSearchScope scope = includeNonProjectItems ? null : GlobalSearchScope.projectScope(project);
 
     List<NavigationItem> symbols = new ArrayList<NavigationItem>();
-//    symbols.addAll(StubIndex.getInstance().get(ClDefNameIndex.KEY, name, project, scope));
+    //    symbols.addAll(StubIndex.getInstance().get(ClDefNameIndex.KEY, name, project, scope));
     return symbols.toArray(new NavigationItem[symbols.size()]);
   }
 }

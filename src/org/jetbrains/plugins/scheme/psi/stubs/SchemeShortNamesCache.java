@@ -23,10 +23,8 @@ import org.jetbrains.plugins.scheme.psi.stubs.index.SchemeFullScriptNameIndex;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * @author ilyas
- */
-public class SchemeShortNamesCache implements PsiShortNamesCache
+
+public class SchemeShortNamesCache extends PsiShortNamesCache
 {
   Project myProject;
 
@@ -49,7 +47,7 @@ public class SchemeShortNamesCache implements PsiShortNamesCache
   @NotNull
   public String[] getAllFileNames()
   {
-    return FilenameIndex.getAllFilenames();
+    return FilenameIndex.getAllFilenames(myProject);
   }
 
   private boolean areClassesCompiled()
@@ -129,7 +127,7 @@ public class SchemeShortNamesCache implements PsiShortNamesCache
       return new String[0];
     }
 
-    Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY);
+    Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY, myProject);
     return classNames.toArray(new String[classNames.size()]);
   }
 
@@ -140,7 +138,7 @@ public class SchemeShortNamesCache implements PsiShortNamesCache
       return;
     }
 
-    Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY);
+    Collection<String> classNames = StubIndex.getInstance().getAllKeys(SchemeClassNameIndex.KEY, myProject);
     dest.addAll(classNames);
   }
 

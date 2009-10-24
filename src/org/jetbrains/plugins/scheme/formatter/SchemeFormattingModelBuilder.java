@@ -12,9 +12,7 @@ import com.intellij.psi.codeStyle.CodeStyleSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFormattingModelBuilder implements FormattingModelBuilder
 {
   @NotNull

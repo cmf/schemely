@@ -4,9 +4,7 @@ import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 
-/**
- * @author ilyas
- */
+
 public class SchemeUtils
 {
   public static boolean isSuitableModule(Module module)

@@ -5,13 +5,11 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
-import org.jetbrains.plugins.scheme.psi.api.SchemeLiteral;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeLiteral;
 
 import java.util.List;
 
-/**
- * @author ilyas
- */
+
 public class SchemeLiteralSelectioner extends SchemeBasicSelectioner
 {
   public boolean canSelect(PsiElement e)

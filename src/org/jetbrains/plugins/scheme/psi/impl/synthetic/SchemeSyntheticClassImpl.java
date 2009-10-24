@@ -14,9 +14,9 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.file.SchemeFileType;
-import org.jetbrains.plugins.scheme.psi.api.SchemeList;
 import org.jetbrains.plugins.scheme.psi.api.synthetic.SchemeSyntheticClass;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
+import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -178,18 +178,18 @@ public class SchemeSyntheticClassImpl extends LightElement implements SchemeSynt
 
   public PsiClass getSuperClass()
   {
-//    final SchemeList ns = getNsElement();
-//    final ClKeyImpl key = SchemePsiUtil.findNamespaceKeyByName(ns, SchemePsiUtil.EXTENDS);
-//    if (key != null)
-//    {
-//      final PsiElement next = SchemePsiUtil.getNextNonWhiteSpace(key);
-//      if (next instanceof SchemeIdentifier)
-//      {
-//        SchemeIdentifier symbol = (SchemeIdentifier) next;
-//        return JavaPsiFacade.getInstance(getProject())
-//          .findClass(symbol.getText(), GlobalSearchScope.allScope(getProject()));
-//      }
-//    }
+    //    final SchemeList ns = getNsElement();
+    //    final ClKeyImpl key = SchemePsiUtil.findNamespaceKeyByName(ns, SchemePsiUtil.EXTENDS);
+    //    if (key != null)
+    //    {
+    //      final PsiElement next = SchemePsiUtil.getNextNonWhiteSpace(key);
+    //      if (next instanceof SchemeIdentifier)
+    //      {
+    //        SchemeIdentifier symbol = (SchemeIdentifier) next;
+    //        return JavaPsiFacade.getInstance(getProject())
+    //          .findClass(symbol.getText(), GlobalSearchScope.allScope(getProject()));
+    //      }
+    //    }
     return null;
   }
 
@@ -202,32 +202,32 @@ public class SchemeSyntheticClassImpl extends LightElement implements SchemeSynt
   public PsiClass[] getInterfaces()
   {
     SchemeList ns = getNsElement();
-//    final ClKeyImpl key = SchemePsiUtil.findNamespaceKeyByName(ns, SchemePsiUtil.IMPLEMENTS);
+    //    final ClKeyImpl key = SchemePsiUtil.findNamespaceKeyByName(ns, SchemePsiUtil.IMPLEMENTS);
     ArrayList<PsiClass> classes = new ArrayList<PsiClass>();
     GlobalSearchScope scope = GlobalSearchScope.allScope(getProject());
     JavaPsiFacade facade = JavaPsiFacade.getInstance(getProject());
     // TODO CMF
-//    if (key != null)
-//    {
-//      final PsiElement next = SchemePsiUtil.getNextNonWhiteSpace(key);
-//      if (next instanceof SchemeVector)
-//      {
-//        SchemeVector vector = (SchemeVector) next;
-//        for (PsiElement element : vector.getChildren())
-//        {
-//          if (element instanceof SchemeIdentifier)
-//          {
-//            SchemeIdentifier symbol = (SchemeIdentifier) element;
-//            final PsiClass clazz = facade.findClass(symbol.getText(), scope);
-//            if (clazz != null)
-//            {
-//              classes.add(clazz);
-//            }
-//          }
-//        }
-//        return classes.toArray(PsiClass.EMPTY_ARRAY);
-//      }
-//    }
+    //    if (key != null)
+    //    {
+    //      final PsiElement next = SchemePsiUtil.getNextNonWhiteSpace(key);
+    //      if (next instanceof SchemeVector)
+    //      {
+    //        SchemeVector vector = (SchemeVector) next;
+    //        for (PsiElement element : vector.getChildren())
+    //        {
+    //          if (element instanceof SchemeIdentifier)
+    //          {
+    //            SchemeIdentifier symbol = (SchemeIdentifier) element;
+    //            final PsiClass clazz = facade.findClass(symbol.getText(), scope);
+    //            if (clazz != null)
+    //            {
+    //              classes.add(clazz);
+    //            }
+    //          }
+    //        }
+    //        return classes.toArray(PsiClass.EMPTY_ARRAY);
+    //      }
+    //    }
     return new PsiClass[0];
   }
 

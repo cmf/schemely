@@ -1,18 +1,17 @@
 package org.jetbrains.plugins.scheme.psi.resolve.processors;
 
+import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.ResolveState;
-import org.jetbrains.plugins.scheme.psi.api.symbols.SchemeIdentifier;
-import org.jetbrains.plugins.scheme.psi.impl.list.ListDeclarations;
+import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 import org.jetbrains.plugins.scheme.psi.resolve.SchemeResolveResultImpl;
 
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author ilyas
- */
+
 public class SymbolResolveProcessor extends ResolveProcessor
 {
   private final Set<PsiElement> myProcessedElements = new HashSet<PsiElement>();
@@ -36,10 +35,16 @@ public class SymbolResolveProcessor extends ResolveProcessor
       }
       myProcessedElements.add(namedElement);
 
-      return !ListDeclarations.isLocal(element);
+      return !SchemeList.isLocal(element);
     }
 
     return true;
+  }
+
+  @Override
+  public <T> T getHint(Key<T> hintKey)
+  {
+    return null;
   }
 
   public String getName(ResolveState resolveState)
@@ -47,7 +52,8 @@ public class SymbolResolveProcessor extends ResolveProcessor
     return myName;
   }
 
-  public boolean shouldProcess(Class aClass)
+  @Override
+  public boolean shouldProcess(DeclaractionKind kind)
   {
     return true;
   }

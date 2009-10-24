@@ -13,10 +13,8 @@ import org.jetbrains.plugins.scheme.psi.impl.SchemePsiManager;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author ilyas
- */
-public class SchemeClassFinder implements ProjectComponent, PsiElementFinder
+
+public class SchemeClassFinder extends PsiElementFinder implements ProjectComponent
 {
   private final Project myProject;
 
@@ -60,10 +58,10 @@ public class SchemeClassFinder implements ProjectComponent, PsiElementFinder
         if (file instanceof SchemeFile)
         {
           SchemeFile schemeFile = (SchemeFile) file;
-//          if (false && schemeFile.getPackageName().equals(psiPackage.getQualifiedName()))
-//          {
-//            result.add(schemeFile.getDefinedClass());
-//          }
+          //          if (false && schemeFile.getPackageName().equals(psiPackage.getQualifiedName()))
+          //          {
+          //            result.add(schemeFile.getDefinedClass());
+          //          }
         }
       }
     }

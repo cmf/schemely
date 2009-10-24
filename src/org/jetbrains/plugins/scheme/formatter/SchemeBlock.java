@@ -8,8 +8,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
-import com.intellij.psi.impl.source.tree.ChameleonElement;
-import com.intellij.psi.tree.IChameleonElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.formatter.processors.SchemeSpacingProcessor;
@@ -18,9 +16,7 @@ import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
 
 import java.util.List;
 
-/**
- * @author ilyas
- */
+
 public class SchemeBlock implements Block, AST
 {
   final protected ASTNode myNode;
@@ -131,19 +127,13 @@ public class SchemeBlock implements Block, AST
    */
   public boolean isIncomplete(@NotNull ASTNode node)
   {
-    if (node.getElementType() instanceof IChameleonElementType)
-    {
-      return false;
-    }
     ASTNode lastChild = node.getLastChildNode();
     while (lastChild != null &&
-           !(lastChild.getElementType() instanceof IChameleonElementType) &&
            (lastChild.getPsi() instanceof PsiWhiteSpace || lastChild.getPsi() instanceof PsiComment))
     {
       lastChild = lastChild.getTreePrev();
     }
     return lastChild != null &&
-           !(lastChild instanceof ChameleonElement) &&
            (lastChild.getPsi() instanceof PsiErrorElement || isIncomplete(lastChild));
   }
 

@@ -8,9 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author ilyas
- */
+
 public class SchemeSourceFilterScope extends GlobalSearchScope
 {
   private final GlobalSearchScope myDelegate;

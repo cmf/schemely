@@ -3,14 +3,14 @@ package org.jetbrains.plugins.scheme.editor.selection;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import org.jetbrains.plugins.scheme.psi.SchemePsiElement;
-import org.jetbrains.plugins.scheme.psi.api.*;
+import org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase;
+import org.jetbrains.plugins.scheme.psi.api.SchemeBraced;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeVector;
+import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
 
 import java.util.List;
 
-/**
- * @author ilyas
- */
+
 public class SchemeListSelectioner extends SchemeBasicSelectioner
 {
   public boolean canSelect(PsiElement e)
@@ -36,9 +36,9 @@ public class SchemeListSelectioner extends SchemeBasicSelectioner
         result.add(new TextRange(left.getTextRange().getStartOffset(), element.getTextRange().getEndOffset()));
       }
     }
-    if (element instanceof SchemePsiElement)
+    if (element instanceof SchemePsiElementBase)
     {
-      SchemePsiElement psi = (SchemePsiElement) element;
+      SchemePsiElementBase psi = (SchemePsiElementBase) element;
       PsiElement fst = psi.getFirstNonLeafElement();
       PsiElement lst = psi.getLastNonLeafElement();
       int start = fst != null ? fst.getTextRange().getStartOffset() : psi.getTextRange().getStartOffset();

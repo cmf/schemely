@@ -6,9 +6,7 @@ import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
 
-/**
- * @author ilyas
- */
+
 public class SchemeCommenter implements CodeDocumentationAwareCommenter, Tokens
 {
   public String getLineCommentPrefix()
@@ -22,6 +20,18 @@ public class SchemeCommenter implements CodeDocumentationAwareCommenter, Tokens
   }
 
   public String getBlockCommentSuffix()
+  {
+    return null;
+  }
+
+  @Override
+  public String getCommentedBlockCommentPrefix()
+  {
+    return null;
+  }
+
+  @Override
+  public String getCommentedBlockCommentSuffix()
   {
     return null;
   }

@@ -6,9 +6,7 @@ import com.intellij.psi.stubs.StubElement;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
 import org.jetbrains.plugins.scheme.psi.stubs.impl.SchemeFileStubImpl;
 
-/**
- * @author ilyas
- */
+
 public class SchemeFileStubBuilder extends DefaultStubBuilder
 {
   protected StubElement createStubForFile(PsiFile file)
