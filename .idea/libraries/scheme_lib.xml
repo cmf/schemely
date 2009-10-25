@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="scheme_lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/scheme.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/lib/src/jvm" />
+    </SOURCES>
+  </library>
+</component>
