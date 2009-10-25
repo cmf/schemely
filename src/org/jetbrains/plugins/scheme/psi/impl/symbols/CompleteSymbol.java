@@ -22,34 +22,8 @@ public class CompleteSymbol
   {
     Collection<Object> variants = new ArrayList<Object>();
 
-    SchemeIdentifier qualifier = symbol.getQualifierSymbol();
     CompletionProcessor processor = new CompletionProcessor(symbol);
-    //    if (qualifier == null)
-    //    {
-    //      ResolveUtil.treeWalkUp(symbol, processor);
-    //    }
-    //    else
-    //    {
-    //      for (ResolveResult result : qualifier.multiResolve(false))
-    //      {
-    //        final PsiElement element = result.getElement();
-    //        if (element != null)
-    //        {
-    //          final PsiElement sep = symbol.getSeparatorToken();
-    //          if (sep != null)
-    //          {
-    //            if ("/".equals(sep.getText()) && isNamespaceLike(element))
-    //            {
-    //              element.processDeclarations(processor, ResolveState.initial(), null, symbol);
-    //            }
-    //            else if (".".equals(sep.getText()))
-    //            {
-    //              element.processDeclarations(processor, ResolveState.initial(), null, symbol);
-    //            }
-    //          }
-    //        }
-    //      }
-    //    }
+//    ResolveUtil.treeWalkUp(symbol, processor);
 
     SchemeResolveResult[] candidates = processor.getCandidates();
     if (candidates.length == 0)

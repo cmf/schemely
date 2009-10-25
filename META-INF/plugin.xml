@@ -77,9 +77,6 @@
       <implementation-class>org.jetbrains.plugins.scheme.config.SchemeFacetLoader</implementation-class>
       <interface-class>org.jetbrains.plugins.scheme.config.SchemeFacetLoader</interface-class>
     </component>
-    <component>
-      <implementation-class>org.jetbrains.plugins.scheme.SchemeApplication</implementation-class>
-    </component>
   </application-components>
 
   <project-components>

@@ -1,0 +1,6 @@
+* Symbol completion
+ - Add symbols from r5rs, chicken etc.
+ - Investigate doc for symbols
+* REPL
+* Quoted forms - syntax highlighting and don't resolve
+* More binding forms - do, define-values

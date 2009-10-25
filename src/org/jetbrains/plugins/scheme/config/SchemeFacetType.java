@@ -70,7 +70,7 @@ public class SchemeFacetType extends FacetType<SchemeFacet, SchemeFacetConfigura
           return true;
         }
         alreadyDetected.set(true);
-        if (SchemeFileType.SCHEME_DEFAULT_EXTENSION.equals(virtualFile.getExtension()))
+        if (SchemeFileType.SCHEME_EXTENSIONS.equals(virtualFile.getExtension()))
         {
           registry.customizeDetectedFacetPresentation(new SchemeFacetPresentation());
           return true;

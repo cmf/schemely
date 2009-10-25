@@ -156,11 +156,6 @@ public class SchemeIdentifier extends SchemePsiElementBase implements PsiReferen
     };
   }
 
-  public SchemeIdentifier getQualifierSymbol()
-  {
-    return findChildByClass(SchemeIdentifier.class);
-  }
-
   @Override
   public String getName()
   {
@@ -244,6 +239,7 @@ public class SchemeIdentifier extends SchemePsiElementBase implements PsiReferen
     return resolved == element;
   }
 
+  @NotNull
   public Object[] getVariants()
   {
     return CompleteSymbol.getVariants(this);

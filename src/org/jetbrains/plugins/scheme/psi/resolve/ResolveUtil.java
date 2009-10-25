@@ -47,14 +47,4 @@ public abstract class ResolveUtil
     }
     return next;
   }
-
-  public static PsiElement getPrevNonLeafElement(@NotNull PsiElement element)
-  {
-    PsiElement next = element.getPrevSibling();
-    while ((next != null) && isWrongElement(next))
-    {
-      next = next.getPrevSibling();
-    }
-    return next;
-  }
 }
