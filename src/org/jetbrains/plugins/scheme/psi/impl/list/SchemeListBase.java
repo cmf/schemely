@@ -90,7 +90,7 @@ public abstract class SchemeListBase extends SchemePsiElementBase
     return second;
   }
 
-  public SchemeIdentifier[] getAllSymbols()
+  public SchemeIdentifier[] getAllIdentifiers()
   {
     return findChildrenByClass(SchemeIdentifier.class);
   }

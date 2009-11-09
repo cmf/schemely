@@ -34,10 +34,12 @@
                                   implementationClass="org.jetbrains.plugins.scheme.structure.SchemeStructureViewBuilderFactory"/>
     <lang.formatter language="Scheme"
                     implementationClass="org.jetbrains.plugins.scheme.formatter.SchemeFormattingModelBuilder"/>
-    <codeStyleSettingsProvider language="Scheme"
-                               implementation="org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettingsProvider"/>
+    <!--<codeStyleSettingsProvider language="Scheme"-->
+    <!--implementation="org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettingsProvider"/>-->
     <lang.findUsagesProvider language="Scheme"
                              implementationClass="org.jetbrains.plugins.scheme.findUsages.SchemeFindUsagesProvider"/>
+    <referencesSearch implementation="org.jetbrains.plugins.scheme.findUsages.SchemeIdentifierSearch"/>
+
     <lang.namesValidator language="Scheme"
                          implementationClass="org.jetbrains.plugins.scheme.utils.SchemeNamesValidator"/>
     <completion.contributor implementation="org.jetbrains.plugins.scheme.completion.SchemeCompletionContributor"/>

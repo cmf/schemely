@@ -14,9 +14,14 @@ import org.jetbrains.plugins.scheme.psi.api.SchemePsiElement;
 import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 import org.jetbrains.plugins.scheme.psi.impl.synthetic.SchemeSyntheticClassImpl;
+import static org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil.resolveFrom;
 import org.jetbrains.plugins.scheme.psi.util.SchemePsiUtil;
 import org.jetbrains.plugins.scheme.psi.util.SchemeTextUtil;
 import org.jetbrains.plugins.scheme.psi.resolve.ResolveResult;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubSupport, SchemePsiElement
 {
@@ -92,12 +97,6 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
     return true;
   }
 
-  private boolean isWrongElement(PsiElement element)
-  {
-    return element == null ||
-           (element instanceof LeafPsiElement || element instanceof PsiWhiteSpace || element instanceof PsiComment);
-  }
-
   @NotNull
   public ResolveResult resolve(SchemeIdentifier place)
   {
@@ -106,7 +105,7 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
     {
       if ((PsiTreeUtil.findCommonParent(place, next) != next) && SchemeList.isDefinition(next))
       {
-        ResolveResult identifier = SchemeList.processDefineDeclaration((SchemeList) next, place);
+        ResolveResult identifier = resolveFrom(place, SchemeList.processDefineDeclaration((SchemeList) next, place));
         if (identifier.isDone())
         {
           return identifier;
@@ -117,6 +116,31 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
     }
 
     return ResolveResult.CONTINUE;
+  }
+
+  @Override
+  public Collection<PsiElement> getSymbolVariants(SchemeIdentifier symbol)
+  {
+    Collection<PsiElement> ret = new ArrayList<PsiElement>();
+
+    PsiElement next = getFirstChild();
+    while (next != null)
+    {
+      if (SchemeList.isDefinition(next))
+      {
+        ret.addAll(SchemeList.processDefineDeclaration((SchemeList) next, symbol));
+      }
+
+      next = next.getNextSibling();
+    }
+
+    return ret;
+  }
+
+  @Override
+  public int getQuotingLevel()
+  {
+    return 0;
   }
 
   public String getNamespace()

@@ -38,7 +38,7 @@ public class LexerTest extends TestCase
       testCase(" 0@-.0 ", NUMBER_LITERAL),
       testCase(" 999999999999999999999 ", NUMBER_LITERAL),
 
-      testCase(" (define x 3) ", LEFT_PAREN, DEFINE, WHITESPACE, IDENTIFIER, WHITESPACE, NUMBER_LITERAL, RIGHT_PAREN)
+      testCase(" (define x 3) ", LEFT_PAREN, IDENTIFIER, WHITESPACE, IDENTIFIER, WHITESPACE, NUMBER_LITERAL, RIGHT_PAREN)
     );
 
   private static final LexerTestCase[] badCases =

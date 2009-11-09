@@ -59,43 +59,40 @@ public class SchemeBlockGenerator
              (child instanceof PsiComment);
     }
 
-    if (settings.ALIGN_SCHEME_FORMS)
+    if (blockPsi instanceof SchemeList /* && !(blockPsi instanceof ClDef) */)
     {
-      if (blockPsi instanceof SchemeList /* && !(blockPsi instanceof ClDef) */)
+      SchemeList list = (SchemeList) blockPsi;
+      PsiElement first = list.getFirstNonLeafElement();
+
+      int start;
+      if (first == null || !(first instanceof SchemeIdentifier))
       {
-        SchemeList list = (SchemeList) blockPsi;
-        PsiElement first = list.getFirstNonLeafElement();
+        start = 0;
+      }
+      else if (isDefineLike(first))
+      {
+        start = 2;
+      }
+      else
+      {
+        start = 1;
+      }
 
-        int start;
-        if (first == null || !(first instanceof SchemeIdentifier))
-        {
-          start = 0;
-        }
-        else if (isDefineLike(first))
-        {
-          start = 2;
-        }
-        else
-        {
-          start = 1;
-        }
-
-        if ((start == 0) &&
-            ((first == null) || (first.getTextRange().getStartOffset() <= child.getTextRange().getStartOffset())))
+      if ((start == 0) &&
+          ((first == null) || (first.getTextRange().getStartOffset() <= child.getTextRange().getStartOffset())))
+      {
+        return true;
+      }
+      else if ((start == 1) && (first.getTextRange().getEndOffset() <= child.getTextRange().getStartOffset()))
+      {
+        return true;
+      }
+      else if ((start == 2))
+      {
+        PsiElement second = list.getSecondNonLeafElement();
+        if ((second != null) && (second.getTextRange().getEndOffset() <= child.getTextRange().getStartOffset()))
         {
           return true;
-        }
-        else if ((start == 1) && (first.getTextRange().getEndOffset() <= child.getTextRange().getStartOffset()))
-        {
-          return true;
-        }
-        else if ((start == 2))
-        {
-          PsiElement second = list.getSecondNonLeafElement();
-          if ((second != null) && (second.getTextRange().getEndOffset() <= child.getTextRange().getStartOffset()))
-          {
-            return true;
-          }
         }
       }
     }

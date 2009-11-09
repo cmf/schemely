@@ -15,12 +15,34 @@ import java.util.Set;
 
 public class SchemeAnnotator implements Annotator
 {
-  public static final Set<String> IMPLICIT_NAMES = new HashSet<String>();
-
-  static
-  {
-    IMPLICIT_NAMES.addAll(Arrays.asList("def", "new", "throw"));
-  }
+  public static final
+  Set<String>
+    IMPLICIT_NAMES =
+    new HashSet<String>(Arrays.asList("define",
+                                      "new",
+                                      "throw",
+                                      "quote",
+                                      "quasiquote",
+                                      "unquote",
+                                      "unquote-splicing",
+                                      "lambda",
+                                      "define",
+                                      "define-syntax",
+                                      "if",
+                                      "else",
+                                      "let",
+                                      "let*",
+                                      "letrec",
+                                      "set!",
+                                      "begin",
+                                      "cond",
+                                      "and",
+                                      "or",
+                                      "case",
+                                      "do",
+                                      "delay",
+                                      "let-syntax",
+                                      "letrec-syntax"));
 
   public void annotate(PsiElement element, AnnotationHolder holder)
   {
@@ -33,10 +55,18 @@ public class SchemeAnnotator implements Annotator
   private void annotateList(SchemeList list, AnnotationHolder holder)
   {
     SchemeIdentifier first = list.getFirstIdentifier();
-    if (((first != null) && (first.resolve() != null)) || IMPLICIT_NAMES.contains(list.getHeadText()))
+
+//    PsiElement second = list.getSecondNonLeafElement();
+//    StringBuffer buffer = new StringBuffer();
+//    buffer.append(first == null ? "null" : '"' + first.getReferenceName() + '"');
+//    buffer.append(" ");
+//    buffer.append(second == null ? "null" : '"' + second.getText() + '"');
+//    System.out.println(buffer.toString());
+
+    if ((first != null) && IMPLICIT_NAMES.contains(first.getReferenceName()))
     {
       Annotation annotation = holder.createInfoAnnotation(first, null);
-      annotation.setTextAttributes(SchemeSyntaxHighlighter.DEF);
+      annotation.setTextAttributes(SchemeSyntaxHighlighter.KEYWORD);
     }
   }
 }

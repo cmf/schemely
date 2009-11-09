@@ -15,22 +15,17 @@ import java.util.Set;
  */
 public class SchemeNamesValidator implements NamesValidator
 {
-  private static final Set<String> keywords = new HashSet<String>();
   private static final Set<String> specialIdentifiers = new HashSet<String>();
 
   static
   {
-    for (IElementType type : Tokens.SYNTACTIC_KEYWORDS.getTypes())
-    {
-      keywords.add(((SchemeElementType) type).getName());
-    }
-
     specialIdentifiers.addAll(Arrays.asList("+", "-", "..."));
   }
 
   public boolean isKeyword(String s, Project project)
   {
-    return keywords.contains(s);
+    // We have no keywords
+    return false;
   }
 
   public boolean isIdentifier(String s, Project project)

@@ -27,6 +27,4 @@ public class SchemeFacetLoader implements ApplicationComponent
   {
     return "SchemeFacetLoader";
   }
-
-
 }

@@ -6,10 +6,13 @@ import org.jetbrains.plugins.scheme.psi.api.SchemePsiElement;
 import static org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase.isWrongElement;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
+import java.util.List;
+import java.util.ListIterator;
+
 
 public abstract class ResolveUtil
 {
-  public static PsiElement treeWalkUp(SchemeIdentifier place)
+  public static PsiElement resolve(SchemeIdentifier place)
   {
     PsiElement element = place;
     ResolveResult result = ResolveResult.CONTINUE;
@@ -25,6 +28,22 @@ public abstract class ResolveUtil
     }
 
     return result.getResult();
+  }
+
+  public static int getQuotingLevel(PsiElement place)
+  {
+    int ret = 0;
+    PsiElement element = place;
+    while (element != null)
+    {
+      if (element instanceof SchemePsiElement)
+      {
+        SchemePsiElement schemeElement = (SchemePsiElement) element;
+        ret += schemeElement.getQuotingLevel();
+      }
+      element = element.getContext();
+    }
+    return ret;
   }
 
   public static PsiElement[] mapToElements(SchemeResolveResult[] candidates)
@@ -46,5 +65,21 @@ public abstract class ResolveUtil
       next = next.getNextSibling();
     }
     return next;
+  }
+
+  @NotNull
+  public static ResolveResult resolveFrom(@NotNull SchemeIdentifier place, @NotNull List<SchemeIdentifier> matches)
+  {
+    ListIterator<SchemeIdentifier> iterator = matches.listIterator(matches.size());
+    while (iterator.hasPrevious())
+    {
+      SchemeIdentifier identifier = iterator.previous();
+      if (place.couldReference(identifier))
+      {
+        return ResolveResult.of(identifier);
+      }
+    }
+
+    return ResolveResult.CONTINUE;
   }
 }

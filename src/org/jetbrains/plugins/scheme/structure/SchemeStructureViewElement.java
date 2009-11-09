@@ -9,6 +9,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiNamedElement;
 import org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase;
+import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -73,7 +75,35 @@ public class SchemeStructureViewElement implements StructureViewTreeElement
 
   private boolean isBrowsableElement(PsiElement element)
   {
-    return false; // element instanceof ClDef && ((ClDef) element).getNameSymbol() != null;
+    if (element instanceof SchemeIdentifier)
+    {
+      SchemeIdentifier identifier = (SchemeIdentifier) element;
+
+      PsiElement parentElement = identifier.getParent();
+      if (!(parentElement instanceof SchemeList))
+      {
+        return false;
+      }
+
+      SchemeList parent = (SchemeList) parentElement;
+      if (parent.isDefinition() && (parent.getSecondNonLeafElement() == element))
+      {
+        // (define x <whatever>)
+        return true;
+      }
+      else if (parent.getParent() instanceof SchemeList)
+      {
+        SchemeList grandparent = (SchemeList) parent.getParent();
+        if (grandparent.isDefinition() &&
+            (grandparent.getSecondNonLeafElement() == parent) &&
+            (parent.getFirstIdentifier() == element))
+        {
+          // (define (x <formals>) <whatever>)
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public ItemPresentation getPresentation()
@@ -82,10 +112,6 @@ public class SchemeStructureViewElement implements StructureViewTreeElement
     {
       public String getPresentableText()
       {
-        //        if (myElement instanceof ClDef)
-        //        {
-        //          return ((ClDef) myElement).getPresentationText();
-        //        }
         return ((PsiNamedElement) myElement).getName();
       }
 

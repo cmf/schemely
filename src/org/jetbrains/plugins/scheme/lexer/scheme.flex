@@ -1,17 +1,3 @@
-/*
- * Copyright 2000-2009 Red Shark Technology
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package org.jetbrains.plugins.scheme.lexer;
 
@@ -186,8 +172,8 @@ Comment = ";" [^\r\n]*
 
 Letter = [A-Z] | [a-z]
 
-Initial = {Letter} | "!" | "$" | "%"  | "&" | "*" | "/" | ":"  | "<" | "=" | ">" | "?"  | "~" | "_" | "^"
-Subsequent = {Initial} | {Digit} | "."  | "+" | "-" | "@"
+Initial = {Letter} | "!" | "$" | "%"  | "&" | "*" | "/" | ":"  | "<" | "=" | ">" | "?"  | "~" | "_" | "^" | "@"
+Subsequent = {Initial} | {Digit} | "."  | "+" | "-"
 Identifier = {Initial} { Subsequent}* | "+" | "-" | "..."
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,29 +192,6 @@ False = "#f"
 %%
 
 <YYINITIAL>{
-  "quote"                                   {  return QUOTE; }
-  "quasiquote"                              {  return QUASIQUOTE; }
-  "unquote"                                 {  return UNQUOTE; }
-  "unquote-splicing"                        {  return UNQUOTE_SPLICING; }
-  "lambda"                                  {  return LAMBDA; }
-  "define"                                  {  return DEFINE; }
-  "define-syntax"                           {  return DEFINE_SYNTAX; }
-  "if"                                      {  return IF; }
-  "else"                                    {  return ELSE; }
-  "let"                                     {  return LET; }
-  "let*"                                    {  return LET_STAR; }
-  "letrec"                                  {  return LETREC; }
-  "set!"                                    {  return SET; }
-  "begin"                                   {  return BEGIN; }
-  "cond"                                    {  return COND; }
-  "and"                                     {  return AND; }
-  "or"                                      {  return OR; }
-  "case"                                    {  return CASE; }
-  "do"                                      {  return DO; }
-  "delay"                                   {  return DELAY; }
-  "let-syntax"                              {  return LET_SYNTAX; }
-  "letrec-syntax"                           {  return LETREC_SYNTAX; }
-
   "=>"                                      {  return ARROW; }
 
   "..."                                     {  return DOTDOTDOT; }

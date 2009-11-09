@@ -37,24 +37,22 @@ public class SchemeColorsAndFontsPage implements ColorSettingsPage
   private static final
   AttributesDescriptor[]
     ATTRS =
-    new AttributesDescriptor[]{new AttributesDescriptor(SchemeSyntaxHighlighter.LINE_COMMENT_ID,
-                                                        SchemeSyntaxHighlighter.LINE_COMMENT),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.ATOM_ID, SchemeSyntaxHighlighter.ATOM),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.KEY_ID, SchemeSyntaxHighlighter.KEY),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.NUMBER_ID,
-                                                        SchemeSyntaxHighlighter.NUMBER),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.STRING_ID,
-                                                        SchemeSyntaxHighlighter.STRING),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.BRACES_ID,
-                                                        SchemeSyntaxHighlighter.BRACES),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.PAREN_ID,
-                                                        SchemeSyntaxHighlighter.PARENTS),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.BAD_CHARACTER_ID,
-                                                        SchemeSyntaxHighlighter.BAD_CHARACTER),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.CHAR_ID, SchemeSyntaxHighlighter.CHAR),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.LITERAL_ID,
-                                                        SchemeSyntaxHighlighter.LITERAL),
-                               new AttributesDescriptor(SchemeSyntaxHighlighter.DEF_ID, SchemeSyntaxHighlighter.DEF),};
+    new AttributesDescriptor[]{desc(SchemeSyntaxHighlighter.IDENTIFIER_ID, SchemeSyntaxHighlighter.IDENTIFIER),
+                               desc(SchemeSyntaxHighlighter.LINE_COMMENT_ID, SchemeSyntaxHighlighter.LINE_COMMENT),
+                               desc(SchemeSyntaxHighlighter.NUMBER_ID, SchemeSyntaxHighlighter.NUMBER),
+                               desc(SchemeSyntaxHighlighter.STRING_ID, SchemeSyntaxHighlighter.STRING),
+                               desc(SchemeSyntaxHighlighter.BRACES_ID, SchemeSyntaxHighlighter.BRACES),
+                               desc(SchemeSyntaxHighlighter.PAREN_ID, SchemeSyntaxHighlighter.PARENS),
+                               desc(SchemeSyntaxHighlighter.BAD_CHARACTER_ID, SchemeSyntaxHighlighter.BAD_CHARACTER),
+                               desc(SchemeSyntaxHighlighter.CHAR_ID, SchemeSyntaxHighlighter.CHAR),
+                               desc(SchemeSyntaxHighlighter.LITERAL_ID, SchemeSyntaxHighlighter.LITERAL),
+                               desc(SchemeSyntaxHighlighter.QUOTED_ID, SchemeSyntaxHighlighter.QUOTED),
+                               desc(SchemeSyntaxHighlighter.KEYWORD_ID, SchemeSyntaxHighlighter.KEYWORD),};
+
+  private static AttributesDescriptor desc(String displayName, TextAttributesKey key)
+  {
+    return new AttributesDescriptor(displayName, key);
+  }
 
   @NotNull
   public ColorDescriptor[] getColorDescriptors()
@@ -91,7 +89,7 @@ public class SchemeColorsAndFontsPage implements ColorSettingsPage
   public Map<String, TextAttributesKey> getAdditionalHighlightingTagToDescriptorMap()
   {
     Map<String, TextAttributesKey> map = new HashMap<String, TextAttributesKey>();
-    map.put("def", SchemeSyntaxHighlighter.DEF);
+    map.put("def", SchemeSyntaxHighlighter.IDENTIFIER);
     return map;
   }
 }

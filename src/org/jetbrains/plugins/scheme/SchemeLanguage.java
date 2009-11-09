@@ -25,5 +25,4 @@ public class SchemeLanguage extends Language
   {
     super(ID);
   }
-
 }

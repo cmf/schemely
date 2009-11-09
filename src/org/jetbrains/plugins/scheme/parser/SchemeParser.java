@@ -39,10 +39,6 @@ public class SchemeParser implements PsiParser, Tokens
     {
       parseLiteral(builder);
     }
-    else if (SYNTACTIC_KEYWORDS.contains(token))
-    {
-      parseKeyword(builder);
-    }
     else if (IDENTIFIER == token)
     {
       parseIdentifier(builder);
@@ -100,19 +96,6 @@ public class SchemeParser implements PsiParser, Tokens
   private void internalError(String msg)
   {
     throw new Error(msg);
-  }
-
-  /**
-   * Enter: Lexer is pointed at symbol
-   * Exit: Lexer is pointed immediately after symbol
-   *
-   * @param builder
-   */
-  private void parseKeyword(PsiBuilder builder)
-  {
-    PsiBuilder.Marker marker = builder.mark();
-    builder.advanceLexer(); // eat atom
-    marker.done(AST.IDENTIFIER);
   }
 
   /**

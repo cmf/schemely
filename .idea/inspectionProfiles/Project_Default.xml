@@ -7,5 +7,6 @@
       <option name="onlyWarnOnAbstractMethods" value="false" />
     </inspection_tool>
     <inspection_tool class="UnnecessaryUnboxing" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="UnusedProperty" enabled="true" level="WARNING" enabled_by_default="true" />
   </profile>
 </component>

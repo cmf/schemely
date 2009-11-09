@@ -15,7 +15,8 @@ public class SchemeBraceMatcher implements PairedBraceMatcher
     PAIRS =
     new BracePair[]{new BracePair(Tokens.LEFT_PAREN, Tokens.RIGHT_PAREN, true),
                     new BracePair(Tokens.LEFT_SQUARE, Tokens.RIGHT_SQUARE, true),
-                    new BracePair(Tokens.LEFT_CURLY, Tokens.RIGHT_CURLY, true),};
+                    new BracePair(Tokens.LEFT_CURLY, Tokens.RIGHT_CURLY, true),
+                    new BracePair(Tokens.OPEN_VECTOR, Tokens.RIGHT_PAREN, true)};
 
   public BracePair[] getPairs()
   {

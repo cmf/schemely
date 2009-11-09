@@ -29,7 +29,7 @@ public class SchemeSpacingProcessor implements AST
     IElementType type1 = node1.getElementType();
     IElementType type2 = node2.getElementType();
 
-    if (MODIFIERS.contains(type1))
+    if (PREFIXES.contains(type1))
     {
       return NO_SPACING;
     }

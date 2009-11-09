@@ -22,9 +22,7 @@ public class SchemeFindUsagesProvider implements FindUsagesProvider
 
   public boolean canFindUsagesFor(@NotNull PsiElement psiElement)
   {
-    boolean ret = psiElement instanceof SchemeIdentifier;
-    System.out.println("canFindUsagesFor " + id(psiElement) + ": " + ret);
-    return ret;
+    return psiElement instanceof SchemeIdentifier;
   }
 
   public String getHelpId(@NotNull PsiElement psiElement)

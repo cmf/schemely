@@ -1,6 +1,16 @@
 * Symbol completion
  - Add symbols from r5rs, chicken etc.
  - Investigate doc for symbols
+
+* Chicken reader extensions
+
+* Named let, do
+
+* Structure view & completion should show function parameters
+
+* Quoted forms - syntax highlighting and don't resolve (new lexer)
+
 * REPL
-* Quoted forms - syntax highlighting and don't resolve
+
 * More binding forms - do, define-values
+ - should be configurable

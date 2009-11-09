@@ -87,23 +87,13 @@ public class ParserTestBase
   protected boolean doesNotResolve(PsiElement element)
   {
     PsiReference reference = element.getReference();
-    if (reference == null)
-    {
-      return true;
-    }
-    if (reference.resolve() != null)
-    {
-      return false;
-    }
-    if (reference instanceof PsiPolyVariantReference)
-    {
-      PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
-      if (polyVariantReference.multiResolve(false).length > 0)
-      {
-        return false;
-      }
-    }
-    return true;
+    return (reference == null) || (reference.resolve() == null);
+  }
+
+  protected boolean resolvesToSelf(PsiElement element)
+  {
+    PsiReference reference = element.getReference();
+    return (reference != null) && (reference.resolve() == reference);
   }
 
   protected boolean resolvesTo(PsiElement source, PsiElement target)

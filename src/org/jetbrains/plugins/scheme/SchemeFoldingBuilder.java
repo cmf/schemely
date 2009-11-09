@@ -81,6 +81,6 @@ public class SchemeFoldingBuilder implements FoldingBuilder
       return true;
     }
 
-    return false; // (type == DEF || type == DEFMETHOD) && node.getText().contains("\n");
+    return false; // (type == IDENTIFIER || type == DEFMETHOD) && node.getText().contains("\n");
   }
 }

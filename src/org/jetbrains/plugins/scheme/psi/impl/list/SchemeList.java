@@ -9,6 +9,10 @@ import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 import org.jetbrains.plugins.scheme.psi.resolve.ResolveResult;
 import org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil;
 
+import static org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil.resolveFrom;
+
+import java.util.*;
+
 
 public class SchemeList extends SchemeListBase
 {
@@ -17,6 +21,11 @@ public class SchemeList extends SchemeListBase
   public static final String LET = "let";
   public static final String LET_STAR = "let*";
   public static final String LETREC = "letrec";
+
+  private static final String QUOTE = "quote";
+  private static final String QUASIQUOTE = "quasiquote";
+  private static final String UNQUOTE = "unquote";
+  private static final String UNQUOTE_SPLICING = "unquote-splicing";
 
   public SchemeList(@NotNull ASTNode astNode)
   {
@@ -33,170 +42,181 @@ public class SchemeList extends SchemeListBase
   @Override
   public ResolveResult resolve(SchemeIdentifier place)
   {
-    String headText = getHeadText();
-    if (headText == null)
+    if (isLambda())
     {
-      return ResolveResult.CONTINUE;
+      return resolveFrom(place, processLambdaDeclaration(this, place));
     }
-    if (headText.equals(LAMBDA))
+    else if (isDefinition())
     {
-      return processLambdaDeclaration(this, place);
+      return resolveFrom(place, processDefineDeclaration(this, place));
     }
-    else if (isDefinitionText(headText))
+    else if (isLet())
     {
-      return processDefineDeclaration(this, place);
-    }
-    else if (headText.equals(LET) || headText.equals(LET_STAR) || headText.equals(LETREC))
-    {
-      return processLetDeclaration(this, place, headText);
+      return resolveFrom(place, processLetDeclaration(this, place));
     }
 
     return ResolveResult.CONTINUE;
   }
 
-  @NotNull
-  private static ResolveResult processLambdaDeclaration(SchemeList lambda, SchemeIdentifier place)
+  @Override
+  public Collection<PsiElement> getSymbolVariants(SchemeIdentifier symbol)
   {
-    if (PsiTreeUtil.findCommonParent(place, lambda) != lambda)
+    String headText = getHeadText();
+    if (headText == null)
     {
-      return ResolveResult.CONTINUE;
+      return Collections.emptyList();
+    }
+    if (headText.equals(LAMBDA))
+    {
+      return new ArrayList<PsiElement>(processLambdaDeclaration(this, symbol));
+    }
+    else if (isDefinition())
+    {
+      return new ArrayList<PsiElement>(processDefineDeclaration(this, symbol));
+    }
+    else if (isLet())
+    {
+      return new ArrayList<PsiElement>(processLetDeclaration(this, symbol));
+    }
+
+    return Collections.emptyList();
+  }
+
+  @Override
+  public int getQuotingLevel()
+  {
+    String headText = getHeadText();
+    if (QUOTE.equals(headText) || QUASIQUOTE.equals(headText))
+    {
+      return 1;
+    }
+    else if (UNQUOTE.equals(headText) || UNQUOTE_SPLICING.equals(headText))
+    {
+      return -1;
+    }
+    return 0;
+  }
+
+  @NotNull
+  private static List<SchemeIdentifier> processLambdaDeclaration(SchemeList lambda, SchemeIdentifier place)
+  {
+    if (!PsiTreeUtil.isAncestor(lambda, place, false))
+    {
+      return Collections.emptyList();
     }
 
     PsiElement formals = lambda.getSecondNonLeafElement();
     if (formals == null)
     {
-      return ResolveResult.CONTINUE;
+      return Collections.emptyList();
     }
 
-    // Lambda formals are not references
-    if (PsiTreeUtil.findCommonParent(place, formals) == formals)
+    // Lambda formals resolve to the symbol itself
+    if (PsiTreeUtil.isAncestor(formals, place, false))
     {
-      return ResolveResult.NONE;
+      return Collections.singletonList(place);
     }
 
-    // Process internal definitions first to get shadowing
-    ResolveResult identifier = processInternalDefinitions((SchemePsiElementBase) formals, place);
-    if (identifier.isDone())
-    {
-      return identifier;
-    }
+    List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
 
     if (formals instanceof SchemeIdentifier)
     {
       // (lambda x (head x))
       if (place == formals)
       {
-        return ResolveResult.NONE;
+        return Collections.singletonList(place);
       }
 
-      SchemeIdentifier arg = (SchemeIdentifier) formals;
-      if (place.couldReference(arg))
-      {
-        return ResolveResult.of(arg);
-      }
+      ret.add((SchemeIdentifier) formals);
     }
     else if (formals instanceof SchemeList)
     {
       // (lambda (x) (+ x 3))
       SchemeList args = (SchemeList) formals;
 
-      for (SchemeIdentifier arg : args.getAllSymbols())
-      {
-        if (place.couldReference(arg))
-        {
-          return ResolveResult.of(arg);
-        }
-      }
+      ret.addAll(Arrays.asList(args.getAllIdentifiers()));
     }
 
-    return ResolveResult.CONTINUE;
+    ret.addAll(processInternalDefinitions((SchemePsiElementBase) formals, place));
+
+    return ret;
   }
 
   @NotNull
-  public static ResolveResult processDefineDeclaration(SchemeList define, SchemeIdentifier place)
+  public static List<SchemeIdentifier> processDefineDeclaration(SchemeList define, SchemeIdentifier place)
   {
     PsiElement formals = define.getSecondNonLeafElement();
     if (formals == null)
     {
-      return ResolveResult.CONTINUE;
+      return Collections.emptyList();
     }
 
-    // Define variables are not references
-    if ((PsiTreeUtil.findCommonParent(place, formals) == formals))
+    // Define variables resolve to the symbol itself
+    if ((PsiTreeUtil.isAncestor(formals, place, false)))
     {
-      // TODO check this
-      return ResolveResult.of(place);
+      return Collections.singletonList(place);
     }
 
     PsiElement body = ResolveUtil.getNextNonLeafElement(formals);
 
     if ((PsiTreeUtil.findCommonParent(place, define) != define.getParent()) &&
-        (PsiTreeUtil.findCommonParent(place, body) != body))
+        !PsiTreeUtil.isAncestor(body, place, false))
     {
-      return ResolveResult.CONTINUE;
+      return Collections.emptyList();
     }
 
     if ((place != formals) && (formals instanceof SchemeIdentifier))
     {
-      SchemeIdentifier identifier = (SchemeIdentifier) formals;
-
       // (define x 3)
-      if (place.couldReference(identifier))
-      {
-        return ResolveResult.of(identifier);
-      }
+      SchemeIdentifier identifier = (SchemeIdentifier) formals;
+      return Collections.singletonList(identifier);
     }
     else if (formals instanceof SchemeList)
     {
       // (define (plus3 x) (+ x 3))
       SchemeList args = (SchemeList) formals;
-
-      for (SchemeIdentifier arg : args.getAllSymbols())
-      {
-        if (place.couldReference(arg))
-        {
-          return ResolveResult.of(arg);
-        }
-      }
+      return Arrays.asList(args.getAllIdentifiers());
     }
 
-    return ResolveResult.CONTINUE;
+    return Collections.emptyList();
   }
 
   @NotNull
-  private static ResolveResult processLetDeclaration(SchemeList declaration, SchemeIdentifier place, String style)
+  private static List<SchemeIdentifier> processLetDeclaration(SchemeList declaration, SchemeIdentifier place)
   {
-    if (PsiTreeUtil.findCommonParent(place, declaration) != declaration)
+    if (!PsiTreeUtil.isAncestor(declaration, place, false))
     {
-      return ResolveResult.CONTINUE;
+      return Collections.emptyList();
     }
 
     PsiElement vars = declaration.getSecondNonLeafElement();
     if (vars == null)
     {
-      return ResolveResult.CONTINUE;
+      return Collections.emptyList();
     }
 
-    if ((PsiTreeUtil.findCommonParent(place, vars) == vars))
+    List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
+
+    if ((PsiTreeUtil.isAncestor(vars, place, false)))
     {
       // place is either a let-bound variable or its value.
       PsiElement placeParent = place.getParent();
       if ((placeParent instanceof SchemeList) && (placeParent.getParent() == vars))
       {
-        // If place is the first identifier in a list which is a sub-list of the let vars, it's a let-bound variable
-        // so it's not a reference
+        // If place is the first identifier in a list which is a sub-list of the let vars, it's a let-bound
+        // variable so it only resolves to itself
         SchemeList parentList = (SchemeList) placeParent;
         if (place == parentList.getFirstIdentifier())
         {
-          return ResolveResult.NONE;
+          return Collections.singletonList(place);
         }
       }
 
+      String style = declaration.getHeadText();
       if (style.equals(LET))
       {
-        // It's part of a value for a let-bound variable, nothing in the let is in scope but we should
-        // keep searching
-        return ResolveResult.CONTINUE;
+        // It's part of a value for a let-bound variable, nothing in the let is in scope
+        return Collections.emptyList();
       }
       else if (style.equals(LET_STAR))
       {
@@ -204,29 +224,24 @@ public class SchemeList extends SchemeListBase
         {
           // (let ((x 3) (y 4)) (+ x y))
           SchemeList args = (SchemeList) vars;
-          SchemeList[] bindings = args.getSubLists();
 
-          // Skip later bindings
-          int i = bindings.length - 1;
-          while ((i >= 0) && !PsiTreeUtil.isAncestor(bindings[i], place, true))
+          for (SchemeList binding : args.getSubLists())
           {
-            i--;
-          }
-          // bindings[i] is now our containing binding list - skip it
-          i--;
-
-          // process all remaining bindings
-          while (i >= 0)
-          {
-            ResolveResult result = processFirstIdentifier(bindings[i], place);
-            if (result.isDone())
+            SchemeIdentifier var = binding.getFirstIdentifier();
+            if (var != null)
             {
-              return result;
+              ret.add(var);
             }
-            i--;
+
+            // Variables are only visible in later bindings
+            if (PsiTreeUtil.isAncestor(binding, place, false))
+            {
+              return ret;
+            }
           }
         }
-        return ResolveResult.CONTINUE;
+        // Should never get this far
+        return ret;
       }
       else if (style.equals(LETREC))
       {
@@ -237,22 +252,15 @@ public class SchemeList extends SchemeListBase
           SchemeList[] bindings = args.getSubLists();
           for (SchemeList binding : bindings)
           {
-            ResolveResult result = processFirstIdentifier(binding, place);
-            if (result.isDone())
+            SchemeIdentifier var = binding.getFirstIdentifier();
+            if (var != null)
             {
-              return result;
+              ret.add(var);
             }
           }
         }
-        return ResolveResult.CONTINUE;
+        return ret;
       }
-    }
-
-    // Process internal definitions first to get shadowing
-    ResolveResult result = processInternalDefinitions((SchemePsiElementBase) vars, place);
-    if (result.isDone())
-    {
-      return result;
     }
 
     // TODO named let
@@ -260,44 +268,41 @@ public class SchemeList extends SchemeListBase
     {
       // (let ((x 3) (y 4)) (+ x y))
       SchemeList args = (SchemeList) vars;
-
-      for (SchemeList arg : args.getSubLists())
+      for (SchemeList binding : args.getSubLists())
       {
-        result = processFirstIdentifier(arg, place);
-        if (result.isDone())
+        SchemeIdentifier var = binding.getFirstIdentifier();
+        if (var != null)
         {
-          return result;
+          ret.add(var);
         }
       }
     }
 
-    return ResolveResult.CONTINUE;
+    // Process internal definitions first to get shadowing
+    ret.addAll(processInternalDefinitions((SchemePsiElementBase) vars, place));
+
+    return ret;
   }
 
-  @NotNull
-  private static ResolveResult processFirstIdentifier(SchemeList arg, SchemeIdentifier place)
+  private static List<SchemeIdentifier> processInternalDefinitions(SchemePsiElementBase after, SchemeIdentifier place)
   {
-    SchemeIdentifier firstIdentifier = arg.getFirstIdentifier();
-    if ((firstIdentifier != null) && place.couldReference(firstIdentifier))
-    {
-      return ResolveResult.of(firstIdentifier);
-    }
-    return ResolveResult.CONTINUE;
-  }
+    List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
 
-  private static ResolveResult processInternalDefinitions(SchemePsiElementBase after, SchemeIdentifier place)
-  {
     PsiElement next = ResolveUtil.getNextNonLeafElement(after);
     while ((next != null) && isDefinition(next))
     {
-      ResolveResult result = processDefineDeclaration((SchemeList) next, place);
-      if (result.isDone())
+      ret.addAll(processDefineDeclaration((SchemeList) next, place));
+
+      // Don't process following definitions
+      if (PsiTreeUtil.isAncestor(next, place, false))
       {
-        return result;
+        break;
       }
+
       next = ResolveUtil.getNextNonLeafElement(next);
     }
-    return ResolveResult.CONTINUE;
+
+    return ret;
   }
 
   public static boolean isLocal(PsiElement element)
@@ -341,13 +346,7 @@ public class SchemeList extends SchemeListBase
     }
 
     SchemeList list = (SchemeList) element;
-    String head = list.getHeadText();
-    return isDefinitionText(head);
-  }
-
-  private static boolean isDefinitionText(String headText)
-  {
-    return DEFINE.equals(headText) || LAMBDA.equals(headText);
+    return list.isDefinition();
   }
 
   public static boolean isLet(PsiElement element)
@@ -358,12 +357,24 @@ public class SchemeList extends SchemeListBase
     }
 
     SchemeList list = (SchemeList) element;
-    String head = list.getHeadText();
-    return isLetText(head);
+    return list.isLet();
   }
 
-  private static boolean isLetText(String headText)
+  public boolean isDefinition()
   {
+    String headText = getHeadText();
+    return DEFINE.equals(headText);
+  }
+
+  public boolean isLambda()
+  {
+    String headText = getHeadText();
+    return LAMBDA.equals(headText);
+  }
+
+  private boolean isLet()
+  {
+    String headText = getHeadText();
     return LET.equals(headText) || LET_STAR.equals(headText) || LETREC.equals(headText);
   }
 }

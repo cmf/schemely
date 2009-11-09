@@ -21,6 +21,4 @@ public interface AST extends Tokens
   TokenSet LIST_LIKE_FORMS = TokenSet.create(LIST, VECTOR);
 
   TokenSet BRACES = TokenSet.create(LEFT_CURLY, LEFT_PAREN, LEFT_SQUARE, RIGHT_CURLY, RIGHT_PAREN, RIGHT_SQUARE);
-
-  TokenSet MODIFIERS = TokenSet.create(QUOTE_MARK, BACKQUOTE, COMMA, COMMA_AT);
 }

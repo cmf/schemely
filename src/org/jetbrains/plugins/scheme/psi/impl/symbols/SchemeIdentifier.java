@@ -22,7 +22,6 @@ import org.jetbrains.plugins.scheme.psi.util.SchemePsiElementFactory;
 
 import javax.swing.*;
 
-
 public class SchemeIdentifier extends SchemePsiElementBase implements PsiReference, PsiNamedElement
 {
   public SchemeIdentifier(ASTNode node)
@@ -44,16 +43,8 @@ public class SchemeIdentifier extends SchemePsiElementBase implements PsiReferen
 
   public boolean couldReference(SchemeIdentifier place)
   {
-    if ((this != place))
-    {
-      String targetName = place.getReferenceName();
-      if (targetName != null && targetName.equals(getReferenceName()))
-      {
-        return true;
-      }
-    }
-
-    return false;
+    String targetName = place.getReferenceName();
+    return targetName != null && targetName.equals(getReferenceName());
   }
 
   public PsiElement getElement()
@@ -159,48 +150,23 @@ public class SchemeIdentifier extends SchemePsiElementBase implements PsiReferen
   @Override
   public String getName()
   {
-    System.out.println("Returning name string " + getNameString() + " for " + id(this));
     return getNameString();
   }
 
   public PsiElement resolve()
   {
+    if (ResolveUtil.getQuotingLevel(this) != 0)
+    {
+      return null;
+    }
+
     String name = getReferenceName();
     if (name == null)
     {
       return null;
     }
 
-    PsiElement element = ResolveUtil.treeWalkUp(this);
-    System.out.println("Resolving " + id(this) + " to " + id(element));
-    return element;
-
-    //      else
-    //      {
-    //        for (ResolveResult result : qualifier.multiResolve(false))
-    //        {
-    //          final PsiElement element = result.getElement();
-    //          if (element != null)
-    //          {
-    //            final PsiElement sep = symbol.getSeparatorToken();
-    //            if (sep != null)
-    //            {
-    //              if ("/".equals(sep.getText()))
-    //              {
-    //                //get class elemets
-    //                if (element instanceof PsiClass)
-    //                {
-    //                  element.processDeclarations(processor, ResolveState.initial(), null, symbol);
-    //                }
-    //              }
-    //              else if (".".equals(sep.getText()))
-    //              {
-    //                element.processDeclarations(processor, ResolveState.initial(), null, symbol);
-    //              }
-    //            }
-    //          }
-    //        }
-    //      }
+    return ResolveUtil.resolve(this);
   }
 
   public static String id(Object object)
@@ -234,9 +200,16 @@ public class SchemeIdentifier extends SchemePsiElementBase implements PsiReferen
 
   public boolean isReferenceTo(PsiElement element)
   {
-    PsiElement resolved = resolve();
-    System.out.println(id(this) + " resolves to " + id(resolved) + ", comparing to " + id(element));
-    return resolved == element;
+    if (element instanceof SchemeIdentifier)
+    {
+      SchemeIdentifier identifier = (SchemeIdentifier) element;
+      String referenceName = getReferenceName();
+      if ((referenceName != null) && referenceName.equals(identifier.getReferenceName()))
+      {
+        return resolve() == identifier;
+      }
+    }
+    return false;
   }
 
   @NotNull

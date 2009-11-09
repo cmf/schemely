@@ -60,12 +60,9 @@ public class SchemeParserDefinition implements ParserDefinition
 
   public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right)
   {
-    if (left.getElementType() == Tokens.QUOTE)
-    //        left.getElementType() == Tokens.SHARP ||
-    //        left.getElementType() == Tokens.SHARPUP)
+    if (Tokens.PREFIXES.contains(left.getElementType()))
     {
       return SpaceRequirements.MUST_NOT;
-
     }
     else if (left.getElementType() == Tokens.LEFT_PAREN ||
              right.getElementType() == Tokens.RIGHT_PAREN ||

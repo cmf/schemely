@@ -7,6 +7,8 @@ import com.intellij.ide.util.treeView.smartTree.Grouper;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
+import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
 
 public class SchemeStructureViewModel extends TextEditorBasedStructureViewModel
@@ -34,7 +36,7 @@ public class SchemeStructureViewModel extends TextEditorBasedStructureViewModel
   @NotNull
   public Sorter[] getSorters()
   {
-    return new Sorter[]{Sorter.ALPHA_SORTER};
+    return new Sorter[] { Sorter.ALPHA_SORTER };
   }
 
   @NotNull
@@ -51,6 +53,6 @@ public class SchemeStructureViewModel extends TextEditorBasedStructureViewModel
   @NotNull
   protected Class[] getSuitableClasses()
   {
-    return new Class[]{ /*ClDef.class*/};
+    return new Class[] { SchemeIdentifier.class };
   }
 }

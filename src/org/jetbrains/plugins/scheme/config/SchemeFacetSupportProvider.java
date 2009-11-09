@@ -27,6 +27,6 @@ public class SchemeFacetSupportProvider extends FacetBasedFrameworkSupportProvid
                                     ModifiableRootModel modifiableRootModel,
                                     FrameworkVersion frameworkVersion)
   {
-    throw new UnsupportedOperationException();
+//    throw new UnsupportedOperationException();
   }
 }

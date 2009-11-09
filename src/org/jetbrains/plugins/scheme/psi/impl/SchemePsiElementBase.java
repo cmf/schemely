@@ -11,6 +11,9 @@ import org.jetbrains.plugins.scheme.psi.api.SchemePsiElement;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 import org.jetbrains.plugins.scheme.psi.resolve.ResolveResult;
 
+import java.util.Collection;
+import java.util.Collections;
+
 
 public abstract class SchemePsiElementBase extends ASTWrapperPsiElement implements SchemePsiElement
 {
@@ -68,5 +71,17 @@ public abstract class SchemePsiElementBase extends ASTWrapperPsiElement implemen
   public ResolveResult resolve(SchemeIdentifier place)
   {
     return ResolveResult.CONTINUE;
+  }
+
+  @Override
+  public Collection<PsiElement> getSymbolVariants(SchemeIdentifier symbol)
+  {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public int getQuotingLevel()
+  {
+    return 0;
   }
 }
