@@ -1,3 +1,5 @@
 .idea/workspace.xml
 out
 test-output
+jflex.log
+src/org/jetbrains/plugins/scheme/lexer/_SchemeLexer.java~
