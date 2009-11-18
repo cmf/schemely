@@ -32,18 +32,17 @@ public interface Tokens
   IElementType STRING_LITERAL = new SchemeElementType("string literal");
   IElementType NUMBER_LITERAL = new SchemeElementType("number literal");
   IElementType CHAR_LITERAL = new SchemeElementType("character literal");
+  IElementType BOOLEAN_LITERAL = new SchemeElementType("boolean literal");
 
-  IElementType TRUE = new SchemeElementType("true");
-  IElementType FALSE = new SchemeElementType("false");
-
-  TokenSet LITERALS = TokenSet.create(STRING_LITERAL, NUMBER_LITERAL, CHAR_LITERAL, TRUE, FALSE);
+  TokenSet LITERALS = TokenSet.create(STRING_LITERAL, NUMBER_LITERAL, CHAR_LITERAL, BOOLEAN_LITERAL);
 
   IElementType IDENTIFIER = new SchemeElementType("identifier");
 
   IElementType DOT = new SchemeElementType(".");
-  IElementType DOTDOTDOT = new SchemeElementType("...");
 
   IElementType ARROW = new SchemeElementType("=>");
+
+  IElementType SPECIAL = new SchemeElementType("special");
 
   // Control characters
   IElementType EOL = new SchemeElementType("end of line");

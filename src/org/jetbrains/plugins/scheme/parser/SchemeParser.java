@@ -43,6 +43,10 @@ public class SchemeParser implements PsiParser, Tokens
     {
       parseIdentifier(builder);
     }
+    else if (SPECIAL == token)
+    {
+      parseSpecial(builder);
+    }
     else if (PREFIXES.contains(token))
     {
       parseAbbreviation(builder);
@@ -125,6 +129,19 @@ public class SchemeParser implements PsiParser, Tokens
     // TODO fix this
     builder.advanceLexer();
     marker.done(AST.IDENTIFIER);
+  }
+
+  /**
+   * Enter: Lexer is pointed at special
+   * Exit: Lexer is pointed immediately after special symbol
+   *
+   * @param builder
+   */
+  private void parseSpecial(PsiBuilder builder)
+  {
+    PsiBuilder.Marker marker = builder.mark();
+    builder.advanceLexer();
+    marker.done(AST.SPECIAL);
   }
 
   /**

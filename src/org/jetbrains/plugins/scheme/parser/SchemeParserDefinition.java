@@ -11,7 +11,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.plugins.scheme.lexer.SchemeFlexLexer;
+import org.jetbrains.plugins.scheme.lexer.SchemeLexer;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
 
@@ -21,7 +21,7 @@ public class SchemeParserDefinition implements ParserDefinition
   @NotNull
   public Lexer createLexer(Project project)
   {
-    return new SchemeFlexLexer();
+    return new SchemeLexer();
   }
 
   public PsiParser createParser(Project project)

@@ -5,10 +5,12 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
+import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scheme.SchemeIcons;
+import org.jetbrains.plugins.scheme.lexer.Tokens;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -38,16 +40,17 @@ public class SchemeColorsAndFontsPage implements ColorSettingsPage
   AttributesDescriptor[]
     ATTRS =
     new AttributesDescriptor[]{desc(SchemeSyntaxHighlighter.IDENTIFIER_ID, SchemeSyntaxHighlighter.IDENTIFIER),
-                               desc(SchemeSyntaxHighlighter.LINE_COMMENT_ID, SchemeSyntaxHighlighter.LINE_COMMENT),
+                               desc(SchemeSyntaxHighlighter.COMMENT_ID, SchemeSyntaxHighlighter.LINE_COMMENT),
                                desc(SchemeSyntaxHighlighter.NUMBER_ID, SchemeSyntaxHighlighter.NUMBER),
                                desc(SchemeSyntaxHighlighter.STRING_ID, SchemeSyntaxHighlighter.STRING),
-                               desc(SchemeSyntaxHighlighter.BRACES_ID, SchemeSyntaxHighlighter.BRACES),
-                               desc(SchemeSyntaxHighlighter.PAREN_ID, SchemeSyntaxHighlighter.PARENS),
+                               desc(SchemeSyntaxHighlighter.BRACES_ID, SchemeSyntaxHighlighter.BRACE),
+                               desc(SchemeSyntaxHighlighter.PAREN_ID, SchemeSyntaxHighlighter.PAREN),
                                desc(SchemeSyntaxHighlighter.BAD_CHARACTER_ID, SchemeSyntaxHighlighter.BAD_CHARACTER),
                                desc(SchemeSyntaxHighlighter.CHAR_ID, SchemeSyntaxHighlighter.CHAR),
                                desc(SchemeSyntaxHighlighter.LITERAL_ID, SchemeSyntaxHighlighter.LITERAL),
                                desc(SchemeSyntaxHighlighter.QUOTED_ID, SchemeSyntaxHighlighter.QUOTED),
-                               desc(SchemeSyntaxHighlighter.KEYWORD_ID, SchemeSyntaxHighlighter.KEYWORD),};
+                               desc(SchemeSyntaxHighlighter.KEYWORD_ID, SchemeSyntaxHighlighter.KEYWORD),
+                               desc(SchemeSyntaxHighlighter.SPECIAL_ID, SchemeSyntaxHighlighter.SPECIAL),};
 
   private static AttributesDescriptor desc(String displayName, TextAttributesKey key)
   {

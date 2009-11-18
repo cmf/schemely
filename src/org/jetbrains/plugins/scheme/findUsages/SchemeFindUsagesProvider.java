@@ -6,10 +6,9 @@ import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.scheme.lexer.SchemeFlexLexer;
+import org.jetbrains.plugins.scheme.lexer.SchemeLexer;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
-import static org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier.id;
 
 
 public class SchemeFindUsagesProvider implements FindUsagesProvider
@@ -17,7 +16,7 @@ public class SchemeFindUsagesProvider implements FindUsagesProvider
   @Nullable
   public WordsScanner getWordsScanner()
   {
-    return new DefaultWordsScanner(new SchemeFlexLexer(), Tokens.IDENTIFIERS, Tokens.COMMENTS, Tokens.STRINGS);
+    return new DefaultWordsScanner(new SchemeLexer(), Tokens.IDENTIFIERS, Tokens.COMMENTS, Tokens.STRINGS);
   }
 
   public boolean canFindUsagesFor(@NotNull PsiElement psiElement)

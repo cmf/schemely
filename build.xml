@@ -65,17 +65,7 @@
     <delete dir="build" includes="**/*"/>
   </target>
 
-  <target name="make.lexer">
-    <java jar="${project.lib}/JFlex.jar" output="jflex.log" fork="true" maxmemory="512m">
-      <arg value="--charat"/>
-      <arg value="-skel"/>
-      <arg value="${project.lib}/idea-flex.skeleton"/>
-      <arg value="src/org/jetbrains/plugins/scheme/lexer/scheme.flex"/>
-    </java>
-
-  </target>
-
-  <target name="make.plugin" depends="make.lexer">
+  <target name="make.plugin">
     <!--Copy descriptor-->
     <copy todir="${project.dest}/META-INF">
       <fileset dir="${project.dir}/META-INF"/>
@@ -145,7 +135,7 @@
          META-INF/**/*.xml,
          lib/**/*,
          test/**/*"
-        />
+      />
   </target>
 
 

@@ -15,6 +15,7 @@ public interface AST extends Tokens
 
   final IElementType LITERAL = new SchemeElementType("literal");
   final IElementType IDENTIFIER = new SchemeElementType("identifier");
+  final IElementType SPECIAL = new SchemeElementType("special");
 
   final IElementType ABBREVIATION = new SchemeElementType("abbreviation");
 

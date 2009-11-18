@@ -32,6 +32,10 @@ public class SchemePsiCreator
     {
       return new SchemeIdentifier(node);
     }
+    if (elementType == AST.SPECIAL)
+    {
+      return new SchemeIdentifier(node);
+    }
     if (elementType == AST.LITERAL)
     {
       return new SchemeLiteral(node);

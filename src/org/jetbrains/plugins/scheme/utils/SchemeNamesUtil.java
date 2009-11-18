@@ -2,7 +2,7 @@ package org.jetbrains.plugins.scheme.utils;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.application.ApplicationManager;
-import org.jetbrains.plugins.scheme.lexer.SchemeFlexLexer;
+import org.jetbrains.plugins.scheme.lexer.SchemeLexer;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
 
 
@@ -15,7 +15,7 @@ public class SchemeNamesUtil
     {
       return false;
     }
-    Lexer lexer = new SchemeFlexLexer();
+    Lexer lexer = new SchemeLexer();
     lexer.start(text, 0, text.length(), 0);
     if (lexer.getTokenType() != Tokens.IDENTIFIER)
     {
@@ -24,5 +24,4 @@ public class SchemeNamesUtil
     lexer.advance();
     return lexer.getTokenType() == null;
   }
-
 }
