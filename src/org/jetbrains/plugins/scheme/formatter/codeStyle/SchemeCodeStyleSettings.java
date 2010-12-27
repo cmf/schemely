@@ -3,10 +3,12 @@ package org.jetbrains.plugins.scheme.formatter.codeStyle;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CustomCodeStyleSettings;
 
+import javax.swing.*;
+
 
 public class SchemeCodeStyleSettings extends CustomCodeStyleSettings
 {
-  public boolean ALIGN_SCHEME_FORMS = false;
+  public String defineForms = "lambda\ndefine\nlet\nletrec\nlet*\ndefine-syntax\nlet-syntax\nletrec-syntax";
 
   protected SchemeCodeStyleSettings(CodeStyleSettings container)
   {

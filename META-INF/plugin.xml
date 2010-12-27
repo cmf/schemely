@@ -34,8 +34,7 @@
                                   implementationClass="org.jetbrains.plugins.scheme.structure.SchemeStructureViewBuilderFactory"/>
     <lang.formatter language="Scheme"
                     implementationClass="org.jetbrains.plugins.scheme.formatter.SchemeFormattingModelBuilder"/>
-    <!--<codeStyleSettingsProvider language="Scheme"-->
-    <!--implementation="org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettingsProvider"/>-->
+    <codeStyleSettingsProvider implementation="org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettingsProvider"/>
     <lang.findUsagesProvider language="Scheme"
                              implementationClass="org.jetbrains.plugins.scheme.findUsages.SchemeFindUsagesProvider"/>
     <referencesSearch implementation="org.jetbrains.plugins.scheme.findUsages.SchemeIdentifierSearch"/>
@@ -43,6 +42,7 @@
     <lang.namesValidator language="Scheme"
                          implementationClass="org.jetbrains.plugins.scheme.utils.SchemeNamesValidator"/>
     <completion.contributor implementation="org.jetbrains.plugins.scheme.completion.SchemeCompletionContributor"/>
+    <compilerSettingsFactory implementation="org.jetbrains.plugins.scheme.compiler.SchemeCompilerSettingsFactory"/>
     <fileTemplateGroup implementation="org.jetbrains.plugins.scheme.actions.SchemeTemplatesFactory"/>
     <fileTypeIndentOptionsProvider
       implementation="org.jetbrains.plugins.scheme.formatter.SchemeIndentOptionsProvider"/>
@@ -83,6 +83,9 @@
 
   <project-components>
     <component>
+      <implementation-class>org.jetbrains.plugins.scheme.compiler.SchemeCompilerSettings</implementation-class>
+    </component>
+    <component>
       <implementation-class>org.jetbrains.plugins.scheme.psi.impl.javaView.SchemeClassFinder
       </implementation-class>
     </component>
@@ -92,6 +95,9 @@
     <!--<component>-->
     <!--<implementation-class>org.jetbrains.plugins.scheme.repl.ReplToolWindow</implementation-class>-->
     <!--</component>-->
+    <component>
+      <implementation-class>org.jetbrains.plugins.scheme.compiler.CompilerProjectComponent</implementation-class>
+    </component>
   </project-components>
 
   <actions>

@@ -45,13 +45,12 @@ public interface Tokens
   IElementType SPECIAL = new SchemeElementType("special");
 
   // Control characters
-  IElementType EOL = new SchemeElementType("end of line");
   IElementType EOF = new SchemeElementType("end of file");
   IElementType WHITESPACE = TokenType.WHITE_SPACE;
   IElementType BAD_CHARACTER = TokenType.BAD_CHARACTER;
 
   // Useful token sets
-  TokenSet WHITESPACE_SET = TokenSet.create(EOL, EOF, WHITESPACE);
+  TokenSet WHITESPACE_SET = TokenSet.create(EOF, WHITESPACE);
   TokenSet IDENTIFIERS = TokenSet.create(IDENTIFIER);
   TokenSet STRINGS = TokenSet.create(STRING_LITERAL);
 

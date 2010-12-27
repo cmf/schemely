@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.scheme.SchemeIcons;
 import org.jetbrains.plugins.scheme.SchemeLanguage;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 public class SchemeFileType extends LanguageFileType
 {
@@ -49,6 +49,4 @@ public class SchemeFileType extends LanguageFileType
   {
     return true;
   }
-
-
 }

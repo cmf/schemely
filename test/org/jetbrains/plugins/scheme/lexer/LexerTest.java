@@ -98,10 +98,6 @@ public class LexerTest
                               RIGHT_PAREN));
   }
 
-  private static final LexerTestCase[] badCases = array(
-    // Numbers
-    testCase(" 1a ", NUMBER_LITERAL));
-
   @Test(dataProvider = "goodCases")
   public static void testLexer(LexerTestCase testCase)
   {
@@ -121,23 +117,6 @@ public class LexerTest
     assert lexer.getTokenType() == null : "Expected final null, got " + lexer.getTokenType();
   }
 
-  public static void testBadCases()
-  {
-    for (LexerTestCase badCase : badCases)
-    {
-      SchemeLexer lexer = new SchemeLexer();
-      lexer.start(badCase.testData);
-      for (int i = 0; i < badCase.types.length; i++)
-      {
-        IElementType expected = badCase.types[i];
-        //        assertEquals("Incorrect token type", expected, lexer.getTokenType());
-        lexer.advance();
-      }
-
-      //      assertEquals("Expected bad token", BAD_CHARACTER, lexer.getTokenType());
-    }
-  }
-
   private static <T> T[] array(T... items)
   {
     return items;
@@ -149,20 +128,6 @@ public class LexerTest
     for (int i = 0; i < items.length; i++)
     {
       ret[i] = new Object[] { items[i] };
-    }
-    return ret;
-  }
-
-  static Object[][] merge(Object[][] first, Object[][] second)
-  {
-    Object[][] ret = new Object[first.length + second.length][];
-    for (int i = 0; i < first.length; i++)
-    {
-      ret[i] = first[i];
-    }
-    for (int i = 0; i < second.length; i++)
-    {
-      ret[first.length + i] = second[i];
     }
     return ret;
   }

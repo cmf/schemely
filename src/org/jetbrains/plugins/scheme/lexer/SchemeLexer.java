@@ -62,12 +62,15 @@ public class SchemeLexer extends LexerBase
              test("=>", Tokens.ARROW) ||
              test("#\\newline", Tokens.CHAR_LITERAL) ||
              test("#\\space", Tokens.CHAR_LITERAL) ||
+             test("#\\tab", Tokens.CHAR_LITERAL) ||
              test("#t", Tokens.BOOLEAN_LITERAL) ||
              test("#f", Tokens.BOOLEAN_LITERAL) ||
              test("#!eof", Tokens.SPECIAL) ||
              test("#!optional", Tokens.SPECIAL) ||
              test("#!rest", Tokens.SPECIAL) ||
-             test("#!key", Tokens.SPECIAL))
+             test("#!key", Tokens.SPECIAL) ||
+             test("#!void", Tokens.SPECIAL) ||
+             test("#!null", Tokens.SPECIAL))
     {
       // done
     }

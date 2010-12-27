@@ -5,124 +5,195 @@ import com.intellij.formatting.Block;
 import com.intellij.formatting.Indent;
 import com.intellij.formatting.Wrap;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.tree.TokenSet;
-import org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettings;
-import org.jetbrains.plugins.scheme.formatter.processors.SchemeIndentProcessor;
-import org.jetbrains.plugins.scheme.lexer.Tokens;
-import org.jetbrains.plugins.scheme.psi.impl.SchemeLiteral;
+import org.jetbrains.plugins.scheme.parser.AST;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeVector;
 import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class SchemeBlockGenerator
 {
-  private static final TokenSet RIGHT_BRACES = TokenSet.create(Tokens.RIGHT_CURLY, Tokens.RIGHT_SQUARE);
+  private static final Map<String, Integer> schemeFormIndent = new HashMap<String, Integer>();
+  private static final
+  TokenSet
+    BRACES =
+    TokenSet.create(AST.LEFT_CURLY,
+                    AST.LEFT_PAREN,
+                    AST.LEFT_SQUARE,
+                    AST.RIGHT_CURLY,
+                    AST.RIGHT_PAREN,
+                    AST.RIGHT_SQUARE);
+
+  static
+  {
+    // From scheme.el && iuscheme.el
+    schemeFormIndent.put("begin", 0);
+    schemeFormIndent.put("define", 1);
+    schemeFormIndent.put("define-class", 2);
+    schemeFormIndent.put("case", 1);
+    schemeFormIndent.put("delay", 0);
+    schemeFormIndent.put("do", 2);
+    schemeFormIndent.put("lambda", 1);
+    schemeFormIndent.put("let", 1);
+    schemeFormIndent.put("let*", 1);
+    schemeFormIndent.put("letrec", 1);
+    schemeFormIndent.put("let-values", 1);
+    schemeFormIndent.put("let*-values", 1);
+    schemeFormIndent.put("sequence", 0);
+    schemeFormIndent.put("let-syntax", 1);
+    schemeFormIndent.put("letrec-syntax", 1);
+    schemeFormIndent.put("syntax-rules", 1);
+    schemeFormIndent.put("syntax-case", 2);
+    schemeFormIndent.put("and", 0);
+    schemeFormIndent.put("or", 0);
+    schemeFormIndent.put("cond", 0);
+    schemeFormIndent.put("set!", 1);
+    schemeFormIndent.put("if", 3);
+    schemeFormIndent.put("when", 1);
+    schemeFormIndent.put("unless", 1);
+    schemeFormIndent.put("parameterize", 1);
+    schemeFormIndent.put("with-syntax", 1);
+
+    schemeFormIndent.put("call-with-input-file", 1);
+    schemeFormIndent.put("with-input-from-file", 1);
+    schemeFormIndent.put("with-input-from-port", 1);
+    schemeFormIndent.put("call-with-output-file", 1);
+    schemeFormIndent.put("with-output-to-file", 1);
+    schemeFormIndent.put("with-output-to-port", 1);
+    schemeFormIndent.put("call-with-values", 1);
+    schemeFormIndent.put("dynamic-wind", 3);
+  }
 
   public static List<Block> generateSubBlocks(ASTNode node, Wrap wrap, CodeStyleSettings settings, SchemeBlock block)
   {
-    PsiElement blockPsi = block.getNode().getPsi();
+    PsiElement blockPsi = node.getPsi();
 
+    Collection<ASTNode> children = getChildren(node);
+
+    if (blockPsi instanceof SchemeList)
+    {
+      SchemeList list = (SchemeList) blockPsi;
+
+      PsiElement first = list.getFirstNonLeafElement();
+      if (first instanceof SchemeIdentifier)
+      {
+        int parameters = 0;
+        Alignment parameterAlignment = Alignment.createAlignment();
+        Alignment bodyAlignment = Alignment.createAlignment();
+
+        ArrayList<Block> subBlocks = new ArrayList<Block>();
+
+        String operator = first.getText();
+        Integer integer = schemeFormIndent.get(operator);
+        if (integer != null)
+        {
+          parameters = integer.intValue();
+        }
+
+        int childIndex = 0;
+        for (ASTNode childNode : children)
+        {
+          Alignment align = null;
+          Indent indent;
+
+          if (BRACES.contains(childNode.getElementType()))
+          {
+            indent = Indent.getNoneIndent();
+          }
+          else
+          {
+            if (childIndex == 0)
+            {
+              indent = Indent.getNormalIndent();
+            }
+            else if ((childIndex - 1) < parameters)
+            {
+              align = parameterAlignment;
+              indent = Indent.getContinuationIndent();
+            }
+            else
+            {
+              align = bodyAlignment;
+              indent = Indent.getNormalIndent();
+            }
+            childIndex++;
+          }
+          subBlocks.add(new SchemeBlock(childNode, align, indent, wrap, settings));
+        }
+        return subBlocks;
+      }
+      else
+      {
+        return indentNormalList(children, Alignment.createAlignment(), wrap, settings);
+      }
+    }
+    else if (blockPsi instanceof SchemeVector)
+    {
+      return indentNormalList(children, null, wrap, settings);
+    }
+    else
+    {
+      return createSubBlocksWith(children, Indent.getNoneIndent(), wrap, settings);
+    }
+  }
+
+  private static List<Block> indentNormalList(Collection<ASTNode> children,
+                                              Alignment alignment,
+                                              Wrap wrap,
+                                              CodeStyleSettings settings)
+  {
     ArrayList<Block> subBlocks = new ArrayList<Block>();
-    ASTNode children[] = node.getChildren(null);
-    ASTNode prevChildNode = null;
-
-    Alignment childAlignment = Alignment.createAlignment();
     for (ASTNode childNode : children)
     {
-      if (canBeCorrectBlock(childNode))
+      Indent indent;
+      Alignment align;
+      if (BRACES.contains(childNode.getElementType()))
       {
-        SchemeCodeStyleSettings styleSettings = block.getSettings().getCustomSettings(SchemeCodeStyleSettings.class);
-        Alignment align = mustAlign(blockPsi, childNode.getPsi(), styleSettings) ? childAlignment : null;
-
-        Indent indent = SchemeIndentProcessor.getChildIndent(block, prevChildNode, childNode);
-        subBlocks.add(new SchemeBlock(childNode, align, indent, wrap, settings));
-        prevChildNode = childNode;
+        indent = Indent.getNoneIndent();
+        align = null;
       }
+      else
+      {
+        indent = Indent.getNormalIndent();
+        align = alignment;
+      }
+      subBlocks.add(new SchemeBlock(childNode, align, indent, wrap, settings));
     }
     return subBlocks;
   }
 
-  public static boolean mustAlign(PsiElement blockPsi, PsiElement child, SchemeCodeStyleSettings settings)
+  private static ArrayList<Block> createSubBlocksWith(Collection<ASTNode> children,
+                                                      Indent indent,
+                                                      Wrap wrap,
+                                                      CodeStyleSettings settings)
   {
-    if (blockPsi instanceof SchemeVector)
+    ArrayList<Block> subBlocks = new ArrayList<Block>();
+    for (ASTNode childNode : children)
     {
-      return !(child instanceof LeafPsiElement) ||
-             RIGHT_BRACES.contains(child.getNode().getElementType()) ||
-             (child instanceof PsiComment);
+      subBlocks.add(new SchemeBlock(childNode, null, indent, wrap, settings));
     }
-
-    if (blockPsi instanceof SchemeList /* && !(blockPsi instanceof ClDef) */)
-    {
-      SchemeList list = (SchemeList) blockPsi;
-      PsiElement first = list.getFirstNonLeafElement();
-
-      int start;
-      if (first == null || !(first instanceof SchemeIdentifier))
-      {
-        start = 0;
-      }
-      else if (isDefineLike(first))
-      {
-        start = 2;
-      }
-      else
-      {
-        start = 1;
-      }
-
-      if ((start == 0) &&
-          ((first == null) || (first.getTextRange().getStartOffset() <= child.getTextRange().getStartOffset())))
-      {
-        return true;
-      }
-      else if ((start == 1) && (first.getTextRange().getEndOffset() <= child.getTextRange().getStartOffset()))
-      {
-        return true;
-      }
-      else if ((start == 2))
-      {
-        PsiElement second = list.getSecondNonLeafElement();
-        if ((second != null) && (second.getTextRange().getEndOffset() <= child.getTextRange().getStartOffset()))
-        {
-          return true;
-        }
-      }
-    }
-
-    if (blockPsi instanceof SchemeLiteral)
-    {
-      ASTNode node = blockPsi.getNode();
-      assert node != null;
-      ASTNode[] elements = node.getChildren(null);
-      if (elements.length > 0 && elements[0].getElementType() == Tokens.STRING_LITERAL)
-      {
-        return true;
-      }
-    }
-    return false;
+    return subBlocks;
   }
 
-  private static boolean isDefineLike(PsiElement first)
+  private static Collection<ASTNode> getChildren(ASTNode node)
   {
-    return first.getText().equalsIgnoreCase("lambda") ||
-           first.getText().equalsIgnoreCase("define") ||
-           first.getText().equalsIgnoreCase("let") ||
-           first.getText().equalsIgnoreCase("letrec") ||
-           first.getText().equalsIgnoreCase("let*") ||
-           first.getText().equalsIgnoreCase("define-syntax") ||
-           first.getText().equalsIgnoreCase("let-syntax") ||
-           first.getText().equalsIgnoreCase("letrec-syntax");
+    Collection<ASTNode> ret = new ArrayList<ASTNode>();
+    for (ASTNode astNode : node.getChildren(null))
+    {
+      if (nonEmptyBlock(astNode))
+      {
+        ret.add(astNode);
+      }
+    }
+    return ret;
   }
 
-  private static boolean canBeCorrectBlock(ASTNode node)
+  private static boolean nonEmptyBlock(ASTNode node)
   {
     String nodeText = node.getText().trim();
     return (nodeText.length() > 0);

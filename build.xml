@@ -37,7 +37,6 @@
     </fileset>
   </path>
 
-
   <path id="scheme.plugin.classpath">
     <path refid="jdk.classpath"/>
     <path refid="idea.classpath"/>
@@ -55,7 +54,6 @@
       </fileset>
     </unzip>
   </target>
-
 
   <target name="init">
     <mkdir dir="${project.dest}"/>
@@ -83,11 +81,7 @@
     <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="idea.classpath"/>
 
     <!--Compile project files-->
-    <javac2 srcdir="${project.dir}"
-            destdir="${project.dest}"
-            verbose="yes"
-            debug="true"
-            target="1.5">
+    <javac2 srcdir="${project.dir}" destdir="${project.dest}" verbose="yes" debug="true" target="1.5">
       <classpath refid="scheme.plugin.classpath"/>
       <include name="src/**/*.java"/>
       <include name="src/**/*.form"/>
@@ -122,8 +116,7 @@
     <delete dir="${project.dir}/tempjar"/>
 
     <!-- Zip sources-->
-    <zip destfile="${output}/scheme-intellij-src-${plugin.version}.zip" basedir="${project.dir}"
-         includes="src/**/*.java,
+    <zip destfile="${output}/scheme-intellij-src-${plugin.version}.zip" basedir="${project.dir}" includes="src/**/*.java,
          src/**/*.properties,
          src/**/*.flex,
          src/**/*.jar,
@@ -134,18 +127,14 @@
          resources/**/*.png,
          META-INF/**/*.xml,
          lib/**/*,
-         test/**/*"
-      />
+         test/**/*"/>
   </target>
-
 
   <target name="build.tests" depends="make.plugin">
 
     <mkdir dir="${test.dest}"/>
 
-    <javac srcdir="${project.dir}"
-           destdir="${test.dest}"
-           debug="true">
+    <javac srcdir="${project.dir}" destdir="${test.dest}" debug="true">
       <classpath refid="scheme.plugin.classpath"/>
       <classpath>
         <path location="${project.dest}"/>
@@ -153,10 +142,7 @@
       <include name="test/**/*.java"/>
     </javac>
 
-    <!--<copy toDir="${project.lib}/testdata">-->
-    <!--<fileset dir="${base.dir}/testdata"/>-->
-    <!--<fileset dir="${scalax.dir}/testdata"/>-->
-    <!--</copy>-->
+    <!--<copy toDir="${project.lib}/testdata">--><!--<fileset dir="${base.dir}/testdata"/>--><!--<fileset dir="${scalax.dir}/testdata"/>--><!--</copy>-->
 
   </target>
 
@@ -166,11 +152,7 @@
     <mkdir dir="${output}/config"/>
     <mkdir dir="${output}/system"/>
 
-    <junit fork="yes"
-           dir="${project.dir}"
-           printsummary="yes"
-           haltonfailure="no"
-           haltonerror="no">
+    <junit fork="yes" dir="${project.dir}" printsummary="yes" haltonfailure="no" haltonerror="no">
 
       <classpath>
         <path location="${project.lib}"/>
@@ -206,5 +188,4 @@
 
     <delete dir="${output}"/>
   </target>
-
 </project>

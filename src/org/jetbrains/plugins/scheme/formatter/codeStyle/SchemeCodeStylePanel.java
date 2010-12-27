@@ -16,8 +16,10 @@ import javax.swing.*;
 public class SchemeCodeStylePanel extends CodeStyleAbstractPanel
 {
   private JPanel myPanel;
-  private JCheckBox alignCheckBox;
   private JPanel myPreviewPanel;
+  private JTextArea defineFormsTextArea;
+  private JTabbedPane myTabbedPane;
+  private JPanel myAlignPanel;
 
   protected SchemeCodeStylePanel(CodeStyleSettings settings)
   {
@@ -57,18 +59,14 @@ public class SchemeCodeStylePanel extends CodeStyleAbstractPanel
   public void apply(CodeStyleSettings settings)
   {
     SchemeCodeStyleSettings scmSettings = settings.getCustomSettings(SchemeCodeStyleSettings.class);
-    scmSettings.ALIGN_SCHEME_FORMS = alignCheckBox.isSelected();
+    scmSettings.defineForms = defineFormsTextArea.getText();
     updatePreview();
   }
 
   public boolean isModified(CodeStyleSettings settings)
   {
     SchemeCodeStyleSettings scmSettings = settings.getCustomSettings(SchemeCodeStyleSettings.class);
-    if (alignCheckBox.isSelected() ^ scmSettings.ALIGN_SCHEME_FORMS)
-    {
-      return true;
-    }
-    return false;
+    return !defineFormsTextArea.getText().equals(scmSettings.defineForms);
   }
 
   public JComponent getPanel()
@@ -85,13 +83,7 @@ public class SchemeCodeStylePanel extends CodeStyleAbstractPanel
 
   private void setSettings(SchemeCodeStyleSettings settings)
   {
-    setValue(alignCheckBox, settings.ALIGN_SCHEME_FORMS);
+    defineFormsTextArea.setText(settings.defineForms);
     //todo add more
   }
-
-  private static void setValue(JCheckBox box, boolean value)
-  {
-    box.setSelected(value);
-  }
-
 }

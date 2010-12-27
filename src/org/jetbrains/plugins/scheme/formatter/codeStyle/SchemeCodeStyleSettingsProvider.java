@@ -20,5 +20,4 @@ public class SchemeCodeStyleSettingsProvider extends CodeStyleSettingsProvider
   {
     return new SchemeCodeStyleSettings(settings);
   }
-
 }

@@ -24,10 +24,7 @@ import com.intellij.util.QueryExecutor;
 import com.intellij.util.text.StringSearcher;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -107,10 +104,13 @@ public class SchemeIdentifierSearch implements QueryExecutor<PsiReference, Refer
             {
               StringSearcher searcher = new StringSearcher(name, caseSensitively, true);
 
+              ProgressManager progressManager = ProgressManager.getInstance();
+
               return LowLevelSearchUtil.processElementsContainingWordInElement(processor,
                                                                                scopeElement,
                                                                                searcher,
-                                                                               ignoreInjectedPsi);
+                                                                               ignoreInjectedPsi,
+                                                                               progressManager.getProgressIndicator());
             }
           }).booleanValue();
         }
@@ -157,8 +157,9 @@ public class SchemeIdentifierSearch implements QueryExecutor<PsiReference, Refer
       final AtomicBoolean canceled = new AtomicBoolean(false);
       final AtomicBoolean pceThrown = new AtomicBoolean(false);
 
-      final int size = fileSet.size();
-      boolean completed = JobUtil.invokeConcurrentlyUnderMyProgress(fileSet, new Processor<PsiFile>()
+      List<PsiFile> psiFiles = new ArrayList<PsiFile>(fileSet);
+      final int size = psiFiles.size();
+      boolean completed = JobUtil.invokeConcurrentlyUnderProgress(psiFiles, new Processor<PsiFile>()
       {
         public boolean process(final PsiFile file)
         {
@@ -176,12 +177,16 @@ public class SchemeIdentifierSearch implements QueryExecutor<PsiReference, Refer
                 Set<PsiElement> processed = new HashSet<PsiElement>(psiRoots.length * 2, (float) 0.5);
                 for (PsiElement psiRoot : psiRoots)
                 {
-                  ProgressManager.getInstance().checkCanceled();
+                  ProgressManager.checkCanceled();
                   if (!processed.add(psiRoot))
                   {
                     continue;
                   }
-                  if (!LowLevelSearchUtil.processElementsContainingWordInElement(processor, psiRoot, searcher, false))
+                  if (!LowLevelSearchUtil.processElementsContainingWordInElement(processor,
+                                                                                 psiRoot,
+                                                                                 searcher,
+                                                                                 false,
+                                                                                 progress))
                   {
                     canceled.set(true);
                     return;
@@ -203,7 +208,7 @@ public class SchemeIdentifierSearch implements QueryExecutor<PsiReference, Refer
           });
           return !canceled.get();
         }
-      }, "Process usages in files");
+      }, true, progress);
 
       if (pceThrown.get())
       {
