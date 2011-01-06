@@ -35,6 +35,7 @@ public class SchemeBlockGenerator
     schemeFormIndent.put("begin", 0);
     schemeFormIndent.put("define", 1);
     schemeFormIndent.put("define-class", 2);
+    schemeFormIndent.put("define-simple-class", 2);
     schemeFormIndent.put("case", 1);
     schemeFormIndent.put("delay", 0);
     schemeFormIndent.put("do", 2);

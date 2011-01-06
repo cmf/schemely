@@ -143,10 +143,10 @@ public abstract class NewSchemeActionBase extends CreateElementActionBase
 
   public static void checkCreateFile(@NotNull PsiDirectory directory, String name) throws IncorrectOperationException
   {
-    if (!SchemeNamesUtil.isIdentifier(name))
-    {
-      throw new IncorrectOperationException(SchemeBundle.message("0.is.not.an.identifier", name));
-    }
+//    if (!SchemeNamesUtil.isIdentifier(name))
+//    {
+//      throw new IncorrectOperationException(SchemeBundle.message("0.is.not.an.identifier", name));
+//    }
 
     String fileName = name + "." + SCHEME_EXTENSION;
     directory.checkCreateFile(fileName);

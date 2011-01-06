@@ -107,6 +107,12 @@
       <add-to-group group-id="NewGroup" anchor="last"/>
     </action>
 
+    <action id="Scheme.JavaToScheme" class="org.jetbrains.plugins.scheme.conversion.JavaToSchemeAction"
+            text="Convert Java File To Scheme" description="Convert Java File To Scheme">
+      <add-to-group group-id="RefactoringMenu" anchor="last"/>
+      <add-to-group group-id="EditorTabPopupMenu" anchor="last"/>
+      <keyboard-shortcut first-keystroke="control shift G" keymap="$default"/>
+    </action>
 
     <!-- REPL-related actions -->
     <!--<action id="org.jetbrains.plugins.scheme.actions.repl.GoToReplAction"-->
