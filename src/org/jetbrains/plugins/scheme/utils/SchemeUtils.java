@@ -7,6 +7,8 @@ import com.intellij.openapi.module.ModuleType;
 
 public class SchemeUtils
 {
+  public static final String SCHEME_NOTIFICATION_GROUP = "Scheme";
+
   public static boolean isSuitableModule(Module module)
   {
     if (module == null)

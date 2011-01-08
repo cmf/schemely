@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public interface SchemeBraced
+public interface SchemeBraced extends SchemePsiElement
 {
   @NotNull
   PsiElement getFirstBrace();

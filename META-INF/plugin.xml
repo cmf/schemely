@@ -34,7 +34,8 @@
                                   implementationClass="org.jetbrains.plugins.scheme.structure.SchemeStructureViewBuilderFactory"/>
     <lang.formatter language="Scheme"
                     implementationClass="org.jetbrains.plugins.scheme.formatter.SchemeFormattingModelBuilder"/>
-    <codeStyleSettingsProvider implementation="org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettingsProvider"/>
+    <codeStyleSettingsProvider
+      implementation="org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettingsProvider"/>
     <lang.findUsagesProvider language="Scheme"
                              implementationClass="org.jetbrains.plugins.scheme.findUsages.SchemeFindUsagesProvider"/>
     <referencesSearch implementation="org.jetbrains.plugins.scheme.findUsages.SchemeIdentifierSearch"/>
@@ -115,51 +116,57 @@
     </action>
 
     <!-- REPL-related actions -->
-    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.GoToReplAction"-->
-    <!--class="org.jetbrains.plugins.scheme.actions.repl.GoToReplAction" text="Go To REPL"-->
-    <!--description="Go to the last Scheme REPL">-->
-    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
-    <!--<keyboard-shortcut keymap="$default" first-keystroke="ctrl BACK_SLASH"/>-->
-    <!--</action>-->
+    <group id="Scheme.REPL.Group"
+           class="org.jetbrains.plugins.scheme.repl.actions.SchemeReplActionGroup"
+           text="Scheme REPL" description="Scheme" popup="true">
 
-    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.RunSelectedTextAction"-->
-    <!--class="org.jetbrains.plugins.scheme.actions.repl.RunSelectedTextAction" text="Run selected in REPL"-->
-    <!--description="Run selected Scheme text in REPL">-->
-    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
-    <!--<keyboard-shortcut keymap="$default" first-keystroke="alt S"/>-->
-    <!--</action>-->
+      <action id="org.jetbrains.plugins.scheme.repl.actions.LoadSchemeFileInConsoleAction"
+              class="org.jetbrains.plugins.scheme.repl.actions.LoadSchemeFileInConsoleAction"
+              text="Load file to REPL">
+        <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift L"/>
+      </action>
 
-    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.AddReplAction"-->
-    <!--class="org.jetbrains.plugins.scheme.actions.repl.AddReplAction" text="Add new Scheme REPL"-->
-    <!--description="Add REPL">-->
-    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
-    <!--<keyboard-shortcut keymap="$default" first-keystroke="ctrl alt A"/>-->
-    <!--</action>-->
-    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.RemoveReplAction"-->
-    <!--class="org.jetbrains.plugins.scheme.actions.repl.RemoveReplAction" text="Remove REPL"-->
-    <!--description="Remove current Scheme REPL">-->
-    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
-    <!--<keyboard-shortcut keymap="$default" first-keystroke="ctrl alt M"/>-->
-    <!--</action>-->
-    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.LoadCurrentfileInReplAction"-->
-    <!--class="org.jetbrains.plugins.scheme.actions.repl.LoadCurrentfileInReplAction" text="Load file to REPL"-->
-    <!--description="Load current file to REPL">-->
-    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
-    <!--<keyboard-shortcut keymap="$default" first-keystroke="alt L"/>-->
-    <!--</action>-->
-    <!--<action id="org.jetbrains.plugins.scheme.actions.repl.RenameReplAction"-->
-    <!--class="org.jetbrains.plugins.scheme.actions.repl.RenameReplAction" text="Rename REPL"-->
-    <!--description="Renamce current Scheme REPL">-->
-    <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
-    <!--<keyboard-shortcut keymap="$default" first-keystroke="ctrl alt SLASH"/>-->
-    <!--</action>-->
+      <action id="org.jetbrains.plugins.scheme.repl.actions.RunSelectedTextAction"
+              class="org.jetbrains.plugins.scheme.repl.actions.RunSelectedTextAction"
+              text="Run selected text in REPL">
+        <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift J"/>
+      </action>
 
-    <!--<group id="SchemeReplActionGroup"-->
-    <!--class="org.jetbrains.plugins.scheme.repl.SchemeReplActionGroup" text="Scheme REPL" description="Scheme">-->
-    <!--</group>-->
+      <action id="org.jetbrains.plugins.scheme.repl.actions.RunLastSExprAction"
+              class="org.jetbrains.plugins.scheme.repl.actions.RunLastSExprAction"
+              text="Execute last S-expression in REPL">
+        <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift H"/>
+      </action>
 
+      <action id="org.jetbrains.plugins.scheme.repl.actions.RunTopSExprAction"
+              class="org.jetbrains.plugins.scheme.repl.actions.RunTopSExprAction"
+              text="Run Top S-expression in REPL">
+        <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift G"/>
+      </action>
+
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+
+    </group>
+
+    <action id="org.jetbrains.plugins.scheme.actions.RunSchemeConsoleAction"
+            class="org.jetbrains.plugins.scheme.repl.actions.RunSchemeConsoleAction" text="Start Scheme Console"
+            description="Runs Scheme REPL">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F10"/>
+    </action>
+
+    <action id="Scheme.Console.Execute"
+            class="com.intellij.openapi.actionSystem.EmptyAction"
+            text="Execute Current Scheme Statement">
+      <keyboard-shortcut keymap="$default" first-keystroke="ENTER"/>
+    </action>
+
+    <action id="Scheme.Console.Execute.Immediately"
+            class="com.intellij.openapi.actionSystem.EmptyAction"
+            text="Execute Current Scheme Statement">
+      <keyboard-shortcut keymap="$default" first-keystroke="shift ENTER"/>
+    </action>
 
   </actions>
-
 
 </idea-plugin>

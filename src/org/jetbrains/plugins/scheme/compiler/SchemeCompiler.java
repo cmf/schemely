@@ -72,7 +72,7 @@ public class SchemeCompiler implements TranslatingCompiler
                                  backEndCompiler,
                                  outputSink);
 
-    // Compile Clojure classes
+    // Compile Scheme classes
     try
     {
       wrapper.compile();
