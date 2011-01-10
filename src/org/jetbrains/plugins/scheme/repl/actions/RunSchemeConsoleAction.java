@@ -23,7 +23,7 @@ public class RunSchemeConsoleAction extends AnAction implements DumbAware
 {
   public RunSchemeConsoleAction()
   {
-    getTemplatePresentation().setIcon(SchemeIcons.REPL_EVAL);
+    getTemplatePresentation().setIcon(SchemeIcons.SCHEME_ICON);
   }
 
   public void update(AnActionEvent e)

@@ -4,6 +4,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.scheme.lexer.Tokens;
+import org.jetbrains.plugins.scheme.psi.api.SchemeBraced;
 import org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 import org.jetbrains.plugins.scheme.psi.resolve.ResolveResult;
@@ -14,13 +16,17 @@ import static org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil.resolveFrom;
 import java.util.*;
 
 
-public class SchemeList extends SchemeListBase
+public class SchemeList extends SchemeListBase implements SchemeBraced
 {
   public static final String LAMBDA = "lambda";
   public static final String DEFINE = "define";
+  public static final String DEFINE_SYNTAX = "define-syntax";
+  public static final String DO = "do";
   public static final String LET = "let";
   public static final String LET_STAR = "let*";
   public static final String LETREC = "letrec";
+  public static final String LET_SYNTAX = "let-syntax";
+  public static final String LETREC_SYNTAX = "letrec-syntax";
 
   private static final String QUOTE = "quote";
   private static final String QUASIQUOTE = "quasiquote";
@@ -39,6 +45,19 @@ public class SchemeList extends SchemeListBase
   }
 
   @NotNull
+  public PsiElement getFirstBrace()
+  {
+    PsiElement element = findChildByType(Tokens.LEFT_PAREN);
+    assert element != null;
+    return element;
+  }
+
+  public PsiElement getLastBrace()
+  {
+    return findChildByType(Tokens.RIGHT_PAREN);
+  }
+
+  @NotNull
   @Override
   public ResolveResult resolve(SchemeIdentifier place)
   {
@@ -50,11 +69,18 @@ public class SchemeList extends SchemeListBase
     {
       return resolveFrom(place, processDefineDeclaration(this, place));
     }
+    else if (isSyntaxDefinition())
+    {
+      return resolveFrom(place, processDefineSyntaxDeclaration(this, place));
+    }
     else if (isLet())
     {
       return resolveFrom(place, processLetDeclaration(this, place));
     }
-
+    else if (isDo())
+    {
+      return resolveFrom(place, processDoDeclaration(this, place));
+    }
     return ResolveResult.CONTINUE;
   }
 
@@ -175,7 +201,45 @@ public class SchemeList extends SchemeListBase
     {
       // (define (plus3 x) (+ x 3))
       SchemeList args = (SchemeList) formals;
-      return Arrays.asList(args.getAllIdentifiers());
+
+      List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
+      if (PsiTreeUtil.isAncestor(body, place, false))
+      {
+        // Arguments are only visible in the define body
+        ret.addAll(Arrays.asList(args.getAllIdentifiers()));
+      }
+      else
+      {
+        // Function name is visible everywhere
+        ret.add(args.getFirstIdentifier());
+      }
+
+      return ret;
+    }
+
+    return Collections.emptyList();
+  }
+
+  @NotNull
+  public static List<SchemeIdentifier> processDefineSyntaxDeclaration(SchemeList define, SchemeIdentifier place)
+  {
+    PsiElement formals = define.getSecondNonLeafElement();
+    if (formals == null)
+    {
+      return Collections.emptyList();
+    }
+
+    // Define variables resolve to the symbol itself
+    if ((PsiTreeUtil.isAncestor(formals, place, false)))
+    {
+      return Collections.singletonList(place);
+    }
+
+    if ((place != formals) && (formals instanceof SchemeIdentifier))
+    {
+      // (define-syntax x <whatever>)
+      SchemeIdentifier identifier = (SchemeIdentifier) formals;
+      return Collections.singletonList(identifier);
     }
 
     return Collections.emptyList();
@@ -195,6 +259,25 @@ public class SchemeList extends SchemeListBase
       return Collections.emptyList();
     }
 
+    String style = declaration.getHeadText();
+    if (style == null)
+    {
+      return Collections.emptyList();
+    }
+
+    SchemeIdentifier namedLetName = null;
+    if (vars instanceof SchemeIdentifier && style.equals(LET))
+    {
+      namedLetName = (SchemeIdentifier) vars;
+      vars = ResolveUtil.getNextNonLeafElement(vars);
+
+      // Named let name resolves to itself
+      if (place == namedLetName)
+      {
+        return Collections.singletonList(place);
+      }
+    }
+
     List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
 
     if ((PsiTreeUtil.isAncestor(vars, place, false)))
@@ -212,8 +295,7 @@ public class SchemeList extends SchemeListBase
         }
       }
 
-      String style = declaration.getHeadText();
-      if (style.equals(LET))
+      if (style.equals(LET) || style.equals(LET_SYNTAX))
       {
         // It's part of a value for a let-bound variable, nothing in the let is in scope
         return Collections.emptyList();
@@ -222,7 +304,7 @@ public class SchemeList extends SchemeListBase
       {
         if (vars instanceof SchemeList)
         {
-          // (let ((x 3) (y 4)) (+ x y))
+          // (let* ((x 3) (y 4)) (+ x y))
           SchemeList args = (SchemeList) vars;
 
           for (SchemeList binding : args.getSubLists())
@@ -243,11 +325,11 @@ public class SchemeList extends SchemeListBase
         // Should never get this far
         return ret;
       }
-      else if (style.equals(LETREC))
+      else if (style.equals(LETREC) || style.equals(LETREC_SYNTAX))
       {
         if (vars instanceof SchemeList)
         {
-          // (let ((x 3) (y 4)) (+ x y))
+          // (letrec ((x 3) (y 4)) (+ x y))
           SchemeList args = (SchemeList) vars;
           SchemeList[] bindings = args.getSubLists();
           for (SchemeList binding : bindings)
@@ -263,7 +345,72 @@ public class SchemeList extends SchemeListBase
       }
     }
 
-    // TODO named let
+    if (vars instanceof SchemeList)
+    {
+      // (let ((x 3) (y 4)) (+ x y))
+      SchemeList args = (SchemeList) vars;
+      for (SchemeList binding : args.getSubLists())
+      {
+        SchemeIdentifier var = binding.getFirstIdentifier();
+        if (var != null)
+        {
+          ret.add(var);
+        }
+      }
+
+      if (namedLetName != null)
+      {
+        ret.add(namedLetName);
+      }
+    }
+
+    // Process internal definitions first to get shadowing
+    ret.addAll(processInternalDefinitions((SchemePsiElementBase) vars, place));
+
+    return ret;
+  }
+
+  @NotNull
+  private static List<SchemeIdentifier> processDoDeclaration(SchemeList declaration, SchemeIdentifier place)
+  {
+    if (!PsiTreeUtil.isAncestor(declaration, place, false))
+    {
+      return Collections.emptyList();
+    }
+
+    PsiElement vars = declaration.getSecondNonLeafElement();
+    if (vars == null)
+    {
+      return Collections.emptyList();
+    }
+
+    List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
+
+    // Are we somewhere within the variable declarations?
+    if ((PsiTreeUtil.isAncestor(vars, place, false)))
+    {
+      // place is either a let-bound variable, part of an init, or its value.
+      PsiElement placeParent = place.getParent();
+      if ((placeParent instanceof SchemeList) && (placeParent.getParent() == vars))
+      {
+        // If place is the first identifier in a list which is a sub-list of the do vars,
+        // it's a do-bound variable so it only resolves to itself
+        SchemeList parentList = (SchemeList) placeParent;
+        if (place == parentList.getFirstIdentifier())
+        {
+          return Collections.singletonList(place);
+        }
+
+        // Init expressions are not in scope
+        PsiElement init = parentList.getSecondNonLeafElement();
+        if (init != null && PsiTreeUtil.isAncestor(init, place, false))
+        {
+          return Collections.emptyList();
+        }
+      }
+    }
+
+    // All vars are in scope everywhere else in the do
     if (vars instanceof SchemeList)
     {
       // (let ((x 3) (y 4)) (+ x y))
@@ -277,9 +424,6 @@ public class SchemeList extends SchemeListBase
         }
       }
     }
-
-    // Process internal definitions first to get shadowing
-    ret.addAll(processInternalDefinitions((SchemePsiElementBase) vars, place));
 
     return ret;
   }
@@ -366,6 +510,12 @@ public class SchemeList extends SchemeListBase
     return DEFINE.equals(headText);
   }
 
+  public boolean isSyntaxDefinition()
+  {
+    String headText = getHeadText();
+    return DEFINE_SYNTAX.equals(headText);
+  }
+
   public boolean isLambda()
   {
     String headText = getHeadText();
@@ -375,6 +525,16 @@ public class SchemeList extends SchemeListBase
   private boolean isLet()
   {
     String headText = getHeadText();
-    return LET.equals(headText) || LET_STAR.equals(headText) || LETREC.equals(headText);
+    return LET.equals(headText) ||
+           LET_STAR.equals(headText) ||
+           LETREC.equals(headText) ||
+           LET_SYNTAX.equals(headText) ||
+           LETREC_SYNTAX.equals(headText);
+  }
+
+  public boolean isDo()
+  {
+    String headText = getHeadText();
+    return DO.equals(headText);
   }
 }

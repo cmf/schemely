@@ -48,7 +48,7 @@ public class SchemeFacetType extends FacetType<SchemeFacet, SchemeFacetConfigura
 
   public Icon getIcon()
   {
-    return SchemeIcons.SCHEME_ICON_16x16;
+    return SchemeIcons.SCHEME_ICON;
   }
 
   public boolean isSuitableModuleType(ModuleType moduleType)

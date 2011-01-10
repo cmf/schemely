@@ -11,7 +11,7 @@ public class SchemeConsoleView extends LanguageConsoleViewImpl
                             ConsoleHistoryModel historyModel,
                             SchemeConsoleExecuteActionHandler executeHandler)
   {
-    super(project, new SchemeConsole(project, title, historyModel, executeHandler));
+    super(project, new SchemeConsole(project, title, historyModel));
   }
 
   public SchemeConsole getConsole()

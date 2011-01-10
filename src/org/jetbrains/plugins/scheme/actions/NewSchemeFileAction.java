@@ -20,7 +20,7 @@ public class NewSchemeFileAction extends NewSchemeActionBase
   {
     super(SchemeBundle.message("newfile.menu.action.text"),
           SchemeBundle.message("newfile.menu.action.description"),
-          SchemeIcons.SCHEME_ICON_16x16);
+          SchemeIcons.SCHEME_ICON);
   }
 
   protected String getActionName(PsiDirectory directory, String newName)

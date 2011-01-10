@@ -27,8 +27,8 @@ public class SchemeTemplatesFactory implements FileTemplateGroupDescriptorFactor
     FileTemplateGroupDescriptor
       group =
       new FileTemplateGroupDescriptor(SchemeBundle.message("file.template.group.title.scheme"),
-                                      SchemeIcons.SCHEME_ICON_16x16);
-    group.addTemplate(new FileTemplateDescriptor(SCHEME_FILE, SchemeIcons.SCHEME_ICON_16x16));
+                                      SchemeIcons.SCHEME_ICON);
+    group.addTemplate(new FileTemplateDescriptor(SCHEME_FILE, SchemeIcons.SCHEME_ICON));
     return group;
   }
 

@@ -97,47 +97,6 @@ public class SchemeConfigUtil
     return result;
   }
 
-  private static String getKawaVersion(@NotNull String jarPath)
-  {
-    String jarVersion = getKawaJarVersion(jarPath, LIBRARY_PROPERTIES_PATH);
-    return jarVersion != null ? jarVersion : UNDEFINED_VERSION;
-  }
-
-  /**
-   * Return value of Implementation-Version attribute in jar manifest
-   * <p/>
-   *
-   * @param jarPath  path to jar file
-   * @param propPath path to properties file in jar file
-   * @return value of Implementation-Version attribute, null if not found
-   */
-  public static String getKawaJarVersion(String jarPath, String propPath)
-  {
-    try
-    {
-      File file = new File(jarPath);
-      if (!file.exists())
-      {
-        return null;
-      }
-      JarFile jarFile = new JarFile(file);
-      JarEntry jarEntry = jarFile.getJarEntry(propPath);
-      if (jarEntry == null)
-      {
-        return null;
-      }
-      Properties properties = new Properties();
-      properties.load(jarFile.getInputStream(jarEntry));
-      String version = properties.getProperty(VERSION_PROPERTY_KEY);
-      jarFile.close();
-      return version;
-    }
-    catch (Exception e)
-    {
-      return null;
-    }
-  }
-
   public static Library[] getProjectKawaLibraries(Project project)
   {
     if (project == null)

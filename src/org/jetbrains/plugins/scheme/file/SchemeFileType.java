@@ -42,7 +42,7 @@ public class SchemeFileType extends LanguageFileType
 
   public Icon getIcon()
   {
-    return SchemeIcons.SCHEME_ICON_16x16;
+    return SchemeIcons.SCHEME_ICON;
   }
 
   public boolean isJVMDebuggingSupported()

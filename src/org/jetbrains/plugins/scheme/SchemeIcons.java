@@ -19,7 +19,7 @@ import javax.swing.*;
 public interface SchemeIcons
 {
   @NonNls
-  final Icon SCHEME_ICON_16x16 = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/scheme_icon_16x16.png");
+  final Icon SCHEME_ICON = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/scheme_icon_16x16.png");
 
   final Icon FUNCTION = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/def_tmp.png");
   final Icon METHOD = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/meth_tmp.png");
@@ -27,11 +27,4 @@ public interface SchemeIcons
   final Icon JAVA_FIELD = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/field.png");
   final Icon SYMBOL = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/symbol.png");
   final Icon NAMESPACE = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/namespace.png");
-
-  final Icon REPL_CONSOLE = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/repl_console.png");
-  final Icon REPL_ADD = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/repl_add.png");
-  final Icon REPL_CLOSE = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/repl_close.png");
-  final Icon REPL_LOAD = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/repl_run.png");
-  final Icon REPL_GO = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/repl_go.png");
-  final Icon REPL_EVAL = IconLoader.findIcon("/org/jetbrains/plugins/scheme/icons/repl_eval.png");
 }

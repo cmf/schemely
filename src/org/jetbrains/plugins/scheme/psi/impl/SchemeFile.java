@@ -2,10 +2,12 @@ package org.jetbrains.plugins.scheme.psi.impl;
 
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.psi.*;
+import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.impl.source.PsiFileWithStubSupport;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -14,14 +16,14 @@ import org.jetbrains.plugins.scheme.psi.api.SchemePsiElement;
 import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 import org.jetbrains.plugins.scheme.psi.impl.synthetic.SchemeSyntheticClassImpl;
-import static org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil.resolveFrom;
+import org.jetbrains.plugins.scheme.psi.resolve.ResolveResult;
 import org.jetbrains.plugins.scheme.psi.util.SchemePsiUtil;
 import org.jetbrains.plugins.scheme.psi.util.SchemeTextUtil;
-import org.jetbrains.plugins.scheme.psi.resolve.ResolveResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+
+import static org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil.resolveFrom;
 
 public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubSupport, SchemePsiElement
 {

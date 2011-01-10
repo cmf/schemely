@@ -24,7 +24,7 @@ public class SchemeFormatConfigurable extends CodeStyleAbstractConfigurable
   @Override
   public Icon getIcon()
   {
-    return SchemeIcons.SCHEME_ICON_16x16;
+    return SchemeIcons.SCHEME_ICON;
   }
 
   public String getHelpTopic()

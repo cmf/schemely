@@ -1,16 +1,19 @@
 * Symbol completion
- - Add symbols from r5rs, chicken etc.
+ - Add symbols from r5rs, Kawa, SISC etc. (stub generation, include in plugin?)
  - Investigate doc for symbols
-
-* Chicken reader extensions
-
-* Named let, do
 
 * Structure view & completion should show function parameters
 
 * Quoted forms - syntax highlighting and don't resolve (new lexer)
 
-* REPL
+* More binding forms - syntax-rules
 
-* More binding forms - do, define-values
- - should be configurable
+* Better AST
+
+* Switch to Java resolution
+
+* Separate r5rs, kawa & sisc, add selection to Facet
+
+* Macro resolution
+
+* Customisable indentation

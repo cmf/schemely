@@ -34,6 +34,7 @@ public class SchemeBlockGenerator
     // From scheme.el && iuscheme.el
     schemeFormIndent.put("begin", 0);
     schemeFormIndent.put("define", 1);
+    schemeFormIndent.put("define-syntax", 1);
     schemeFormIndent.put("define-class", 2);
     schemeFormIndent.put("define-simple-class", 2);
     schemeFormIndent.put("case", 1);
@@ -87,13 +88,22 @@ public class SchemeBlockGenerator
         Alignment parameterAlignment = Alignment.createAlignment();
         Alignment bodyAlignment = Alignment.createAlignment();
 
-        ArrayList<Block> subBlocks = new ArrayList<Block>();
+        List<Block> subBlocks = new ArrayList<Block>();
 
         String operator = first.getText();
         Integer integer = schemeFormIndent.get(operator);
         if (integer != null)
         {
           parameters = integer.intValue();
+        }
+        if (operator.equals("let"))
+        {
+          // Special case named let
+          PsiElement element = list.getSecondNonLeafElement();
+          if (element instanceof SchemeIdentifier)
+          {
+            parameters = 2;
+          }
         }
 
         int childIndex = 0;
@@ -110,17 +120,17 @@ public class SchemeBlockGenerator
           {
             if (childIndex == 0)
             {
-              indent = Indent.getNormalIndent();
+              indent = Indent.getNormalIndent(true);
             }
             else if ((childIndex - 1) < parameters)
             {
               align = parameterAlignment;
-              indent = Indent.getContinuationIndent();
+              indent = Indent.getContinuationIndent(true);
             }
             else
             {
               align = bodyAlignment;
-              indent = Indent.getNormalIndent();
+              indent = Indent.getNormalIndent(true);
             }
             childIndex++;
           }
@@ -148,7 +158,7 @@ public class SchemeBlockGenerator
                                               Wrap wrap,
                                               CodeStyleSettings settings)
   {
-    ArrayList<Block> subBlocks = new ArrayList<Block>();
+    List<Block> subBlocks = new ArrayList<Block>();
     for (ASTNode childNode : children)
     {
       Indent indent;
@@ -160,7 +170,7 @@ public class SchemeBlockGenerator
       }
       else
       {
-        indent = Indent.getNormalIndent();
+        indent = Indent.getNormalIndent(true);
         align = alignment;
       }
       subBlocks.add(new SchemeBlock(childNode, align, indent, wrap, settings));

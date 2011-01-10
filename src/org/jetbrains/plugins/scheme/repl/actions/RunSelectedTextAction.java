@@ -11,7 +11,7 @@ public class RunSelectedTextAction extends SchemeConsoleActionBase
 {
   public RunSelectedTextAction()
   {
-    getTemplatePresentation().setIcon(SchemeIcons.REPL_EVAL);
+    getTemplatePresentation().setIcon(SchemeIcons.SCHEME_ICON);
   }
 
   public void actionPerformed(AnActionEvent e)

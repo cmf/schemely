@@ -15,7 +15,7 @@ public class RunLastSExprAction extends SchemeConsoleActionBase
 {
   public RunLastSExprAction()
   {
-    getTemplatePresentation().setIcon(SchemeIcons.REPL_EVAL);
+    getTemplatePresentation().setIcon(SchemeIcons.SCHEME_ICON);
   }
 
   public void actionPerformed(AnActionEvent event)

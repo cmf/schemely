@@ -9,7 +9,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 @State(
   name = "SchemeApplicationSettings",
   storages = {@Storage(
-    id = "scala_config",
+    id = "scheme_config",
     file = "$APP_CONFIG$/scheme_config.xml")})
 public class SchemeApplicationSettings implements PersistentStateComponent<SchemeApplicationSettings>
 {

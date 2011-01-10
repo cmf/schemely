@@ -317,9 +317,6 @@ public class SchemeConsoleRunner
     Project project = PlatformDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext());
     GeneralCommandLine line = CommandLineBuilder.createFromJavaParameters(params, project, true);
 
-//    line.addParameter("--server");
-//    line.addParameter("8192");
-
     Sdk sdk = params.getJdk();
     assert (sdk != null);
     SdkType type = sdk.getSdkType();

@@ -146,6 +146,11 @@ public class ParserTestBase
     return item(root, text, 4);
   }
 
+  protected PsiElement fifth(PsiElement root, String text)
+  {
+    return item(root, text, 5);
+  }
+
   protected PsiElement item(PsiElement root, String text, int index)
   {
     int count = 0;

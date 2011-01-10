@@ -42,7 +42,8 @@
 
     <lang.namesValidator language="Scheme"
                          implementationClass="org.jetbrains.plugins.scheme.utils.SchemeNamesValidator"/>
-    <completion.contributor implementation="org.jetbrains.plugins.scheme.completion.SchemeCompletionContributor"/>
+    <completion.contributor language="Scheme"
+                           implementationClass="org.jetbrains.plugins.scheme.completion.SchemeCompletionContributor"/>
     <compilerSettingsFactory implementation="org.jetbrains.plugins.scheme.compiler.SchemeCompilerSettingsFactory"/>
     <fileTemplateGroup implementation="org.jetbrains.plugins.scheme.actions.SchemeTemplatesFactory"/>
     <fileTypeIndentOptionsProvider

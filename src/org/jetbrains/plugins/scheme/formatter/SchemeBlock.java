@@ -110,7 +110,7 @@ public class SchemeBlock implements Block, AST
     }
     if (LIST_LIKE_FORMS.contains(astNode.getElementType()))
     {
-      return new ChildAttributes(Indent.getNormalIndent(), myChildAlignment);
+      return new ChildAttributes(Indent.getNormalIndent(true), myChildAlignment);
     }
     return new ChildAttributes(Indent.getNoneIndent(), null);
   }

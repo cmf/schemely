@@ -10,10 +10,7 @@ public class SchemeConsole extends LanguageConsoleImpl
   private final ConsoleHistoryModel myHistoryModel;
   private SchemeConsoleExecuteActionHandler myExecuteHandler;
 
-  public SchemeConsole(Project project,
-                        String title,
-                        ConsoleHistoryModel historyModel,
-                        SchemeConsoleExecuteActionHandler handler)
+  public SchemeConsole(Project project, String title, ConsoleHistoryModel historyModel)
   {
     super(project, title, SchemeFileType.SCHEME_LANGUAGE);
     this.myHistoryModel = historyModel;

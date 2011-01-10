@@ -16,7 +16,7 @@ public class LoadSchemeFileInConsoleAction extends SchemeConsoleActionBase
 {
   public LoadSchemeFileInConsoleAction()
   {
-    getTemplatePresentation().setIcon(SchemeIcons.REPL_LOAD);
+    getTemplatePresentation().setIcon(SchemeIcons.SCHEME_ICON);
   }
 
   public void update(AnActionEvent e)

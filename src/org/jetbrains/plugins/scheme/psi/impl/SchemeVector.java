@@ -4,7 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
-import org.jetbrains.plugins.scheme.psi.impl.SchemePsiElementBase;
+import org.jetbrains.plugins.scheme.psi.api.SchemeBraced;
 import org.jetbrains.plugins.scheme.psi.api.SchemePsiElement;
 import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
 import java.util.ArrayList;
 
 
-public class SchemeVector extends SchemePsiElementBase
+public class SchemeVector extends SchemePsiElementBase implements SchemeBraced
 {
   public SchemeVector(ASTNode node)
   {

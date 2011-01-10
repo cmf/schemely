@@ -15,7 +15,7 @@ public final class RunTopSExprAction extends SchemeConsoleActionBase
 {
   public RunTopSExprAction()
   {
-    getTemplatePresentation().setIcon(SchemeIcons.REPL_EVAL);
+    getTemplatePresentation().setIcon(SchemeIcons.SCHEME_ICON);
   }
 
   public void actionPerformed(AnActionEvent event)
@@ -42,8 +42,8 @@ public final class RunTopSExprAction extends SchemeConsoleActionBase
     if (SchemePsiElementFactory.getInstance(project).hasSyntacticalErrors(text))
     {
       Messages.showErrorDialog(project,
-                               SchemeBundle.message("evaluate.incorrect.sexp", new Object[0]),
-                               SchemeBundle.message("evaluate.incorrect.cannot.evaluate", new Object[0]));
+                               SchemeBundle.message("evaluate.incorrect.sexp"),
+                               SchemeBundle.message("evaluate.incorrect.cannot.evaluate"));
 
       return;
     }

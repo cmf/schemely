@@ -21,6 +21,7 @@ import com.intellij.util.NotNullFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.scheme.SchemeBundle;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
+import org.jetbrains.plugins.scheme.repl.KawaRepl;
 import org.jetbrains.plugins.scheme.repl.SchemeConsole;
 import org.jetbrains.plugins.scheme.repl.SchemeConsoleExecuteActionHandler;
 import org.jetbrains.plugins.scheme.repl.SchemeConsoleProcessHandler;
@@ -65,7 +66,7 @@ public abstract class SchemeConsoleActionBase extends AnAction
   {
     Presentation presentation = e.getPresentation();
 
-    Editor editor = (Editor) e.getData(DataKeys.EDITOR);
+    Editor editor = e.getData(DataKeys.EDITOR);
 
     if (editor == null)
     {
@@ -127,7 +128,7 @@ public abstract class SchemeConsoleActionBase extends AnAction
     @NotNull
     public Boolean fun(String cmdLine)
     {
-      return Boolean.valueOf((cmdLine != null) && (cmdLine.contains("kawa.repl")));
+      return (cmdLine != null) && (cmdLine.contains(KawaRepl.class.getSimpleName()));
     }
   }
 }

@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.scheme.parser;
 
+import org.intellij.lang.annotations.Language;
 import org.testng.annotations.Test;
 import com.intellij.psi.PsiFile;
 
@@ -11,7 +12,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testBasicDefine()
   {
-    PsiFile file = parse("(define x 3) x");
+    @Language("Scheme") String contents = "(define x 3) x";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
   }
@@ -19,43 +21,54 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testBasicLambda()
   {
-    PsiFile file = parse("(lambda (x) (+ x 3))");
+    @Language("Scheme") String contents = "(lambda (x) (+ x 3)) x";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert !resolvesTo(third(file, "x"), first(file, "x"));
   }
 
   @Test
   public void testLambda2Params()
   {
-    PsiFile file = parse("(lambda (x y) (+ x y))");
+    @Language("Scheme") String contents = "(lambda (x y) (+ x y)) x y";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
     assert resolvesTo(second(file, "y"), first(file, "y"));
+    assert !resolvesTo(third(file, "x"), first(file, "x"));
+    assert !resolvesTo(third(file, "y"), first(file, "y"));
   }
 
   @Test
   public void testDottedLambdaParams()
   {
-    PsiFile file = parse("(lambda (x . y) (+ x y))");
+    @Language("Scheme") String contents = "(lambda (x . y) (+ x y)) x y";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
     assert resolvesTo(second(file, "y"), first(file, "y"));
+    assert !resolvesTo(third(file, "x"), first(file, "x"));
+    assert !resolvesTo(third(file, "y"), first(file, "y"));
   }
 
   @Test
   public void testListLambdaParams()
   {
-    PsiFile file = parse("(lambda x (head x))");
+    @Language("Scheme") String contents = "(lambda x (head x)) x";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert !resolvesTo(third(file, "x"), first(file, "x"));
   }
 
   @Test
   public void testBasicFunctionDefine()
   {
-    PsiFile file = parse("(define f (lambda (x) (+ x 2))) (f 5)");
+    @Language("Scheme") String contents = "(define f (lambda (x) (+ x 2))) (f 5)";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "f"));
     assert resolvesTo(second(file, "f"), first(file, "f"));
   }
@@ -63,7 +76,30 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testBasicDefunStyle()
   {
-    PsiFile file = parse("(define (f x) (+ x 2)) (f 5)");
+    @Language("Scheme") String contents = "(define (f x) (+ x 2)) (f 5) x";
+    PsiFile file = parse(contents);
+    assert resolvesToSelf(first(file, "f"));
+    assert resolvesTo(second(file, "f"), first(file, "f"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert !resolvesTo(third(file, "x"), first(file, "x"));
+  }
+
+  @Test
+  public void testDefunReturnArgument()
+  {
+    @Language("Scheme") String contents = "(define (f x) x) (f 5) x";
+    PsiFile file = parse(contents);
+    assert resolvesToSelf(first(file, "f"));
+    assert resolvesTo(second(file, "f"), first(file, "f"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert !resolvesTo(third(file, "x"), first(file, "x"));
+  }
+
+  @Test
+  public void testDefunNoArgs()
+  {
+    @Language("Scheme") String contents = "(define (f) 5) (f)";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "f"));
     assert resolvesTo(second(file, "f"), first(file, "f"));
   }
@@ -71,17 +107,20 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLambdaInternalDefine()
   {
-    PsiFile file = parse("(lambda (x) (define y 4) (+ x y))");
+    @Language("Scheme") String contents = "(lambda (x) (define y 4) (+ x y)) y";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
     assert resolvesTo(second(file, "y"), first(file, "y"));
+    assert !resolvesTo(third(file, "y"), first(file, "y"));
   }
 
   @Test
   public void testLambdaInternalDefineSeesParameters()
   {
-    PsiFile file = parse("(lambda (x) (define y (+ 3 x)) (+ x y))");
+    @Language("Scheme") String contents = "(lambda (x) (define y (+ 3 x)) (+ x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
@@ -92,7 +131,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLambdaInternalDefineShadowsParameter()
   {
-    PsiFile file = parse("(lambda (x) (define x 4) (+ x 3))");
+    @Language("Scheme") String contents = "(lambda (x) (define x 4) (+ x 3))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(second(file, "x"));
     assert resolvesTo(third(file, "x"), second(file, "x"));
@@ -101,7 +141,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLambdaInternalDefineLetrecShadowing()
   {
-    PsiFile file = parse("(lambda (x y) (define x 7) (define y x) (+ x y))");
+    @Language("Scheme") String contents = "(lambda (x y) (define x 7) (define y x) (+ x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesToSelf(second(file, "x"));
@@ -114,7 +155,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testBasicLet()
   {
-    PsiFile file = parse("(let ((x 2) (y 3)) (* x y))");
+    @Language("Scheme") String contents = "(let ((x 2) (y 3)) (* x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
@@ -124,7 +166,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLetVarsDontSeeEachOther()
   {
-    PsiFile file = parse("(lambda (x) (let ((x 7) (y (+ x 3))) (* y x)))");
+    @Language("Scheme") String contents = "(lambda (x) (let ((x 7) (y (+ x 3))) (* y x)))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(second(file, "x"));
     assert resolvesToSelf(first(file, "y"));
@@ -136,7 +179,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLetShadowing()
   {
-    PsiFile file = parse("(let ((x 3)) (let ((x 5)) x))");
+    @Language("Scheme") String contents = "(let ((x 3)) (let ((x 5)) x))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(second(file, "x"));
     assert resolvesTo(third(file, "x"), second(file, "x"));
@@ -145,7 +189,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testEmbeddedLet()
   {
-    PsiFile file = parse("(let ((x (let ((y 5)) y)) (y 3)) (* x y))");
+    @Language("Scheme") String contents = "(let ((x (let ((y 5)) y)) (y 3)) (* x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "y"), first(file, "y"));
@@ -157,7 +202,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testBasicLetStar()
   {
-    PsiFile file = parse("(let* ((x 2) (y 3)) (* x y))");
+    @Language("Scheme") String contents = "(let* ((x 2) (y 3)) (* x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
@@ -167,7 +213,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLetStarSeesPreviousBindings()
   {
-    PsiFile file = parse("(let* ((x 2) (y x)) (* x y))");
+    @Language("Scheme") String contents = "(let* ((x 2) (y x)) (* x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
@@ -178,7 +225,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLetStarDoesntSeeLaterBindings()
   {
-    PsiFile file = parse("(let* ((x y) (y 3)) (* x y))");
+    @Language("Scheme") String contents = "(let* ((x y) (y 3)) (* x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert doesNotResolve(first(file, "y"));
     assert resolvesToSelf(second(file, "y"));
@@ -190,7 +238,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testBasicLetRec()
   {
-    PsiFile file = parse("(letrec ((x 2) (y 3)) (* x y))");
+    @Language("Scheme") String contents = "(letrec ((x 2) (y 3)) (* x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
@@ -200,7 +249,8 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLetRecSeesPreviousBindings()
   {
-    PsiFile file = parse("(letrec ((x 2) (y x)) (* x y))");
+    @Language("Scheme") String contents = "(letrec ((x 2) (y x)) (* x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
@@ -211,11 +261,52 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLetRecSeesLaterBindings()
   {
-    PsiFile file = parse("(letrec ((x y) (y 3)) (* x y))");
+    @Language("Scheme") String contents = "(letrec ((x y) (y 3)) (* x y))";
+    PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(second(file, "y"));
     assert resolvesTo(first(file, "y"), second(file, "y"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
     assert resolvesTo(third(file, "y"), second(file, "y"));
+  }
+
+  @Test
+  public void testBasicNamedLet()
+  {
+    @Language("Scheme") String contents = "(let loop ((x 2) (y 3)) (loop (+ x 1) (+ y 1)))";
+    PsiFile file = parse(contents);
+    assert resolvesToSelf(first(file, "loop"));
+    assert resolvesToSelf(first(file, "x"));
+    assert resolvesToSelf(first(file, "y"));
+    assert resolvesTo(second(file, "loop"), first(file, "loop"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(second(file, "y"), first(file, "y"));
+  }
+
+  @Test
+  public void testDo()
+  {
+    @Language("Scheme") String contents = "(do ((x 2) (y 3 (+ y 1))) ((= x y) y) x y)";
+    PsiFile file = parse(contents);
+    assert resolvesToSelf(first(file, "x"));
+    assert resolvesToSelf(first(file, "y"));
+    assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(third(file, "x"), first(file, "x"));
+    assert resolvesTo(second(file, "y"), first(file, "y"));
+    assert resolvesTo(third(file, "y"), first(file, "y"));
+    assert resolvesTo(fourth(file, "y"), first(file, "y"));
+    assert resolvesTo(fifth(file, "y"), first(file, "y"));
+  }
+
+  @Test
+  public void testDoInitDoesntResolve()
+  {
+    @Language("Scheme") String contents = "(let ((x 2)) (do ((x x)) ((= x 3) x) x))";
+    PsiFile file = parse(contents);
+    assert resolvesToSelf(first(file, "x"));
+    assert resolvesToSelf(second(file, "x"));
+    assert resolvesTo(third(file, "x"), first(file, "x"));
+    assert resolvesTo(fourth(file, "x"), second(file, "x"));
+    assert resolvesTo(fifth(file, "x"), second(file, "x"));
   }
 }
