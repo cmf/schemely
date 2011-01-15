@@ -208,9 +208,9 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
     {
       child = child.getNextSibling();
     }
-    if (child instanceof SchemeAbbreviation)
+    if (child instanceof SchemeQuoted)
     {
-      SchemeAbbreviation quoted = (SchemeAbbreviation) child;
+      SchemeQuoted quoted = (SchemeQuoted) child;
 
       SchemeList items = quoted.findFirstChildByClass(SchemeList.class);
       SchemeList item = items.findFirstChildByClass(SchemeList.class);

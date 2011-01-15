@@ -3,7 +3,7 @@ package org.jetbrains.plugins.scheme.parser;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import org.jetbrains.plugins.scheme.psi.impl.SchemeAbbreviation;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeQuoted;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeLiteral;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeVector;
 import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
@@ -24,9 +24,9 @@ public class SchemePsiCreator
     {
       return new SchemeVector(node);
     }
-    if (elementType == AST.ABBREVIATION)
+    if (elementType == AST.QUOTED)
     {
-      return new SchemeAbbreviation(node);
+      return new SchemeQuoted(node);
     }
     if (elementType == AST.IDENTIFIER)
     {

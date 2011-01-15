@@ -153,7 +153,7 @@ public class SchemeParser implements PsiParser, Tokens
     PsiBuilder.Marker marker = builder.mark();
     builder.advanceLexer();
     parseDatum(builder);
-    marker.done(AST.ABBREVIATION);
+    marker.done(AST.QUOTED);
   }
 
   /**

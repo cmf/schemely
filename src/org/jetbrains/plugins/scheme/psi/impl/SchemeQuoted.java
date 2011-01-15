@@ -5,17 +5,17 @@ import com.intellij.psi.tree.IElementType;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
 
 
-public class SchemeAbbreviation extends SchemePsiElementBase
+public class SchemeQuoted extends SchemePsiElementBase
 {
-  public SchemeAbbreviation(ASTNode node)
+  public SchemeQuoted(ASTNode node)
   {
-    super(node, "Abbreviation");
+    super(node, "Quoted");
   }
 
   @Override
   public String toString()
   {
-    return "SchemeAbbreviation";
+    return "SchemeQuoted";
   }
 
   @Override

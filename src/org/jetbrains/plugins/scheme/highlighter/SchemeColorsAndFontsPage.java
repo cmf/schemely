@@ -46,9 +46,12 @@ public class SchemeColorsAndFontsPage implements ColorSettingsPage
                                desc(SchemeSyntaxHighlighter.BAD_CHARACTER_ID, SchemeSyntaxHighlighter.BAD_CHARACTER),
                                desc(SchemeSyntaxHighlighter.CHAR_ID, SchemeSyntaxHighlighter.CHAR),
                                desc(SchemeSyntaxHighlighter.LITERAL_ID, SchemeSyntaxHighlighter.LITERAL),
-                               desc(SchemeSyntaxHighlighter.QUOTED_ID, SchemeSyntaxHighlighter.QUOTED),
                                desc(SchemeSyntaxHighlighter.KEYWORD_ID, SchemeSyntaxHighlighter.KEYWORD),
-                               desc(SchemeSyntaxHighlighter.SPECIAL_ID, SchemeSyntaxHighlighter.SPECIAL),};
+                               desc(SchemeSyntaxHighlighter.SPECIAL_ID, SchemeSyntaxHighlighter.SPECIAL),
+                               desc(SchemeSyntaxHighlighter.QUOTED_TEXT_ID, SchemeSyntaxHighlighter.QUOTED_TEXT),
+                               desc(SchemeSyntaxHighlighter.QUOTED_STRING_ID, SchemeSyntaxHighlighter.QUOTED_STRING),
+                               desc(SchemeSyntaxHighlighter.QUOTED_NUMBER_ID, SchemeSyntaxHighlighter.QUOTED_NUMBER),
+    };
 
   private static AttributesDescriptor desc(String displayName, TextAttributesKey key)
   {
@@ -71,19 +74,20 @@ public class SchemeColorsAndFontsPage implements ColorSettingsPage
   @NotNull
   public String getDemoText()
   {
-    return "; Example from Scheme Special Forms http://scheme.org/special_forms\n" +
-           "; \n" +
+    return ";; Test highlighting\n" +
            "\n" +
-           "(<def>defn</def>\n" +
-           "#^{:doc \"mymax [xs+] gets the maximum value in xs using > \"\n" +
-           "   :test (fn []\n" +
-           "             (assert (= 42  (max 2 42 5 4))))\n" +
-           "   :user/comment \"this is the best fn ever!\"}\n" +
-           "  mymax\n" +
-           "  ([x] x)\n" +
-           "  ([x y] (if (> x y) x y))\n" +
-           "  ([x y & nil]\n" +
-           "   (<def>reduce</def> mymax (mymax x y) more {\\tab \"  \"})))";
+           "(define string \"Some string\")\n" +
+           "\n" +
+           "(define quoted '(my quoted 3 items \"with quoted string\"))\n" +
+           "\n" +
+           "(define char #\\c)\n" +
+           "\n" +
+           "(define special #!eof)\n" +
+           "\n" +
+           "(let ((x '(1 3 5 7 9)))\n" +
+           "  (do ((x x (cdr x))\n" +
+           "       (sum 0 (+ sum (car x))))\n" +
+           "      ((null? x) sum)))";
   }
 
   @Nullable

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.scheme.lexer.SchemeLexer;
 import org.jetbrains.plugins.scheme.lexer.Tokens;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,11 +53,16 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
   @NonNls
   static final String CHAR_ID = "Scheme Character";
   @NonNls
-  static final String QUOTED_ID = "Quoted text";
-  @NonNls
   static final String KEYWORD_ID = "Keyword";
   @NonNls
   static final String SPECIAL_ID = "Special";
+
+  @NonNls
+  static final String QUOTED_TEXT_ID = "Quoted text";
+  @NonNls
+  static final String QUOTED_STRING_ID = "Quoted string";
+  @NonNls
+  static final String QUOTED_NUMBER_ID = "Quoted number";
 
 
   // Registering TextAttributes
@@ -71,9 +77,11 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
     createTextAttributesKey(LITERAL_ID, defaultFor(SyntaxHighlighterColors.KEYWORD));
     createTextAttributesKey(CHAR_ID, defaultFor(SyntaxHighlighterColors.STRING));
     createTextAttributesKey(BAD_CHARACTER_ID, defaultFor(HighlighterColors.BAD_CHARACTER));
-    createTextAttributesKey(QUOTED_ID, defaultFor(HighlighterColors.TEXT));
     createTextAttributesKey(KEYWORD_ID, defaultFor(SyntaxHighlighterColors.KEYWORD));
     createTextAttributesKey(SPECIAL_ID, defaultFor(SyntaxHighlighterColors.KEYWORD));
+    createTextAttributesKey(QUOTED_TEXT_ID, brighter(HighlighterColors.TEXT));
+    createTextAttributesKey(QUOTED_STRING_ID, brighter(SyntaxHighlighterColors.STRING));
+    createTextAttributesKey(QUOTED_NUMBER_ID, brighter(SyntaxHighlighterColors.NUMBER));
   }
 
   public static TextAttributesKey LINE_COMMENT = createTextAttributesKey(COMMENT_ID);
@@ -85,9 +93,11 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
   public static TextAttributesKey LITERAL = createTextAttributesKey(LITERAL_ID);
   public static TextAttributesKey CHAR = createTextAttributesKey(CHAR_ID);
   public static TextAttributesKey BAD_CHARACTER = createTextAttributesKey(BAD_CHARACTER_ID);
-  public static TextAttributesKey QUOTED = createTextAttributesKey(QUOTED_ID);
   public static TextAttributesKey KEYWORD = createTextAttributesKey(KEYWORD_ID);
   public static TextAttributesKey SPECIAL = createTextAttributesKey(SPECIAL_ID);
+  public static TextAttributesKey QUOTED_TEXT = createTextAttributesKey(QUOTED_TEXT_ID);
+  public static TextAttributesKey QUOTED_STRING = createTextAttributesKey(QUOTED_STRING_ID);
+  public static TextAttributesKey QUOTED_NUMBER = createTextAttributesKey(QUOTED_NUMBER_ID);
 
   static
   {
@@ -104,5 +114,20 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
   private static TextAttributes defaultFor(TextAttributesKey key)
   {
     return key.getDefaultAttributes();
+  }
+
+  private static TextAttributes brighter(TextAttributesKey key)
+  {
+    TextAttributes attributes = key.getDefaultAttributes().clone();
+    Color foregroundColor = attributes.getForegroundColor();
+    if (foregroundColor != null)
+    {
+      attributes.setForegroundColor(foregroundColor.brighter());
+    }
+    else
+    {
+      attributes.setForegroundColor(Color.darkGray);
+    }
+    return attributes;
   }
 }

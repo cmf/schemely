@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.scheme.psi.util;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -8,8 +9,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.scheme.lexer.Tokens;
 import org.jetbrains.plugins.scheme.psi.api.SchemeBraced;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeFile;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeLiteral;
 import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
 
 
@@ -138,5 +141,35 @@ public class SchemePsiUtil
       }
     }
     return false;
+  }
+
+  public static boolean isStringLiteral(PsiElement element)
+  {
+    if (!(element instanceof SchemeLiteral))
+    {
+      return false;
+    }
+    ASTNode node = element.getNode();
+    if (node == null)
+    {
+      return false;
+    }
+    ASTNode[] children = node.getChildren(null);
+    return children.length == 1 && (children[0].getElementType() == Tokens.STRING_LITERAL);
+  }
+
+  public static boolean isNumberLiteral(PsiElement element)
+  {
+    if (!(element instanceof SchemeLiteral))
+    {
+      return false;
+    }
+    ASTNode node = element.getNode();
+    if (node == null)
+    {
+      return false;
+    }
+    ASTNode[] children = node.getChildren(null);
+    return children.length == 1 && (children[0].getElementType() == Tokens.NUMBER_LITERAL);
   }
 }

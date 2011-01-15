@@ -4,7 +4,8 @@ import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import org.jetbrains.plugins.scheme.psi.impl.SchemeAbbreviation;
+import org.intellij.lang.annotations.Language;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeQuoted;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeLiteral;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeVector;
 import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
@@ -70,9 +71,15 @@ public class ParserTest extends ParserTestBase
   }
 
   @Test
-  public void testQuote()
+  public void testQuotedList()
   {
-    element("'(a b (c d))", SchemeAbbreviation.class);
+    element("'(a b (c d))", SchemeQuoted.class);
+  }
+
+  @Test
+  public void testQuotedIdentifier()
+  {
+    element("'a", SchemeQuoted.class);
   }
 
   @Test
@@ -99,22 +106,22 @@ public class ParserTest extends ParserTestBase
     assert list("(a b . c)").isImproper() : "Expected dotted list!";
   }
 
-  private SchemeList list(String contents)
+  private SchemeList list(@Language("Scheme") String contents)
   {
     return element(contents, SchemeList.class);
   }
 
-  private void literal(String contents)
+  private void literal(@Language("Scheme") String contents)
   {
     element(contents, SchemeLiteral.class);
   }
 
-  private void identifier(String contents)
+  private void identifier(@Language("Scheme") String contents)
   {
     element(contents, SchemeIdentifier.class);
   }
 
-  private <T extends PsiElement> T element(String contents, Class<T> theClass)
+  private <T extends PsiElement> T element(@Language("Scheme") String contents, Class<T> theClass)
   {
     PsiFile psiFile = parse(contents);
     PsiElement[] children = psiFile.getChildren();

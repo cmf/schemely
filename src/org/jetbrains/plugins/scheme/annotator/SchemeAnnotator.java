@@ -1,13 +1,20 @@
 package org.jetbrains.plugins.scheme.annotator;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.HashSet;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.scheme.highlighter.SchemeSyntaxHighlighter;
+import org.jetbrains.plugins.scheme.lexer.Tokens;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeLiteral;
+import org.jetbrains.plugins.scheme.psi.impl.SchemeVector;
 import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
+import org.jetbrains.plugins.scheme.psi.resolve.ResolveUtil;
+import org.jetbrains.plugins.scheme.psi.util.SchemePsiUtil;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -44,9 +51,42 @@ public class SchemeAnnotator implements Annotator
                                       "let-syntax",
                                       "letrec-syntax"));
 
-  public void annotate(PsiElement element, AnnotationHolder holder)
+  public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder)
   {
-    if (element instanceof SchemeList)
+    if (ResolveUtil.getQuotingLevel(element) > 0)
+    {
+      if (element instanceof SchemeIdentifier)
+      {
+        Annotation annotation = holder.createInfoAnnotation(element, null);
+        annotation.setTextAttributes(SchemeSyntaxHighlighter.QUOTED_TEXT);
+      }
+      else if (element instanceof SchemeLiteral)
+      {
+        Annotation annotation = holder.createInfoAnnotation(element, null);
+        if (SchemePsiUtil.isStringLiteral(element))
+        {
+          annotation.setTextAttributes(SchemeSyntaxHighlighter.QUOTED_STRING);
+        }
+        else if (SchemePsiUtil.isNumberLiteral(element))
+        {
+          annotation.setTextAttributes(SchemeSyntaxHighlighter.QUOTED_NUMBER);
+        }
+        else
+        {
+          annotation.setTextAttributes(SchemeSyntaxHighlighter.QUOTED_TEXT);
+        }
+      }
+      else if (element instanceof SchemeList || element instanceof SchemeVector)
+      {
+        ASTNode node = element.getNode();
+        for (ASTNode child : node.getChildren(Tokens.BRACES))
+        {
+          Annotation annotation = holder.createInfoAnnotation(child, null);
+          annotation.setTextAttributes(SchemeSyntaxHighlighter.QUOTED_TEXT);
+        }
+      }
+    }
+    else if (element instanceof SchemeList)
     {
       annotateList((SchemeList) element, holder);
     }
