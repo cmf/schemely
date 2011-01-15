@@ -61,6 +61,16 @@ public abstract class SchemePsiElementBase extends ASTWrapperPsiElement implemen
     return aClass.cast(element);
   }
 
+  public <T> T findFirstSiblingByClass(Class<T> aClass)
+  {
+    PsiElement element = getNextSibling();
+    while (element != null && !aClass.isInstance(element))
+    {
+      element = element.getNextSibling();
+    }
+    return aClass.cast(element);
+  }
+
   @Override
   public String toString()
   {
