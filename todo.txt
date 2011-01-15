@@ -4,8 +4,6 @@
 
 * Structure view & completion should show function parameters
 
-* Quoted forms - syntax highlighting and don't resolve (new lexer)
-
 * More binding forms - syntax-rules
 
 * Better AST
