@@ -14,4 +14,14 @@
 
 * Macro resolution
 
-* Customisable indentation
+* Customisable indentation - how to create scheme editor in code style panel
+
+* Customisable list of keyword names
+
+* Compiler - check for SDK, use built in if not, warn
+
+* Fix Facet
+
+* SISC REPL
+
+* Runners for Kawa and SISC

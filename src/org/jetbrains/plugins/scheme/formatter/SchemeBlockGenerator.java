@@ -7,8 +7,7 @@ import com.intellij.formatting.Wrap;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
-import com.intellij.psi.tree.TokenSet;
-import org.jetbrains.plugins.scheme.parser.AST;
+import org.jetbrains.plugins.scheme.lexer.Tokens;
 import org.jetbrains.plugins.scheme.psi.impl.SchemeVector;
 import org.jetbrains.plugins.scheme.psi.impl.list.SchemeList;
 import org.jetbrains.plugins.scheme.psi.impl.symbols.SchemeIdentifier;
@@ -19,15 +18,6 @@ import java.util.*;
 public class SchemeBlockGenerator
 {
   private static final Map<String, Integer> schemeFormIndent = new HashMap<String, Integer>();
-  private static final
-  TokenSet
-    BRACES =
-    TokenSet.create(AST.LEFT_CURLY,
-                    AST.LEFT_PAREN,
-                    AST.LEFT_SQUARE,
-                    AST.RIGHT_CURLY,
-                    AST.RIGHT_PAREN,
-                    AST.RIGHT_SQUARE);
 
   static
   {
@@ -112,7 +102,7 @@ public class SchemeBlockGenerator
           Alignment align = null;
           Indent indent;
 
-          if (BRACES.contains(childNode.getElementType()))
+          if (Tokens.BRACES.contains(childNode.getElementType()))
           {
             indent = Indent.getNoneIndent();
           }
@@ -163,7 +153,7 @@ public class SchemeBlockGenerator
     {
       Indent indent;
       Alignment align;
-      if (BRACES.contains(childNode.getElementType()))
+      if (Tokens.BRACES.contains(childNode.getElementType()))
       {
         indent = Indent.getNoneIndent();
         align = null;

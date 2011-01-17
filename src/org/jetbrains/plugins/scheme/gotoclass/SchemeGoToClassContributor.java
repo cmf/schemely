@@ -37,5 +37,4 @@ public class SchemeGoToClassContributor implements ChooseByNameContributor
     });
     return scriptClasses.toArray(new NavigationItem[scriptClasses.size()]);
   }
-
 }

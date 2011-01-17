@@ -3,3 +3,6 @@ out
 test-output
 jflex.log
 src/org/jetbrains/plugins/scheme/lexer/_SchemeLexer.java~
+scheme-plugin.zip
+src/org/jetbrains/plugins/scheme/conversion/JavaToScala.scala
+
