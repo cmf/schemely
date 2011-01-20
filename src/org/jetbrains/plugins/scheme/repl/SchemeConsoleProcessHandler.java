@@ -21,11 +21,11 @@ public class SchemeConsoleProcessHandler extends ColoredProcessHandler
   protected void textAvailable(String text, Key attributes)
   {
     // This is where we process input from the process
-    String string = processPrompts(this.myLanguageConsole, StringUtil.convertLineSeparators(text));
+    String string = processPrompts(StringUtil.convertLineSeparators(text));
     SchemeConsoleHighlightingUtil.processOutput(this.myLanguageConsole, string, attributes);
   }
 
-  private static String processPrompts(LanguageConsoleImpl console, String text)
+  private static String processPrompts(String text)
   {
     if (text != null)
     {
@@ -34,9 +34,8 @@ public class SchemeConsoleProcessHandler extends ColoredProcessHandler
       while (matcher.lookingAt())
       {
         String prefix = matcher.group();
-        trimmed = StringUtil.trimStart(trimmed, prefix).trim();
+        trimmed = StringUtil.trimStart(trimmed, prefix);
         matcher.reset(trimmed);
-        console.setPrompt(prefix);
       }
       return trimmed;
     }

@@ -115,6 +115,7 @@ public class SchemeConsoleRunner
     this.myConsoleExecuteActionHandler =
       new SchemeConsoleExecuteActionHandler(getProcessHandler(), getProject(), false);
     getLanguageConsole().setExecuteHandler(this.myConsoleExecuteActionHandler);
+    myConsoleView.getConsole().setPrompt("> ");
 
     ProcessTerminatedListener.attach(this.myProcessHandler);
 
