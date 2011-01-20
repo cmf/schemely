@@ -13,9 +13,6 @@ public class SchemeConsoleHighlightingUtil
   @Language("RegExp")
   public static final String KAWA_PROMPT = "#\\|[^\\|]*\\|#\\s*";
 
-  @Language("RegExp")
-  public static final String LINE_WITH_KAWA_PROMPT = KAWA_PROMPT + ".*";
-
   public static final Pattern KAWA_PROMPT_PATTERN = Pattern.compile(KAWA_PROMPT);
 
   public static void processOutput(LanguageConsoleImpl console, String text, Key attributes)

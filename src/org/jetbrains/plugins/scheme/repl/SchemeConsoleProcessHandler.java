@@ -30,12 +30,12 @@ public class SchemeConsoleProcessHandler extends ColoredProcessHandler
     if (text != null)
     {
       String trimmed = text;
-      while (trimmed.matches(SchemeConsoleHighlightingUtil.LINE_WITH_KAWA_PROMPT))
+      Matcher matcher = SchemeConsoleHighlightingUtil.KAWA_PROMPT_PATTERN.matcher(trimmed);
+      while (matcher.lookingAt())
       {
-        Matcher matcher = SchemeConsoleHighlightingUtil.KAWA_PROMPT_PATTERN.matcher(trimmed);
-        matcher.find();
         String prefix = matcher.group();
         trimmed = StringUtil.trimStart(trimmed, prefix).trim();
+        matcher.reset(trimmed);
         console.setPrompt(prefix);
       }
       return trimmed;
