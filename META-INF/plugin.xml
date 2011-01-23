@@ -2,7 +2,7 @@
 <idea-plugin>
   <module-components>
     <component>
-      <implementation-class>org.jetbrains.plugins.scheme.config.SchemeFacetListener</implementation-class>
+      <implementation-class>schemely.config.SchemeFacetListener</implementation-class>
     </component>
   </module-components>
 
@@ -11,105 +11,105 @@
   <description>Plugin for Scheme language support</description>
   <category>Custom Languages</category>
   <version>VERSION</version>
-  <vendor logo="/org/jetbrains/plugins/scheme/icons/scheme_icon_16x16.png" url="http://www.jetbrains.com">JetBrains
+  <vendor logo="/schemely/icons/scheme_icon_16x16.png" url="http://www.jetbrains.com">JetBrains
     Inc.
   </vendor>
   <idea-version since-build="9000"/>
 
   <extensions defaultExtensionNs="com.intellij">
     <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
-    <fileTypeFactory implementation="org.jetbrains.plugins.scheme.file.SchemeFileTypeLoader"/>
+    <fileTypeFactory implementation="schemely.file.SchemeFileTypeLoader"/>
     <lang.braceMatcher language="Scheme"
-                       implementationClass="org.jetbrains.plugins.scheme.highlighter.SchemeBraceMatcher"/>
+                       implementationClass="schemely.highlighter.SchemeBraceMatcher"/>
     <syntaxHighlighter key="Scheme"
-                       implementationClass="org.jetbrains.plugins.scheme.highlighter.SchemeSyntaxHighlighter"/>
-    <colorSettingsPage implementation="org.jetbrains.plugins.scheme.highlighter.SchemeColorsAndFontsPage"/>
+                       implementationClass="schemely.highlighter.SchemeSyntaxHighlighter"/>
+    <colorSettingsPage implementation="schemely.highlighter.SchemeColorsAndFontsPage"/>
     <lang.commenter language="Scheme"
-                    implementationClass="org.jetbrains.plugins.scheme.highlighter.SchemeCommenter"/>
+                    implementationClass="schemely.highlighter.SchemeCommenter"/>
     <lang.parserDefinition language="Scheme"
-                           implementationClass="org.jetbrains.plugins.scheme.parser.SchemeParserDefinition"/>
+                           implementationClass="schemely.parser.SchemeParserDefinition"/>
     <lang.foldingBuilder language="Scheme"
-                         implementationClass="org.jetbrains.plugins.scheme.SchemeFoldingBuilder"/>
+                         implementationClass="schemely.SchemeFoldingBuilder"/>
     <lang.psiStructureViewFactory language="Scheme"
-                                  implementationClass="org.jetbrains.plugins.scheme.structure.SchemeStructureViewBuilderFactory"/>
+                                  implementationClass="schemely.structure.SchemeStructureViewBuilderFactory"/>
     <lang.formatter language="Scheme"
-                    implementationClass="org.jetbrains.plugins.scheme.formatter.SchemeFormattingModelBuilder"/>
+                    implementationClass="schemely.formatter.SchemeFormattingModelBuilder"/>
     <codeStyleSettingsProvider
-      implementation="org.jetbrains.plugins.scheme.formatter.codeStyle.SchemeCodeStyleSettingsProvider"/>
+      implementation="schemely.formatter.codeStyle.SchemeCodeStyleSettingsProvider"/>
     <lang.findUsagesProvider language="Scheme"
-                             implementationClass="org.jetbrains.plugins.scheme.findUsages.SchemeFindUsagesProvider"/>
-    <referencesSearch implementation="org.jetbrains.plugins.scheme.findUsages.SchemeIdentifierSearch"/>
+                             implementationClass="schemely.findUsages.SchemeFindUsagesProvider"/>
+    <referencesSearch implementation="schemely.findUsages.SchemeIdentifierSearch"/>
 
     <lang.namesValidator language="Scheme"
-                         implementationClass="org.jetbrains.plugins.scheme.utils.SchemeNamesValidator"/>
+                         implementationClass="schemely.utils.SchemeNamesValidator"/>
     <completion.contributor language="Scheme"
-                           implementationClass="org.jetbrains.plugins.scheme.completion.SchemeCompletionContributor"/>
-    <compilerSettingsFactory implementation="org.jetbrains.plugins.scheme.compiler.SchemeCompilerSettingsFactory"/>
-    <fileTemplateGroup implementation="org.jetbrains.plugins.scheme.actions.SchemeTemplatesFactory"/>
+                           implementationClass="schemely.completion.SchemeCompletionContributor"/>
+    <compilerSettingsFactory implementation="schemely.compiler.SchemeCompilerSettingsFactory"/>
+    <fileTemplateGroup implementation="schemely.actions.SchemeTemplatesFactory"/>
     <fileTypeIndentOptionsProvider
-      implementation="org.jetbrains.plugins.scheme.formatter.SchemeIndentOptionsProvider"/>
-    <quoteHandler fileType="Scheme" className="org.jetbrains.plugins.scheme.editor.SchemeQuoteHandler"/>
-    <annotator language="Scheme" implementationClass="org.jetbrains.plugins.scheme.annotator.SchemeAnnotator"/>
+      implementation="schemely.formatter.SchemeIndentOptionsProvider"/>
+    <quoteHandler fileType="Scheme" className="schemely.editor.SchemeQuoteHandler"/>
+    <annotator language="Scheme" implementationClass="schemely.annotator.SchemeAnnotator"/>
 
-    <gotoSymbolContributor implementation="org.jetbrains.plugins.scheme.gotoclass.SchemeGoToSymbolContributor"/>
-    <gotoClassContributor implementation="org.jetbrains.plugins.scheme.gotoclass.SchemeGoToClassContributor"/>
+    <gotoSymbolContributor implementation="schemely.gotoclass.SchemeGoToSymbolContributor"/>
+    <gotoClassContributor implementation="schemely.gotoclass.SchemeGoToClassContributor"/>
 
-    <stubElementTypeHolder class="org.jetbrains.plugins.scheme.parser.AST"/>
+    <stubElementTypeHolder class="schemely.parser.AST"/>
 
-    <stubIndex implementation="org.jetbrains.plugins.scheme.psi.stubs.index.SchemeClassNameIndex"/>
-    <stubIndex implementation="org.jetbrains.plugins.scheme.psi.stubs.index.SchemeFullScriptNameIndex"/>
+    <stubIndex implementation="schemely.psi.stubs.index.SchemeClassNameIndex"/>
+    <stubIndex implementation="schemely.psi.stubs.index.SchemeFullScriptNameIndex"/>
 
     <extendWordSelectionHandler
-      implementation="org.jetbrains.plugins.scheme.editor.selection.SchemeListSelectioner"/>
+      implementation="schemely.editor.selection.SchemeListSelectioner"/>
     <extendWordSelectionHandler
-      implementation="org.jetbrains.plugins.scheme.editor.selection.SchemeLiteralSelectioner"/>
+      implementation="schemely.editor.selection.SchemeLiteralSelectioner"/>
 
-    <frameworkSupport implementation="org.jetbrains.plugins.scheme.config.SchemeFacetSupportProvider"/>
-    <applicationService serviceInterface="org.jetbrains.plugins.scheme.settings.SchemeApplicationSettings"
-                        serviceImplementation="org.jetbrains.plugins.scheme.settings.SchemeApplicationSettings"/>
+    <frameworkSupport implementation="schemely.config.SchemeFacetSupportProvider"/>
+    <applicationService serviceInterface="schemely.settings.SchemeApplicationSettings"
+                        serviceImplementation="schemely.settings.SchemeApplicationSettings"/>
 
-    <projectService serviceInterface="org.jetbrains.plugins.scheme.psi.util.SchemePsiElementFactory"
-                    serviceImplementation="org.jetbrains.plugins.scheme.psi.util.SchemePsiElementFactoryImpl"/>
+    <projectService serviceInterface="schemely.psi.util.SchemePsiElementFactory"
+                    serviceImplementation="schemely.psi.util.SchemePsiElementFactoryImpl"/>
 
   </extensions>
 
   <application-components>
     <component>
-      <implementation-class>org.jetbrains.plugins.scheme.SchemeLoader</implementation-class>
+      <implementation-class>schemely.SchemeLoader</implementation-class>
     </component>
     <component>
-      <implementation-class>org.jetbrains.plugins.scheme.config.SchemeFacetLoader</implementation-class>
-      <interface-class>org.jetbrains.plugins.scheme.config.SchemeFacetLoader</interface-class>
+      <implementation-class>schemely.config.SchemeFacetLoader</implementation-class>
+      <interface-class>schemely.config.SchemeFacetLoader</interface-class>
     </component>
   </application-components>
 
   <project-components>
     <component>
-      <implementation-class>org.jetbrains.plugins.scheme.compiler.SchemeCompilerSettings</implementation-class>
+      <implementation-class>schemely.compiler.SchemeCompilerSettings</implementation-class>
     </component>
     <component>
-      <implementation-class>org.jetbrains.plugins.scheme.psi.impl.javaView.SchemeClassFinder
+      <implementation-class>schemely.psi.impl.javaView.SchemeClassFinder
       </implementation-class>
     </component>
     <component>
-      <implementation-class>org.jetbrains.plugins.scheme.psi.impl.SchemePsiManager</implementation-class>
+      <implementation-class>schemely.psi.impl.SchemePsiManager</implementation-class>
     </component>
     <!--<component>-->
-    <!--<implementation-class>org.jetbrains.plugins.scheme.repl.ReplToolWindow</implementation-class>-->
+    <!--<implementation-class>schemely.repl.ReplToolWindow</implementation-class>-->
     <!--</component>-->
     <component>
-      <implementation-class>org.jetbrains.plugins.scheme.compiler.CompilerProjectComponent</implementation-class>
+      <implementation-class>schemely.compiler.CompilerProjectComponent</implementation-class>
     </component>
   </project-components>
 
   <actions>
     <!-- Create file actions -->
-    <action id="Scheme.SchemeFile" class="org.jetbrains.plugins.scheme.actions.NewSchemeFileAction"
+    <action id="Scheme.SchemeFile" class="schemely.actions.NewSchemeFileAction"
             text="Scheme File" description="Create new Scheme File">
       <add-to-group group-id="NewGroup" anchor="last"/>
     </action>
 
-    <action id="Scheme.JavaToScheme" class="org.jetbrains.plugins.scheme.conversion.JavaToSchemeAction"
+    <action id="Scheme.JavaToScheme" class="schemely.conversion.JavaToSchemeAction"
             text="Convert Java File To Scheme" description="Convert Java File To Scheme">
       <add-to-group group-id="RefactoringMenu" anchor="last"/>
       <add-to-group group-id="EditorTabPopupMenu" anchor="last"/>
@@ -118,29 +118,29 @@
 
     <!-- REPL-related actions -->
     <group id="Scheme.REPL.Group"
-           class="org.jetbrains.plugins.scheme.repl.actions.SchemeReplActionGroup"
+           class="schemely.repl.actions.SchemeReplActionGroup"
            text="Scheme REPL" description="Scheme" popup="true">
 
-      <action id="org.jetbrains.plugins.scheme.repl.actions.LoadSchemeFileInConsoleAction"
-              class="org.jetbrains.plugins.scheme.repl.actions.LoadSchemeFileInConsoleAction"
+      <action id="schemely.repl.actions.LoadSchemeFileInConsoleAction"
+              class="schemely.repl.actions.LoadSchemeFileInConsoleAction"
               text="Load file to REPL">
         <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift L"/>
       </action>
 
-      <action id="org.jetbrains.plugins.scheme.repl.actions.RunSelectedTextAction"
-              class="org.jetbrains.plugins.scheme.repl.actions.RunSelectedTextAction"
+      <action id="schemely.repl.actions.RunSelectedTextAction"
+              class="schemely.repl.actions.RunSelectedTextAction"
               text="Run selected text in REPL">
         <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift J"/>
       </action>
 
-      <action id="org.jetbrains.plugins.scheme.repl.actions.RunLastSExprAction"
-              class="org.jetbrains.plugins.scheme.repl.actions.RunLastSExprAction"
+      <action id="schemely.repl.actions.RunLastSExprAction"
+              class="schemely.repl.actions.RunLastSExprAction"
               text="Execute last S-expression in REPL">
         <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift H"/>
       </action>
 
-      <action id="org.jetbrains.plugins.scheme.repl.actions.RunTopSExprAction"
-              class="org.jetbrains.plugins.scheme.repl.actions.RunTopSExprAction"
+      <action id="schemely.repl.actions.RunTopSExprAction"
+              class="schemely.repl.actions.RunTopSExprAction"
               text="Run Top S-expression in REPL">
         <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift G"/>
       </action>
@@ -149,8 +149,8 @@
 
     </group>
 
-    <action id="org.jetbrains.plugins.scheme.actions.RunSchemeConsoleAction"
-            class="org.jetbrains.plugins.scheme.repl.actions.RunSchemeConsoleAction" text="Start Scheme Console"
+    <action id="schemely.actions.RunSchemeConsoleAction"
+            class="schemely.repl.actions.RunSchemeConsoleAction" text="Start Scheme Console"
             description="Runs Scheme REPL">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
       <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F10"/>

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/scheme-plugin.iml" filepath="$PROJECT_DIR$/scheme-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/schemely.iml" filepath="$PROJECT_DIR$/schemely.iml" />
     </modules>
   </component>
 </project>

@@ -10,11 +10,9 @@
 
 * Switch to Java resolution
 
-* Separate r5rs, kawa & sisc, add selection to Facet
-
 * Macro resolution
 
-* Customisable indentation - how to create scheme editor in code style panel
+* Customisable indentation - how to create scheme editor in code style panel?
 
 * Customisable list of keyword names
 
