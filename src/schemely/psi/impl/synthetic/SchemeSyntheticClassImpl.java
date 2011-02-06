@@ -24,11 +24,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author ilyas
- *         <p/>
- *         Class to represent bytecode-compiled scheme files
- */
 public class SchemeSyntheticClassImpl extends LightElement implements SchemeSyntheticClass
 {
   @Override
