@@ -27,26 +27,26 @@ public class SchemeConsoleExecuteActionHandler
   private final ProcessHandler myProcessHandler;
   private final Project myProject;
   private final IndentHelper myIndentHelper;
-  private boolean myPreserveMarkup;
+  private final boolean myPreserveMarkup;
 
   public SchemeConsoleExecuteActionHandler(ProcessHandler processHandler, Project project, boolean preserveMarkup)
   {
-    this.myProcessHandler = processHandler;
-    this.myProject = project;
-    this.myPreserveMarkup = preserveMarkup;
-    this.myIndentHelper = HelperFactory.createHelper(SchemeFileType.SCHEME_FILE_TYPE, this.myProject);
+    myProcessHandler = processHandler;
+    myProject = project;
+    myPreserveMarkup = preserveMarkup;
+    myIndentHelper = HelperFactory.createHelper(SchemeFileType.SCHEME_FILE_TYPE, myProject);
   }
 
   public void processLine(String line)
   {
-    OutputStream outputStream = this.myProcessHandler.getProcessInput();
+    OutputStream outputStream = myProcessHandler.getProcessInput();
     try
     {
-      byte[] bytes = (line + "\n").getBytes();
+      byte[] bytes = (line + '\n').getBytes();
       outputStream.write(bytes);
       outputStream.flush();
     }
-    catch (IOException e)
+    catch (IOException ignore)
     {
     }
   }
@@ -70,12 +70,13 @@ public class SchemeConsoleExecuteActionHandler
     {
       String before = text.substring(0, offset);
       String after = text.substring(offset);
-      final int indent = this.myIndentHelper.getIndent(before, false);
-      String spaces = this.myIndentHelper.fillIndent(indent);
-      final String newText = before + "\n" + spaces + after;
+      final int indent = myIndentHelper.getIndent(before, false);
+      String spaces = myIndentHelper.fillIndent(indent);
+      final String newText = before + '\n' + spaces + after;
 
-      new WriteCommandAction(this.myProject)
+      new WriteCommandAction(myProject)
       {
+        @Override
         protected void run(Result result) throws Throwable
         {
           console.setInputText(newText);
@@ -88,14 +89,14 @@ public class SchemeConsoleExecuteActionHandler
 
     String candidate = text.trim();
 
-    if ((SchemePsiUtil.isValidSchemeExpression(candidate, this.myProject)) || ("".equals(candidate)))
+    if ((SchemePsiUtil.isValidSchemeExpression(candidate, myProject)) || ("".equals(candidate)))
     {
       execute(console, consoleHistoryModel);
       scrollDown(editor);
     }
     else
     {
-      console.setInputText(text + "\n" + SPACES.substring(0, console.getPrompt().length()));
+      console.setInputText(text + '\n' + SPACES.substring(0, console.getPrompt().length()));
     }
   }
 
@@ -106,7 +107,7 @@ public class SchemeConsoleExecuteActionHandler
     TextRange range = new TextRange(0, document.getTextLength());
 
     languageConsole.getCurrentEditor().getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
-    languageConsole.addCurrentToHistory(range, false, this.myPreserveMarkup);
+    languageConsole.addCurrentToHistory(range, false, myPreserveMarkup);
     languageConsole.setInputText("");
     if (!StringUtil.isEmptyOrSpaces(text))
     {
@@ -116,13 +117,14 @@ public class SchemeConsoleExecuteActionHandler
     processLine(text);
   }
 
-  private void scrollDown(final Editor currentEditor)
+  private static void scrollDown(final Editor editor)
   {
     ApplicationManager.getApplication().invokeLater(new Runnable()
     {
+      @Override
       public void run()
       {
-        currentEditor.getCaretModel().moveToOffset(currentEditor.getDocument().getTextLength());
+        editor.getCaretModel().moveToOffset(editor.getDocument().getTextLength());
       }
     });
   }

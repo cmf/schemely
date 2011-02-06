@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module relativePaths="true" type="PLUGIN_MODULE" version="4">
   <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/META-INF/plugin.xml" />
-  <component name="FacetManager">
-    <facet type="Scheme" name="Scheme">
-      <configuration />
-    </facet>
-  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -16,7 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
           <root url="jar://$APPLICATION_HOME_DIR$/plugins/testng/lib/testng-jdk15.jar!/" />
@@ -35,9 +30,11 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library>
+      <library name="sisc-1.16.6">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/KawaRepl.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/sisc-lib-1.16.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/sisc-1.16.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/sisc-opt-1.16.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

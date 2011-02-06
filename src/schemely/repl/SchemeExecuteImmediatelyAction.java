@@ -6,14 +6,18 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 public class SchemeExecuteImmediatelyAction extends SchemeExecuteActionBase
 {
   public SchemeExecuteImmediatelyAction(SchemeConsole languageConsole,
-                                         ProcessHandler processHandler,
-                                         SchemeConsoleExecuteActionHandler consoleExecuteActionHandler)
+                                        ProcessHandler processHandler,
+                                        SchemeConsoleExecuteActionHandler executeActionHandler)
   {
-    super(languageConsole, processHandler, consoleExecuteActionHandler, "Scheme.Console.Execute.Immediately");
+    super(languageConsole,
+          processHandler,
+          executeActionHandler,
+          SchemeConsoleRunner.EXECUTE_ACTION_IMMEDIATELY_ID);
   }
 
+  @Override
   public void actionPerformed(AnActionEvent e)
   {
-    getExecuteActionHandler().runExecuteAction(this.myLanguageConsole, true);
+    getExecuteActionHandler().runExecuteAction(myLanguageConsole, true);
   }
 }

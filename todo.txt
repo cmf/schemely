@@ -6,7 +6,7 @@
 
 * More binding forms - syntax-rules
 
-* Better AST
+* Better AST?
 
 * Switch to Java resolution
 
@@ -20,6 +20,22 @@
 
 * Fix Facet
 
-* SISC REPL
+* Runner creation
 
-* Runners for Kawa and SISC
+* Scheme Implementation
+- Lexer, Parser, PSIBuilder
+- Symbol resolution (identifier, file)
+- Completion symbols
+- Compiler (SchemeBackendCompiler)
+- REPL (Classpath, Prompt, ProcessHandler, Console highlighting, Console detection)
+- Annotation list?
+
+* Allow case-sensitivity
+
+* Allow use of square brackets/braces
+
+* Internationalise
+
+* Fix quoting of lists
+
+* Block comments

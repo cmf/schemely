@@ -6,14 +6,15 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 public class SchemeConsoleEnterAction extends SchemeExecuteActionBase
 {
   public SchemeConsoleEnterAction(SchemeConsole languageConsole,
-                                   ProcessHandler processHandler,
-                                   SchemeConsoleExecuteActionHandler consoleExecuteActionHandler)
+                                  ProcessHandler processHandler,
+                                  SchemeConsoleExecuteActionHandler executeActionHandler)
   {
-    super(languageConsole, processHandler, consoleExecuteActionHandler, "Scheme.Console.Execute");
+    super(languageConsole, processHandler, executeActionHandler, SchemeConsoleRunner.EXECUTE_ACTION_ID);
   }
 
+  @Override
   public void actionPerformed(AnActionEvent e)
   {
-    getExecuteActionHandler().runExecuteAction(this.myLanguageConsole, false);
+    getExecuteActionHandler().runExecuteAction(myLanguageConsole, false);
   }
 }

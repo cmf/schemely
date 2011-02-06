@@ -5,7 +5,7 @@ import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.CaretModel;
@@ -17,23 +17,22 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightVirtualFile;
-import com.intellij.util.NotNullFunction;
-import org.jetbrains.annotations.NotNull;
 import schemely.SchemeBundle;
 import schemely.psi.impl.SchemeFile;
-import schemely.repl.KawaRepl;
 import schemely.repl.SchemeConsole;
 import schemely.repl.SchemeConsoleExecuteActionHandler;
 import schemely.repl.SchemeConsoleProcessHandler;
+import schemely.scheme.Scheme.REPL;
+import schemely.scheme.SchemeImplementation;
 
 public abstract class SchemeConsoleActionBase extends AnAction
 {
-  private static final Logger LOG =
-    Logger.getInstance("#schemely.repl.actions.LoadSchemeFileInConsoleAction");
+  private static final Logger LOG = Logger.getInstance(SchemeConsoleActionBase.class.getName());
 
   protected static SchemeConsoleProcessHandler findRunningSchemeConsole(Project project)
   {
-    ProcessHandler handler = ExecutionHelper.findRunningConsole(project, new SchemeConsoleMatcher());
+    REPL repl = SchemeImplementation.from(project).getRepl();
+    ProcessHandler handler = ExecutionHelper.findRunningConsole(project, repl.getConsoleMatcher());
     if ((handler instanceof SchemeConsoleProcessHandler))
     {
       return (SchemeConsoleProcessHandler) handler;
@@ -62,11 +61,12 @@ public abstract class SchemeConsoleActionBase extends AnAction
     handler.runExecuteAction(console, true);
   }
 
+  @Override
   public void update(AnActionEvent e)
   {
     Presentation presentation = e.getPresentation();
 
-    Editor editor = e.getData(DataKeys.EDITOR);
+    Editor editor = e.getData(PlatformDataKeys.EDITOR);
 
     if (editor == null)
     {
@@ -120,15 +120,6 @@ public abstract class SchemeConsoleActionBase extends AnAction
 
   protected static void showError(String msg)
   {
-    Messages.showErrorDialog(msg, SchemeBundle.message("scheme.repl.actions.load.text.title", new Object[0]));
-  }
-
-  private static class SchemeConsoleMatcher implements NotNullFunction<String, Boolean>
-  {
-    @NotNull
-    public Boolean fun(String cmdLine)
-    {
-      return (cmdLine != null) && (cmdLine.contains(KawaRepl.class.getSimpleName()));
-    }
+    Messages.showErrorDialog(msg, SchemeBundle.message("scheme.repl.actions.load.text.title"));
   }
 }

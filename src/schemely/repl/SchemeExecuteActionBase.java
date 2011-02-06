@@ -16,28 +16,29 @@ public abstract class SchemeExecuteActionBase extends DumbAwareAction
   protected final ProcessHandler myProcessHandler;
   protected final SchemeConsoleExecuteActionHandler myConsoleExecuteActionHandler;
 
-  public SchemeExecuteActionBase(SchemeConsole languageConsole,
-                                  ProcessHandler processHandler,
-                                  SchemeConsoleExecuteActionHandler consoleExecuteActionHandler,
-                                  String actionId)
+  protected SchemeExecuteActionBase(SchemeConsole languageConsole,
+                                    ProcessHandler processHandler,
+                                    SchemeConsoleExecuteActionHandler executeActionHandler,
+                                    String actionId)
   {
-    super(null, null, IconLoader.getIcon("/actions/execute.png"));
-    this.myLanguageConsole = languageConsole;
-    this.myProcessHandler = processHandler;
-    this.myConsoleExecuteActionHandler = consoleExecuteActionHandler;
+    super(null, null, IconLoader.getIcon(ACTIONS_EXECUTE_ICON));
+    myLanguageConsole = languageConsole;
+    myProcessHandler = processHandler;
+    myConsoleExecuteActionHandler = executeActionHandler;
     EmptyAction.setupAction(this, actionId, null);
   }
 
+  @Override
   public void update(AnActionEvent e)
   {
-    EditorEx editor = this.myLanguageConsole.getConsoleEditor();
+    EditorEx editor = myLanguageConsole.getConsoleEditor();
     Lookup lookup = LookupManager.getActiveLookup(editor);
     e.getPresentation()
-      .setEnabled((!this.myProcessHandler.isProcessTerminated()) && ((lookup == null) || (!lookup.isCompletion())));
+      .setEnabled((!myProcessHandler.isProcessTerminated()) && ((lookup == null) || (!lookup.isCompletion())));
   }
 
   public SchemeConsoleExecuteActionHandler getExecuteActionHandler()
   {
-    return this.myConsoleExecuteActionHandler;
+    return myConsoleExecuteActionHandler;
   }
 }

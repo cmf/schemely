@@ -43,7 +43,7 @@
     <lang.namesValidator language="Scheme"
                          implementationClass="schemely.utils.SchemeNamesValidator"/>
     <completion.contributor language="Scheme"
-                           implementationClass="schemely.completion.SchemeCompletionContributor"/>
+                            implementationClass="schemely.completion.SchemeCompletionContributor"/>
     <compilerSettingsFactory implementation="schemely.compiler.SchemeCompilerSettingsFactory"/>
     <fileTemplateGroup implementation="schemely.actions.SchemeTemplatesFactory"/>
     <fileTypeIndentOptionsProvider
@@ -65,11 +65,15 @@
       implementation="schemely.editor.selection.SchemeLiteralSelectioner"/>
 
     <frameworkSupport implementation="schemely.config.SchemeFacetSupportProvider"/>
-    <applicationService serviceInterface="schemely.settings.SchemeApplicationSettings"
-                        serviceImplementation="schemely.settings.SchemeApplicationSettings"/>
+    <applicationService serviceInterface="schemely.settings.SchemeProjectSettings"
+                        serviceImplementation="schemely.settings.SchemeProjectSettings"/>
 
     <projectService serviceInterface="schemely.psi.util.SchemePsiElementFactory"
                     serviceImplementation="schemely.psi.util.SchemePsiElementFactoryImpl"/>
+
+    <projectConfigurable implementation="schemely.settings.SchemeConfigurable"/>
+    <projectService serviceInterface="schemely.settings.SchemeProjectSettings"
+                    serviceImplementation="schemely.settings.SchemeProjectSettings"/>
 
   </extensions>
 

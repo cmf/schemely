@@ -1,4 +1,4 @@
-package schemely.repl;
+package schemely.scheme.kawa.impl;
 
 import gnu.expr.Language;
 import kawa.Shell;
@@ -7,7 +7,7 @@ import kawa.standard.Scheme;
 /**
  * @author Colin Fleming
  */
-public class KawaRepl
+public class KawaREPLMain
 {
   public static void main(String[] args)
   {

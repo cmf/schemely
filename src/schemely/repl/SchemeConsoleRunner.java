@@ -1,54 +1,67 @@
 package schemely.repl;
 
 import com.google.common.collect.Lists;
-import com.intellij.execution.*;
-import com.intellij.execution.configurations.CommandLineBuilder;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.configurations.JavaParameters;
+import com.intellij.execution.CantRunException;
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.ExecutionHelper;
+import com.intellij.execution.ExecutionManager;
+import com.intellij.execution.Executor;
+import com.intellij.execution.ExecutorRegistry;
 import com.intellij.execution.executors.DefaultRunExecutor;
-import com.intellij.execution.process.*;
+import com.intellij.execution.process.CommandLineArgumentsProvider;
+import com.intellij.execution.process.ConsoleHistoryModel;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessOutputTypes;
+import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.execution.runners.AbstractConsoleRunnerWithHistory;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.execution.ui.actions.CloseAction;
 import com.intellij.ide.CommonActionsManager;
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.JavaSdkType;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.projectRoots.SdkType;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.ModuleSourceOrderEntry;
-import com.intellij.openapi.roots.OrderEntry;
-import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.util.PairProcessor;
-import com.intellij.util.PathUtil;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import schemely.SchemeBundle;
-import schemely.utils.SchemeConfigUtil;
+import schemely.scheme.Scheme;
+import schemely.scheme.Scheme.REPL;
+import schemely.scheme.SchemeImplementation;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.List;
+import java.util.Map;
 
 public class SchemeConsoleRunner
 {
   public static final String REPL_TITLE;
+  @NonNls
   public static final String EXECUTE_ACTION_IMMEDIATELY_ID = "Scheme.Console.Execute.Immediately";
+  @NonNls
   public static final String EXECUTE_ACTION_ID = "Scheme.Console.Execute";
+  private static final String[] EMPTY_ENV = new String[0];
+
   private final Module myModule;
   private final Project myProject;
   private final String myConsoleTitle;
@@ -65,35 +78,40 @@ public class SchemeConsoleRunner
                              @NotNull CommandLineArgumentsProvider provider,
                              @Nullable String workingDir)
   {
-    this.myModule = module;
-    this.myProject = module.getProject();
-    this.myConsoleTitle = consoleTitle;
-    this.myProvider = provider;
-    this.myWorkingDir = workingDir;
-    this.myHistory = new ConsoleHistoryModel();
+    myModule = module;
+    myProject = module.getProject();
+    myConsoleTitle = consoleTitle;
+    myProvider = provider;
+    myWorkingDir = workingDir;
+    myHistory = new ConsoleHistoryModel();
   }
 
   public static void run(@NotNull Module module, String workingDir, String[] statements2execute) throws CantRunException
   {
-    final List<String> args = createRuntimeArgs(module, workingDir);
+    Scheme scheme = SchemeImplementation.from(module.getProject());
+    final List<String> args = scheme.getRepl().createRuntimeArgs(module, workingDir);
 
     CommandLineArgumentsProvider provider = new CommandLineArgumentsProvider()
     {
+      @Override
       public String[] getArguments()
       {
         return args.toArray(new String[args.size()]);
       }
 
+      @Override
       public boolean passParentEnvs()
       {
         return false;
       }
 
+      @Override
       public Map<String, String> getAdditionalEnvs()
       {
         return new HashMap<String, String>();
       }
     };
+
     Project project = module.getProject();
     SchemeConsoleRunner runner = new SchemeConsoleRunner(module, REPL_TITLE, provider, workingDir);
     try
@@ -108,34 +126,36 @@ public class SchemeConsoleRunner
 
   public void initAndRun(String[] statements2execute) throws ExecutionException
   {
-    Process process = createProcess(this.myProvider);
-    this.myConsoleView = createConsoleView();
-    this.myProcessHandler =
-      new SchemeConsoleProcessHandler(process, this.myProvider.getCommandLineString(), getLanguageConsole());
-    this.myConsoleExecuteActionHandler =
-      new SchemeConsoleExecuteActionHandler(getProcessHandler(), getProject(), false);
-    getLanguageConsole().setExecuteHandler(this.myConsoleExecuteActionHandler);
+    Process process = createProcess(myProvider);
+    myConsoleView = createConsoleView();
+    myProcessHandler =
+      new SchemeConsoleProcessHandler(process, myProvider.getCommandLineString(), getLanguageConsole());
+    myConsoleExecuteActionHandler =
+      new SchemeConsoleExecuteActionHandler(myProcessHandler, myProject, false);
+    getLanguageConsole().setExecuteHandler(myConsoleExecuteActionHandler);
     myConsoleView.getConsole().setPrompt("> ");
 
-    ProcessTerminatedListener.attach(this.myProcessHandler);
+    ProcessTerminatedListener.attach(myProcessHandler);
 
-    this.myProcessHandler.addProcessListener(new ProcessAdapter()
+    myProcessHandler.addProcessListener(new ProcessAdapter()
     {
+      @Override
       public void processTerminated(ProcessEvent event)
       {
-        SchemeConsoleRunner.this.myRunAction.getTemplatePresentation().setEnabled(false);
-        SchemeConsoleRunner.this.myConsoleView.getConsole().setPrompt("");
-        SchemeConsoleRunner.this.myConsoleView.getConsole().getConsoleEditor().setRendererMode(true);
+        myRunAction.getTemplatePresentation().setEnabled(false);
+        myConsoleView.getConsole().setPrompt("");
+        myConsoleView.getConsole().getConsoleEditor().setRendererMode(true);
         ApplicationManager.getApplication().invokeLater(new Runnable()
         {
+          @Override
           public void run()
           {
-            SchemeConsoleRunner.this.myConsoleView.getConsole().getConsoleEditor().getComponent().updateUI();
+            myConsoleView.getConsole().getConsoleEditor().getComponent().updateUI();
           }
         });
       }
     });
-    this.myConsoleView.attachToProcess(this.myProcessHandler);
+    myConsoleView.attachToProcess(myProcessHandler);
 
     Executor defaultExecutor = ExecutorRegistry.getInstance().getExecutorById(DefaultRunExecutor.EXECUTOR_ID);
     DefaultActionGroup toolbarActions = new DefaultActionGroup();
@@ -143,10 +163,10 @@ public class SchemeConsoleRunner
 
     JPanel panel = new JPanel(new BorderLayout());
     panel.add(actionToolbar.getComponent(), "West");
-    panel.add(this.myConsoleView.getComponent(), "Center");
+    panel.add(myConsoleView.getComponent(), "Center");
 
     RunContentDescriptor myDescriptor =
-      new RunContentDescriptor(this.myConsoleView, this.myProcessHandler, panel, this.myConsoleTitle);
+      new RunContentDescriptor(myConsoleView, myProcessHandler, panel, myConsoleTitle);
 
     AnAction[] actions = fillToolBarActions(toolbarActions, defaultExecutor, myDescriptor);
     registerActionShortcuts(actions, getLanguageConsole().getConsoleEditor().getComponent());
@@ -155,25 +175,27 @@ public class SchemeConsoleRunner
 
     createAndRegisterEnterAction(panel);
 
-    ExecutionManager.getInstance(this.myProject).getContentManager().showRunContent(defaultExecutor, myDescriptor);
+    ExecutionManager.getInstance(myProject).getContentManager().showRunContent(defaultExecutor, myDescriptor);
 
-    ToolWindow window = ToolWindowManager.getInstance(this.myProject).getToolWindow(defaultExecutor.getId());
+    ToolWindow window = ToolWindowManager.getInstance(myProject).getToolWindow(defaultExecutor.getId());
     window.activate(new Runnable()
     {
+      @Override
       public void run()
       {
-        IdeFocusManager.getInstance(SchemeConsoleRunner.this.myProject)
-          .requestFocus(SchemeConsoleRunner.this.getLanguageConsole().getCurrentEditor().getContentComponent(), true);
+        IdeFocusManager.getInstance(myProject)
+          .requestFocus(getLanguageConsole().getCurrentEditor().getContentComponent(), true);
       }
     });
-    this.myProcessHandler.startNotify();
+    myProcessHandler.startNotify();
 
-    SchemeConsole console = getConsoleView().getConsole();
+    SchemeConsole console = myConsoleView.getConsole();
     for (String statement : statements2execute)
     {
-      String st = statement + "\n";
-      SchemeConsoleHighlightingUtil.processOutput(console, st, ProcessOutputTypes.SYSTEM);
-      SchemeConsoleExecuteActionHandler actionHandler = getConsoleExecuteActionHandler();
+      String st = statement + '\n';
+      REPL repl = SchemeImplementation.from(myProject).getRepl();
+      repl.processOutput(console, st, ProcessOutputTypes.SYSTEM);
+      SchemeConsoleExecuteActionHandler actionHandler = myConsoleExecuteActionHandler;
       actionHandler.processLine(st);
     }
   }
@@ -181,7 +203,7 @@ public class SchemeConsoleRunner
   private void createAndRegisterEnterAction(JPanel panel)
   {
     AnAction enterAction =
-      new SchemeConsoleEnterAction(getLanguageConsole(), getProcessHandler(), getConsoleExecuteActionHandler());
+      new SchemeConsoleEnterAction(getLanguageConsole(), myProcessHandler, myConsoleExecuteActionHandler);
     enterAction.registerCustomShortcutSet(enterAction.getShortcutSet(),
                                           getLanguageConsole().getConsoleEditor().getComponent());
     enterAction.registerCustomShortcutSet(enterAction.getShortcutSet(), panel);
@@ -211,11 +233,10 @@ public class SchemeConsoleRunner
     actionList.add(closeAction);
 
     List<AnAction> executionActions = createConsoleExecActions(getLanguageConsole(),
-                                                               this.myProcessHandler,
-                                                               this.myConsoleExecuteActionHandler,
-                                                               getHistoryModel());
+                                                               myProcessHandler,
+                                                               myConsoleExecuteActionHandler, myHistory);
 
-    this.myRunAction = executionActions.get(0);
+    myRunAction = executionActions.get(0);
     actionList.addAll(executionActions);
 
     actionList.add(CommonActionsManager.getInstance().createHelpAction("interactive_console"));
@@ -227,18 +248,20 @@ public class SchemeConsoleRunner
 
   public static List<AnAction> createConsoleExecActions(final SchemeConsole languageConsole,
                                                         ProcessHandler processHandler,
-                                                        SchemeConsoleExecuteActionHandler consoleExecuteActionHandler,
+                                                        SchemeConsoleExecuteActionHandler executeActionHandler,
                                                         ConsoleHistoryModel historyModel)
   {
     AnAction runImmediatelyAction =
-      new SchemeExecuteImmediatelyAction(languageConsole, processHandler, consoleExecuteActionHandler);
+      new SchemeExecuteImmediatelyAction(languageConsole, processHandler, executeActionHandler);
 
     PairProcessor<AnActionEvent, String> historyProcessor = new PairProcessor<AnActionEvent, String>()
     {
+      @Override
       public boolean process(AnActionEvent e, final String s)
       {
         new WriteCommandAction(languageConsole.getProject(), languageConsole.getFile())
         {
+          @Override
           protected void run(Result result) throws Throwable
           {
             languageConsole.getEditorDocument().setText(s == null ? "" : s);
@@ -267,87 +290,29 @@ public class SchemeConsoleRunner
 
   protected AnAction createCloseAction(Executor defaultExecutor, RunContentDescriptor myDescriptor)
   {
-    return new CloseAction(defaultExecutor, myDescriptor, this.myProject);
+    return new CloseAction(defaultExecutor, myDescriptor, myProject);
   }
 
-  protected AnAction createStopAction()
+  protected static AnAction createStopAction()
   {
     return ActionManager.getInstance().getAction("Stop");
   }
 
   protected SchemeConsoleView createConsoleView()
   {
-    return new SchemeConsoleView(getProject(), getConsoleTitle(), getHistoryModel(), getConsoleExecuteActionHandler());
-  }
-
-  private static List<String> createRuntimeArgs(Module module, String workingDir) throws CantRunException
-  {
-    JavaParameters params = new JavaParameters();
-    params.configureByModule(module, JavaParameters.JDK_AND_CLASSES);
-
-    boolean sdkConfigured = SchemeConfigUtil.isKawaConfigured(module);
-    if (!sdkConfigured)
-    {
-      String jarPath = SchemeConfigUtil.KAWA_SDK;
-      assert (jarPath != null);
-      params.getClassPath().add(jarPath);
-    }
-
-    Set<VirtualFile> cpVFiles = new HashSet<VirtualFile>();
-    ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
-    OrderEntry[] entries = moduleRootManager.getOrderEntries();
-    for (OrderEntry orderEntry : entries)
-    {
-      if ((orderEntry instanceof ModuleSourceOrderEntry))
-      {
-        cpVFiles.addAll(Arrays.asList(orderEntry.getFiles(OrderRootType.SOURCES)));
-      }
-    }
-
-    for (VirtualFile file : cpVFiles)
-    {
-      params.getClassPath().add(file.getPath());
-    }
-
-    String replPath = PathUtil.getJarPathForClass(KawaRepl.class);
-    params.getClassPath().add(replPath);
-
-    params.setMainClass(KawaRepl.class.getName());
-    params.setWorkingDirectory(new File(workingDir));
-
-    Project project = PlatformDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext());
-    GeneralCommandLine line = CommandLineBuilder.createFromJavaParameters(params, project, true);
-
-    Sdk sdk = params.getJdk();
-    assert (sdk != null);
-    SdkType type = sdk.getSdkType();
-    String executablePath = ((JavaSdkType) type).getVMExecutablePath(sdk);
-
-    List<String> cmd = new ArrayList<String>();
-    cmd.add(executablePath);
-    cmd.addAll(line.getParametersList().getList());
-
-    //    TODO
-    //    if (!sdkConfigured)
-    //    {
-    //      SchemeConfigUtil.warningDefaultSchemeJar(module);
-    //    }
-    return cmd;
+    return new SchemeConsoleView(myProject, myConsoleTitle, myHistory, myConsoleExecuteActionHandler);
   }
 
   protected Process createProcess(CommandLineArgumentsProvider provider) throws ExecutionException
   {
-    List<String> cmd = createRuntimeArgs(this.myModule, getWorkingDir());
-
     Process process = null;
     try
     {
-      process =
-        Runtime.getRuntime().exec(cmd.toArray(new String[cmd.size()]), new String[0], new File(getWorkingDir()));
+      process = Runtime.getRuntime().exec(provider.getArguments(), EMPTY_ENV, new File(myWorkingDir));
     }
     catch (IOException e)
     {
-      ExecutionHelper.showErrors(getProject(), Arrays.<Exception>asList(e), REPL_TITLE, null);
+      ExecutionHelper.showErrors(myProject, Arrays.<Exception>asList(e), REPL_TITLE, null);
     }
 
     return process;
@@ -355,42 +320,42 @@ public class SchemeConsoleRunner
 
   public Project getProject()
   {
-    return this.myProject;
+    return myProject;
   }
 
   public String getConsoleTitle()
   {
-    return this.myConsoleTitle;
+    return myConsoleTitle;
   }
 
   public SchemeConsole getLanguageConsole()
   {
-    return this.myConsoleView.getConsole();
+    return myConsoleView.getConsole();
   }
 
   public SchemeConsoleView getConsoleView()
   {
-    return this.myConsoleView;
+    return myConsoleView;
   }
 
   public ProcessHandler getProcessHandler()
   {
-    return this.myProcessHandler;
+    return myProcessHandler;
   }
 
   public SchemeConsoleExecuteActionHandler getConsoleExecuteActionHandler()
   {
-    return this.myConsoleExecuteActionHandler;
+    return myConsoleExecuteActionHandler;
   }
 
   public ConsoleHistoryModel getHistoryModel()
   {
-    return this.myHistory;
+    return myHistory;
   }
 
   public String getWorkingDir()
   {
-    return this.myWorkingDir;
+    return myWorkingDir;
   }
 
   static

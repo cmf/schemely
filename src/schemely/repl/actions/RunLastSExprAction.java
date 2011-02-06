@@ -1,7 +1,7 @@
 package schemely.repl.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -18,9 +18,10 @@ public class RunLastSExprAction extends SchemeConsoleActionBase
     getTemplatePresentation().setIcon(SchemeIcons.SCHEME_ICON);
   }
 
+  @Override
   public void actionPerformed(AnActionEvent event)
   {
-    Editor editor = event.getData(DataKeys.EDITOR);
+    Editor editor = event.getData(PlatformDataKeys.EDITOR);
     if (editor == null)
     {
       return;
@@ -42,8 +43,8 @@ public class RunLastSExprAction extends SchemeConsoleActionBase
     if (SchemePsiElementFactory.getInstance(project).hasSyntacticalErrors(text))
     {
       Messages.showErrorDialog(project,
-                               SchemeBundle.message("evaluate.incorrect.sexp", new Object[0]),
-                               SchemeBundle.message("evaluate.incorrect.cannot.evaluate", new Object[0]));
+                               SchemeBundle.message("evaluate.incorrect.sexp"),
+                               SchemeBundle.message("evaluate.incorrect.cannot.evaluate"));
 
       return;
     }

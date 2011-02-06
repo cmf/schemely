@@ -16,7 +16,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JavaSdkType;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.MockJdkWrapper;
-import com.intellij.openapi.roots.*;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.ModuleSourceOrderEntry;
+import com.intellij.openapi.roots.OrderEntry;
+import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -27,9 +32,11 @@ import org.jetbrains.annotations.NotNull;
 import schemely.file.SchemeFileType;
 import schemely.psi.impl.SchemeFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -184,7 +191,7 @@ public class SchemeBackendCompiler extends ExternalCompiler
   }
 
   private void createStartupCommandImpl(ModuleChunk chunk,
-                                        ArrayList<String> commandLine,
+                                        Collection<String> commandLine,
                                         String outputPath,
                                         CompileScope scope) throws IOException
   {
