@@ -52,7 +52,6 @@
     <annotator language="Scheme" implementationClass="schemely.annotator.SchemeAnnotator"/>
 
     <gotoSymbolContributor implementation="schemely.gotoclass.SchemeGoToSymbolContributor"/>
-    <gotoClassContributor implementation="schemely.gotoclass.SchemeGoToClassContributor"/>
 
     <stubElementTypeHolder class="schemely.parser.AST"/>
 
@@ -90,13 +89,6 @@
   <project-components>
     <component>
       <implementation-class>schemely.compiler.SchemeCompilerSettings</implementation-class>
-    </component>
-    <component>
-      <implementation-class>schemely.psi.impl.javaView.SchemeClassFinder
-      </implementation-class>
-    </component>
-    <component>
-      <implementation-class>schemely.psi.impl.SchemePsiManager</implementation-class>
     </component>
     <!--<component>-->
     <!--<implementation-class>schemely.repl.ReplToolWindow</implementation-class>-->

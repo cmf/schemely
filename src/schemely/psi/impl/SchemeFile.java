@@ -18,7 +18,6 @@ import schemely.file.SchemeFileType;
 import schemely.psi.api.SchemePsiElement;
 import schemely.psi.impl.list.SchemeList;
 import schemely.psi.impl.symbols.SchemeIdentifier;
-import schemely.psi.impl.synthetic.SchemeSyntheticClassImpl;
 import schemely.psi.resolve.ResolveResult;
 import schemely.psi.resolve.ResolveUtil;
 import schemely.psi.util.SchemePsiUtil;
@@ -53,21 +52,6 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
     }
     return super.getContext();
   }
-
-  public PsiClass getDefinedClass()
-  {
-    if (!myScriptClassInitialized)
-    {
-      if (isScript())
-      {
-        myClass = new SchemeSyntheticClassImpl(this);
-      }
-
-      myScriptClassInitialized = true;
-    }
-    return myClass;
-  }
-
 
   protected PsiFileImpl clone()
   {

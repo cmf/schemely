@@ -73,5 +73,4 @@ public class SchemeStubFileElementType extends IStubFileElementType<SchemeFileSt
       sink.occurrence(SchemeFullScriptNameIndex.KEY, fqn.hashCode());
     }
   }
-
 }
