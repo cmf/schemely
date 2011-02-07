@@ -117,7 +117,7 @@ public class SchemeConsoleExecuteActionHandler
     processLine(text);
   }
 
-  private static void scrollDown(final Editor editor)
+  static void scrollDown(final Editor editor)
   {
     ApplicationManager.getApplication().invokeLater(new Runnable()
     {

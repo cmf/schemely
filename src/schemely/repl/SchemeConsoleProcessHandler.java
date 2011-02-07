@@ -2,6 +2,7 @@ package schemely.repl;
 
 import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.execution.process.ColoredProcessHandler;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.CharsetToolkit;
@@ -24,6 +25,8 @@ public class SchemeConsoleProcessHandler extends ColoredProcessHandler
     // This is where we process input from the process
     Scheme scheme = SchemeImplementation.from(myLanguageConsole.getProject());
     scheme.getRepl().processOutput(myLanguageConsole, StringUtil.convertLineSeparators(text), attributes);
+    EditorEx historyViewer = myLanguageConsole.getHistoryViewer();
+    SchemeConsoleExecuteActionHandler.scrollDown(historyViewer);
   }
 
   public LanguageConsoleImpl getLanguageConsole()
