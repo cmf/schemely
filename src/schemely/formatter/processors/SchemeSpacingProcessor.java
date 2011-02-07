@@ -33,6 +33,10 @@ public class SchemeSpacingProcessor implements AST
     {
       return NO_SPACING;
     }
+    else if (type1 == COMMENT)
+    {
+      return NO_SPACING_WITH_NEWLINE;
+    }
 
     //    if (Tokens.ATOMS.contains(type2))
     //    {
