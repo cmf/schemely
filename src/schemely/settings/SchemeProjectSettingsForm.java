@@ -7,19 +7,19 @@ import javax.swing.*;
 
 public class SchemeProjectSettingsForm
 {
-  private final SchemeProjectSettings mySettings;
+  private final SchemeProjectSettings settings;
 
-  private JPanel myPanel;
+  private JPanel panel;
   private JComboBox schemeImplementationComboBox;
 
   public SchemeProjectSettingsForm(Project project)
   {
-    mySettings = SchemeProjectSettings.getInstance(project);
+    settings = SchemeProjectSettings.getInstance(project);
   }
 
   JComponent getComponent()
   {
-    return myPanel;
+    return panel;
   }
 
   public SchemeImplementation getSchemeImplementation()
@@ -29,12 +29,12 @@ public class SchemeProjectSettingsForm
 
   boolean isModified()
   {
-    return !schemeImplementationComboBox.getSelectedItem().equals(mySettings.schemeImplementation);
+    return !schemeImplementationComboBox.getSelectedItem().equals(settings.schemeImplementation);
   }
 
   void reset()
   {
-    schemeImplementationComboBox.setSelectedItem(mySettings.schemeImplementation);
+    schemeImplementationComboBox.setSelectedItem(settings.schemeImplementation);
   }
 
   private void createUIComponents()

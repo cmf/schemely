@@ -7,24 +7,23 @@ import com.intellij.ide.util.treeView.smartTree.Grouper;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-import schemely.psi.impl.list.SchemeList;
 import schemely.psi.impl.symbols.SchemeIdentifier;
 
 
 public class SchemeStructureViewModel extends TextEditorBasedStructureViewModel
 {
-  private PsiFile myFile;
+  private PsiFile file;
 
   public SchemeStructureViewModel(PsiFile file)
   {
     super(file);
-    myFile = file;
+    this.file = file;
   }
 
   @NotNull
   public StructureViewTreeElement getRoot()
   {
-    return new SchemeStructureViewElement(myFile);
+    return new SchemeStructureViewElement(file);
   }
 
   @NotNull
@@ -47,7 +46,7 @@ public class SchemeStructureViewModel extends TextEditorBasedStructureViewModel
 
   protected PsiFile getPsiFile()
   {
-    return myFile;
+    return file;
   }
 
   @NotNull

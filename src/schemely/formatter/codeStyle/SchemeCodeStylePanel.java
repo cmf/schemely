@@ -15,18 +15,18 @@ import javax.swing.*;
 
 public class SchemeCodeStylePanel extends CodeStyleAbstractPanel
 {
-  private JPanel myPanel;
-  private JPanel myPreviewPanel;
+  private JPanel panel;
+  private JPanel previewPanel;
   private JTextArea defineFormsTextArea;
-  private JTabbedPane myTabbedPane;
-  private JPanel myAlignPanel;
+  private JTabbedPane tabbedPane;
+  private JPanel alignPanel;
 
   protected SchemeCodeStylePanel(CodeStyleSettings settings)
   {
     super(settings);
     SchemeCodeStyleSettings css = settings.getCustomSettings(SchemeCodeStyleSettings.class);
     setSettings(css);
-    installPreviewPanel(myPreviewPanel);
+    installPreviewPanel(previewPanel);
   }
 
   protected EditorHighlighter createHighlighter(EditorColorsScheme scheme)
@@ -71,7 +71,7 @@ public class SchemeCodeStylePanel extends CodeStyleAbstractPanel
 
   public JComponent getPanel()
   {
-    return myPanel;
+    return panel;
   }
 
   protected void resetImpl(CodeStyleSettings settings)

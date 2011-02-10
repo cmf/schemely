@@ -28,9 +28,9 @@ import java.util.Collection;
 
 public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubSupport, SchemePsiElement
 {
-  private PsiElement myContext = null;
-  private PsiClass myClass;
-  private boolean myScriptClassInitialized = false;
+  private PsiElement context = null;
+  private PsiClass psiClass;
+  private boolean scriptClassInitialized = false;
 
   @Override
   public String toString()
@@ -46,9 +46,9 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
   @Override
   public PsiElement getContext()
   {
-    if (myContext != null)
+    if (context != null)
     {
-      return myContext;
+      return context;
     }
     return super.getContext();
   }
@@ -56,7 +56,7 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
   protected PsiFileImpl clone()
   {
     SchemeFile clone = (SchemeFile) super.clone();
-    clone.myContext = myContext;
+    clone.context = context;
     return clone;
   }
 

@@ -14,26 +14,26 @@ import java.util.Set;
 
 public class SymbolResolveProcessor extends ResolveProcessor
 {
-  private final Set<PsiElement> myProcessedElements = new HashSet<PsiElement>();
+  private final Set<PsiElement> processedElements = new HashSet<PsiElement>();
   private final SchemeIdentifier place;
 
-  public SymbolResolveProcessor(String myName, SchemeIdentifier place)
+  public SymbolResolveProcessor(String name, SchemeIdentifier place)
   {
-    super(myName);
+    super(name);
     this.place = place;
   }
 
   public boolean execute(PsiElement element, ResolveState resolveState)
   {
-    if ((element instanceof PsiNamedElement) && !myProcessedElements.contains(element))
+    if ((element instanceof PsiNamedElement) && !processedElements.contains(element))
     {
       PsiNamedElement namedElement = (PsiNamedElement) element;
 
       if (!namedElement.equals(place))
       {
-        myCandidates.add(new SchemeResolveResultImpl(namedElement));
+        candidates.add(new SchemeResolveResultImpl(namedElement));
       }
-      myProcessedElements.add(namedElement);
+      processedElements.add(namedElement);
 
       return !SchemeList.isLocal(element);
     }
@@ -49,7 +49,7 @@ public class SymbolResolveProcessor extends ResolveProcessor
 
   public String getName(ResolveState resolveState)
   {
-    return myName;
+    return name;
   }
 
   @Override

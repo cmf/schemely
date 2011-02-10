@@ -9,22 +9,22 @@ import schemely.psi.resolve.SchemeResolveResult;
 
 public abstract class ResolveProcessor implements PsiScopeProcessor, NameHint, ElementClassHint
 {
-  protected HashSet<SchemeResolveResult> myCandidates = new HashSet<SchemeResolveResult>();
-  protected final String myName;
+  protected HashSet<SchemeResolveResult> candidates = new HashSet<SchemeResolveResult>();
+  protected final String name;
 
-  public ResolveProcessor(String myName)
+  public ResolveProcessor(String name)
   {
-    this.myName = myName;
+    this.name = name;
   }
 
   public SchemeResolveResult[] getCandidates()
   {
-    return myCandidates.toArray(new SchemeResolveResult[myCandidates.size()]);
+    return candidates.toArray(new SchemeResolveResult[candidates.size()]);
   }
 
   public <T> T getHint(Class<T> hintClass)
   {
-    if (NameHint.class == hintClass && myName != null)
+    if (NameHint.class == hintClass && name != null)
     {
       return (T) this;
     }

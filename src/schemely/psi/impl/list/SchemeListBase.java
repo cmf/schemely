@@ -13,9 +13,9 @@ import schemely.psi.util.SchemePsiUtil;
 
 public abstract class SchemeListBase extends SchemePsiElementBase
 {
-  public SchemeListBase(@NotNull ASTNode astNode, String myName)
+  public SchemeListBase(@NotNull ASTNode astNode, String name)
   {
-    super(astNode, myName);
+    super(astNode, name);
   }
 
   @Nullable

@@ -34,11 +34,11 @@ public class SchemeCompiler implements TranslatingCompiler
   private static final Logger log = Logger.getLogger(SchemeCompiler.class);
 
   private static final FileTypeManager FILE_TYPE_MANAGER = FileTypeManager.getInstance();
-  private final Project myProject;
+  private final Project project;
 
-  public SchemeCompiler(Project myProject)
+  public SchemeCompiler(Project project)
   {
-    this.myProject = myProject;
+    this.project = project;
   }
 
   @Override
@@ -49,7 +49,7 @@ public class SchemeCompiler implements TranslatingCompiler
     {
       public PsiFile compute()
       {
-        return PsiManager.getInstance(myProject).findFile(virtualFile);
+        return PsiManager.getInstance(project).findFile(virtualFile);
       }
     });
 
@@ -65,8 +65,7 @@ public class SchemeCompiler implements TranslatingCompiler
     BackendCompiler backEndCompiler = getBackEndCompiler();
     BackendCompilerWrapper
       wrapper =
-      new BackendCompilerWrapper(moduleChunk,
-                                 myProject,
+      new BackendCompilerWrapper(moduleChunk, project,
                                  Arrays.asList(virtualFiles),
                                  (CompileContextEx) compileContext,
                                  backEndCompiler,
@@ -102,6 +101,6 @@ public class SchemeCompiler implements TranslatingCompiler
 
   private BackendCompiler getBackEndCompiler()
   {
-    return new SchemeBackendCompiler(myProject);
+    return new SchemeBackendCompiler(project);
   }
 }

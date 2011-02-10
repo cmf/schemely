@@ -22,11 +22,11 @@ import schemely.config.ui.SchemeFacetTab;
 public class SchemeFacetConfiguration implements FacetConfiguration,
                                                  PersistentStateComponent<SchemeLibrariesConfiguration>
 {
-  private final SchemeLibrariesConfiguration mySchemeLibrariesConfiguration = new SchemeLibrariesConfiguration();
+  private final SchemeLibrariesConfiguration librariesConfiguration = new SchemeLibrariesConfiguration();
 
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager)
   {
-    return new FacetEditorTab[]{new SchemeFacetTab(editorContext, mySchemeLibrariesConfiguration)};
+    return new FacetEditorTab[]{new SchemeFacetTab(editorContext, librariesConfiguration)};
   }
 
   public void readExternal(Element element) throws InvalidDataException
@@ -39,11 +39,11 @@ public class SchemeFacetConfiguration implements FacetConfiguration,
 
   public SchemeLibrariesConfiguration getState()
   {
-    return mySchemeLibrariesConfiguration;
+    return librariesConfiguration;
   }
 
   public void loadState(SchemeLibrariesConfiguration state)
   {
-    XmlSerializerUtil.copyBean(state, mySchemeLibrariesConfiguration);
+    XmlSerializerUtil.copyBean(state, librariesConfiguration);
   }
 }

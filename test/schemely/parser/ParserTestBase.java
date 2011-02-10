@@ -21,25 +21,25 @@ import java.util.Collection;
  */
 public class ParserTestBase
 {
-  protected Project myProject;
-  protected Module myModule;
-  protected IdeaProjectTestFixture myFixture;
+  protected Project project;
+  protected Module module;
+  protected IdeaProjectTestFixture fixture;
 
   @BeforeTest
   protected void setUp()
   {
-    myFixture = createFixture();
+    fixture = createFixture();
 
     try
     {
-      myFixture.setUp();
+      fixture.setUp();
     }
     catch (Exception e)
     {
       throw new Error(e);
     }
-    myModule = myFixture.getModule();
-    myProject = myModule.getProject();
+    module = fixture.getModule();
+    project = module.getProject();
   }
 
   protected IdeaProjectTestFixture createFixture()
@@ -54,7 +54,7 @@ public class ParserTestBase
   {
     try
     {
-      myFixture.tearDown();
+      fixture.tearDown();
     }
     catch (Exception e)
     {
@@ -72,7 +72,7 @@ public class ParserTestBase
 
   public PsiFile parse(String contents)
   {
-    PsiFile psiFile = createPseudoPhysicalFile(myProject, "test.scm", contents);
+    PsiFile psiFile = createPseudoPhysicalFile(project, "test.scm", contents);
     System.out.println(contents);
     dump(psiFile);
     return psiFile;

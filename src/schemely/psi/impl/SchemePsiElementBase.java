@@ -17,12 +17,12 @@ import java.util.Collections;
 
 public abstract class SchemePsiElementBase extends ASTWrapperPsiElement implements SchemePsiElement
 {
-  final private String myName;
+  final private String name;
 
-  public SchemePsiElementBase(@NotNull ASTNode astNode, String myName)
+  public SchemePsiElementBase(@NotNull ASTNode astNode, String name)
   {
     super(astNode);
-    this.myName = myName;
+    this.name = name;
   }
 
   public static boolean isWrongElement(PsiElement element)
@@ -74,7 +74,7 @@ public abstract class SchemePsiElementBase extends ASTWrapperPsiElement implemen
   @Override
   public String toString()
   {
-    return myName == null ? super.toString() : myName;
+    return name == null ? super.toString() : name;
   }
 
   @NotNull

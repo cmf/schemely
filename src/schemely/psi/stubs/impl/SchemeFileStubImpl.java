@@ -10,23 +10,23 @@ import schemely.psi.stubs.api.SchemeFileStub;
 
 public class SchemeFileStubImpl extends PsiFileStubImpl<SchemeFile> implements SchemeFileStub
 {
-  private final StringRef myPackageName;
-  private final StringRef myName;
+  private final StringRef packageName;
+  private final StringRef name;
   private final boolean isClassDefinition;
 
   public SchemeFileStubImpl(SchemeFile file)
   {
     super(file);
-    myPackageName = StringRef.fromString(file.getPackageName());
+    packageName = StringRef.fromString(file.getPackageName());
     isClassDefinition = false;
-    myName = StringRef.fromString(null);
+    name = StringRef.fromString(null);
   }
 
   public SchemeFileStubImpl(StringRef packName, StringRef name, boolean isScript)
   {
     super(null);
-    myPackageName = packName;
-    myName = name;
+    packageName = packName;
+    this.name = name;
     this.isClassDefinition = isScript;
   }
 
@@ -37,12 +37,12 @@ public class SchemeFileStubImpl extends PsiFileStubImpl<SchemeFile> implements S
 
   public StringRef getPackageName()
   {
-    return myPackageName;
+    return packageName;
   }
 
   public StringRef getName()
   {
-    return myName;
+    return name;
   }
 
   public boolean isClassDefinition()

@@ -12,11 +12,11 @@ import schemely.psi.impl.SchemeFile;
 
 public class SchemePsiElementFactoryImpl extends SchemePsiElementFactory
 {
-  private final Project myProject;
+  private final Project project;
 
   public SchemePsiElementFactoryImpl(Project project)
   {
-    myProject = project;
+    this.project = project;
   }
 
   private static final String DUMMY = "DUMMY.";
@@ -62,6 +62,6 @@ public class SchemePsiElementFactoryImpl extends SchemePsiElementFactory
 
   public Project getProject()
   {
-    return myProject;
+    return project;
   }
 }

@@ -24,22 +24,22 @@ public class SchemeConsoleExecuteActionHandler
 {
   private static final String SPACES = "                             ";
 
-  private final ProcessHandler myProcessHandler;
-  private final Project myProject;
-  private final IndentHelper myIndentHelper;
-  private final boolean myPreserveMarkup;
+  private final ProcessHandler processHandler;
+  private final Project project;
+  private final IndentHelper indentHelper;
+  private final boolean preserveMarkup;
 
   public SchemeConsoleExecuteActionHandler(ProcessHandler processHandler, Project project, boolean preserveMarkup)
   {
-    myProcessHandler = processHandler;
-    myProject = project;
-    myPreserveMarkup = preserveMarkup;
-    myIndentHelper = HelperFactory.createHelper(SchemeFileType.SCHEME_FILE_TYPE, myProject);
+    this.processHandler = processHandler;
+    this.project = project;
+    this.preserveMarkup = preserveMarkup;
+    indentHelper = HelperFactory.createHelper(SchemeFileType.SCHEME_FILE_TYPE, this.project);
   }
 
   public void processLine(String line)
   {
-    OutputStream outputStream = myProcessHandler.getProcessInput();
+    OutputStream outputStream = processHandler.getProcessInput();
     try
     {
       byte[] bytes = (line + '\n').getBytes();
@@ -70,11 +70,11 @@ public class SchemeConsoleExecuteActionHandler
     {
       String before = text.substring(0, offset);
       String after = text.substring(offset);
-      final int indent = myIndentHelper.getIndent(before, false);
-      String spaces = myIndentHelper.fillIndent(indent);
+      final int indent = indentHelper.getIndent(before, false);
+      String spaces = indentHelper.fillIndent(indent);
       final String newText = before + '\n' + spaces + after;
 
-      new WriteCommandAction(myProject)
+      new WriteCommandAction(project)
       {
         @Override
         protected void run(Result result) throws Throwable
@@ -89,7 +89,7 @@ public class SchemeConsoleExecuteActionHandler
 
     String candidate = text.trim();
 
-    if ((SchemePsiUtil.isValidSchemeExpression(candidate, myProject)) || ("".equals(candidate)))
+    if ((SchemePsiUtil.isValidSchemeExpression(candidate, project)) || ("".equals(candidate)))
     {
       execute(console, consoleHistoryModel);
       scrollDown(editor);
@@ -107,7 +107,7 @@ public class SchemeConsoleExecuteActionHandler
     TextRange range = new TextRange(0, document.getTextLength());
 
     languageConsole.getCurrentEditor().getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
-    languageConsole.addCurrentToHistory(range, false, myPreserveMarkup);
+    languageConsole.addCurrentToHistory(range, false, preserveMarkup);
     languageConsole.setInputText("");
     if (!StringUtil.isEmptyOrSpaces(text))
     {

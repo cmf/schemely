@@ -7,27 +7,27 @@ import schemely.file.SchemeFileType;
 
 public class SchemeConsole extends LanguageConsoleImpl
 {
-  private final ConsoleHistoryModel myHistoryModel;
-  private SchemeConsoleExecuteActionHandler myExecuteHandler;
+  private final ConsoleHistoryModel historyModel;
+  private SchemeConsoleExecuteActionHandler executeHandler;
 
   public SchemeConsole(Project project, String title, ConsoleHistoryModel historyModel)
   {
     super(project, title, SchemeFileType.SCHEME_LANGUAGE);
-    this.myHistoryModel = historyModel;
+    this.historyModel = historyModel;
   }
 
   public ConsoleHistoryModel getHistoryModel()
   {
-    return this.myHistoryModel;
+    return this.historyModel;
   }
 
   public SchemeConsoleExecuteActionHandler getExecuteHandler()
   {
-    return this.myExecuteHandler;
+    return this.executeHandler;
   }
 
   public void setExecuteHandler(SchemeConsoleExecuteActionHandler handler)
   {
-    this.myExecuteHandler = handler;
+    this.executeHandler = handler;
   }
 }

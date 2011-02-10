@@ -15,21 +15,21 @@ import javax.swing.*;
 
 public class SchemeFacetTab extends FacetEditorTab
 {
-  private JPanel myPanel;
-  private JCheckBox myCompilerExcludeCb;
-  private JCheckBox myLibraryExcludeCb;
-  private final SchemeLibrariesConfiguration myConfiguration;
+  private JPanel panel;
+  private JCheckBox compilerExcludeCb;
+  private JCheckBox libraryExcludeCb;
+  private final SchemeLibrariesConfiguration configuration;
 
   public SchemeFacetTab(FacetEditorContext editorContext, SchemeLibrariesConfiguration configuration)
   {
 
-    myConfiguration = configuration;
+    this.configuration = configuration;
 
-    myCompilerExcludeCb.setSelected(myConfiguration.myExcludeCompilerFromModuleScope);
-    myLibraryExcludeCb.setSelected(myConfiguration.myExcludeSdkFromModuleScope);
+    compilerExcludeCb.setSelected(this.configuration.excludeCompilerFromModuleScope);
+    libraryExcludeCb.setSelected(this.configuration.excludeSdkFromModuleScope);
 
-//    myCompilerExcludeCb.setVisible(false);
-//    myLibraryExcludeCb.setVisible(false);
+//    compilerExcludeCb.setVisible(false);
+//    libraryExcludeCb.setVisible(false);
     reset();
   }
 
@@ -41,13 +41,13 @@ public class SchemeFacetTab extends FacetEditorTab
 
   public JComponent createComponent()
   {
-    return myPanel;
+    return panel;
   }
 
   public boolean isModified()
   {
-    return !(myConfiguration.myExcludeCompilerFromModuleScope == myCompilerExcludeCb.isSelected() &&
-             myConfiguration.myExcludeSdkFromModuleScope == myLibraryExcludeCb.isSelected());
+    return !(configuration.excludeCompilerFromModuleScope == compilerExcludeCb.isSelected() &&
+             configuration.excludeSdkFromModuleScope == libraryExcludeCb.isSelected());
   }
 
   @Override
@@ -62,8 +62,8 @@ public class SchemeFacetTab extends FacetEditorTab
 
   public void apply() throws ConfigurationException
   {
-    myConfiguration.myExcludeCompilerFromModuleScope = myCompilerExcludeCb.isSelected();
-    myConfiguration.myExcludeSdkFromModuleScope = myLibraryExcludeCb.isSelected();
+    configuration.excludeCompilerFromModuleScope = compilerExcludeCb.isSelected();
+    configuration.excludeSdkFromModuleScope = libraryExcludeCb.isSelected();
   }
 
   public void reset()

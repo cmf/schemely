@@ -11,19 +11,19 @@ import org.jetbrains.annotations.NotNull;
 
 public class SchemeFacetListener extends FacetManagerAdapter implements ModuleComponent
 {
-  private MessageBusConnection myConnection;
+  private MessageBusConnection connection;
 
-  private Module myModule;
+  private Module module;
 
   public SchemeFacetListener(Module module)
   {
-    myModule = module;
+    this.module = module;
   }
 
   public void initComponent()
   {
-    myConnection = myModule.getMessageBus().connect();
-    myConnection.subscribe(FacetManager.FACETS_TOPIC, new FacetManagerAdapter()
+    connection = module.getMessageBus().connect();
+    connection.subscribe(FacetManager.FACETS_TOPIC, new FacetManagerAdapter()
     {
       public void facetAdded(@NotNull Facet facet)
       {
@@ -41,7 +41,7 @@ public class SchemeFacetListener extends FacetManagerAdapter implements ModuleCo
 
   public void disposeComponent()
   {
-    myConnection.disconnect();
+    connection.disconnect();
   }
 
   @NotNull
@@ -52,17 +52,17 @@ public class SchemeFacetListener extends FacetManagerAdapter implements ModuleCo
 
   public void projectOpened()
   {
-    // called when myProject is opened
+    // called when project is opened
   }
 
   public void projectClosed()
   {
-    // called when myProject is being closed
+    // called when project is being closed
   }
 
   public void moduleAdded()
   {
     // Invoked when the module corresponding to this component instance has been completely
-    // loaded and added to the myProject.
+    // loaded and added to the project.
   }
 }

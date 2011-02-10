@@ -18,10 +18,10 @@ import javax.swing.*;
 public class SchemeConfigurable extends AbstractProjectComponent implements Configurable
 {
   protected static final String PROJECT_SETTINGS = "SchemeProjectSettings";
-  private SchemeProjectSettingsForm mySettingsForm;
+  private SchemeProjectSettingsForm settingsForm;
   private SchemeImplementation originalImplementation;
 
-  private volatile Runnable myReloadProjectRequest;
+  private volatile Runnable reloadProjectRequest;
 
   public SchemeConfigurable(Project project)
   {
@@ -53,24 +53,24 @@ public class SchemeConfigurable extends AbstractProjectComponent implements Conf
   @Override
   public JComponent createComponent()
   {
-    if (mySettingsForm == null)
+    if (settingsForm == null)
     {
-      mySettingsForm = new SchemeProjectSettingsForm(myProject);
+      settingsForm = new SchemeProjectSettingsForm(myProject);
     }
-    return mySettingsForm.getComponent();
+    return settingsForm.getComponent();
   }
 
   @Override
   public boolean isModified()
   {
-    return mySettingsForm.isModified();
+    return settingsForm.isModified();
   }
 
   @Override
   public void apply() throws ConfigurationException
   {
     SchemeProjectSettings settings = SchemeProjectSettings.getInstance(myProject);
-    SchemeImplementation implementation = mySettingsForm.getSchemeImplementation();
+    SchemeImplementation implementation = settingsForm.getSchemeImplementation();
     settings.schemeImplementation = implementation;
     reloadProjectOnLanguageLevelChange(implementation, false);
   }
@@ -78,16 +78,16 @@ public class SchemeConfigurable extends AbstractProjectComponent implements Conf
   @Override
   public void reset()
   {
-    if (mySettingsForm != null)
+    if (settingsForm != null)
     {
-      mySettingsForm.reset();
+      settingsForm.reset();
     }
   }
 
   @Override
   public void disposeUIResources()
   {
-    mySettingsForm = null;
+    settingsForm = null;
   }
 
   // ProjectComponent =========================================================
@@ -103,7 +103,7 @@ public class SchemeConfigurable extends AbstractProjectComponent implements Conf
   {
     if (willReload())
     {
-      myReloadProjectRequest = new Runnable()
+      reloadProjectRequest = new Runnable()
       {
         @Override
         public void run()
@@ -112,7 +112,7 @@ public class SchemeConfigurable extends AbstractProjectComponent implements Conf
           {
             return;
           }
-          if (myReloadProjectRequest != this)
+          if (reloadProjectRequest != this)
           {
             // obsolete, another request has already replaced this one
             return;
@@ -133,10 +133,10 @@ public class SchemeConfigurable extends AbstractProjectComponent implements Conf
           {
             ProjectManager.getInstance().reloadProject(myProject);
           }
-          myReloadProjectRequest = null;
+          reloadProjectRequest = null;
         }
       };
-      ApplicationManager.getApplication().invokeLater(myReloadProjectRequest, ModalityState.NON_MODAL);
+      ApplicationManager.getApplication().invokeLater(reloadProjectRequest, ModalityState.NON_MODAL);
     }
     else
     {

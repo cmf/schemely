@@ -3,8 +3,8 @@ package schemely.config;
 
 public class SchemeLibrariesConfiguration
 {
-  public boolean myExcludeCompilerFromModuleScope = false;
-  public boolean myExcludeSdkFromModuleScope = false;
+  public boolean excludeCompilerFromModuleScope = false;
+  public boolean excludeSdkFromModuleScope = false;
 
 
 }

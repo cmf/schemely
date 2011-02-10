@@ -11,26 +11,26 @@ import schemely.scheme.SchemeImplementation;
 
 public class SchemeConsoleProcessHandler extends ColoredProcessHandler
 {
-  private final LanguageConsoleImpl myLanguageConsole;
+  private final LanguageConsoleImpl languageConsole;
 
   public SchemeConsoleProcessHandler(Process process, String commandLine, LanguageConsoleImpl console)
   {
     super(process, commandLine, CharsetToolkit.UTF8_CHARSET);
-    myLanguageConsole = console;
+    languageConsole = console;
   }
 
   @Override
   protected void textAvailable(String text, Key attributes)
   {
     // This is where we process input from the process
-    Scheme scheme = SchemeImplementation.from(myLanguageConsole.getProject());
-    scheme.getRepl().processOutput(myLanguageConsole, StringUtil.convertLineSeparators(text), attributes);
-    EditorEx historyViewer = myLanguageConsole.getHistoryViewer();
+    Scheme scheme = SchemeImplementation.from(languageConsole.getProject());
+    scheme.getRepl().processOutput(languageConsole, StringUtil.convertLineSeparators(text), attributes);
+    EditorEx historyViewer = languageConsole.getHistoryViewer();
     SchemeConsoleExecuteActionHandler.scrollDown(historyViewer);
   }
 
   public LanguageConsoleImpl getLanguageConsole()
   {
-    return myLanguageConsole;
+    return languageConsole;
   }
 }

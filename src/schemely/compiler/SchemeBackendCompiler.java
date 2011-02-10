@@ -46,11 +46,11 @@ import java.util.Set;
 public class SchemeBackendCompiler extends ExternalCompiler
 {
   private static final Logger log = Logger.getLogger(SchemeBackendCompiler.class);
-  private final Project myProject;
+  private final Project project;
 
-  public SchemeBackendCompiler(Project myProject)
+  public SchemeBackendCompiler(Project project)
   {
-    this.myProject = myProject;
+    this.project = project;
   }
 
   @NotNull
@@ -69,7 +69,7 @@ public class SchemeBackendCompiler extends ExternalCompiler
       return true;
     }
 
-    ProjectFileIndex index = ProjectRootManager.getInstance(myProject).getFileIndex();
+    ProjectFileIndex index = ProjectRootManager.getInstance(project).getFileIndex();
     Set<Module> modules = new HashSet<Module>();
     for (VirtualFile file : files)
     {
@@ -97,7 +97,7 @@ public class SchemeBackendCompiler extends ExternalCompiler
     {
       if (!isSuitableModule(module))
       {
-        Messages.showErrorDialog(myProject, "Cannot compile scheme files, module incorrect", "Cannot compile");
+        Messages.showErrorDialog(project, "Cannot compile scheme files, module incorrect", "Cannot compile");
         return false;
       }
     }
@@ -123,7 +123,7 @@ public class SchemeBackendCompiler extends ExternalCompiler
       Module[] noJdkArray = nojdkModules.toArray(new Module[nojdkModules.size()]);
       if (noJdkArray.length == 1)
       {
-        Messages.showErrorDialog(myProject,
+        Messages.showErrorDialog(project,
                                  "Cannot compile files, please configure JDK for " + noJdkArray[0].getName(),
                                  "Cannot compile");
       }
@@ -138,7 +138,7 @@ public class SchemeBackendCompiler extends ExternalCompiler
           }
           modulesList.append(noJdkArray[i].getName());
         }
-        Messages.showErrorDialog(myProject,
+        Messages.showErrorDialog(project,
                                  "Cannot compile files, please configure JDK for " + modulesList.toString(),
                                  "Cannot compile");
       }
@@ -251,7 +251,7 @@ public class SchemeBackendCompiler extends ExternalCompiler
     commandLine.add("-cp");
     commandLine.add(classPathBuilder.toString());
 
-    SchemeCompilerSettings settings = SchemeCompilerSettings.getInstance(myProject);
+    SchemeCompilerSettings settings = SchemeCompilerSettings.getInstance(project);
 
     //Add REPL class runner
     commandLine.add("kawa.repl");
@@ -301,7 +301,7 @@ public class SchemeBackendCompiler extends ExternalCompiler
   {
     Sdk jdk = chunk.getJdk();
     if (ApplicationManager.getApplication().isUnitTestMode() &&
-        JavacSettings.getInstance(myProject).isTestsUseExternalCompiler())
+        JavacSettings.getInstance(project).isTestsUseExternalCompiler())
     {
       String jdkHomePath = CompilerConfigurationImpl.getTestsExternalCompilerHome();
       if (jdkHomePath == null)

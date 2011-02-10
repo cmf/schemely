@@ -19,37 +19,37 @@ import java.util.List;
 
 public class SchemeStructureViewElement implements StructureViewTreeElement
 {
-  private PsiElement myElement;
+  private PsiElement element;
 
   public SchemeStructureViewElement(PsiElement element)
   {
-    myElement = element;
+    this.element = element;
   }
 
   public PsiElement getValue()
   {
-    return myElement;
+    return element;
   }
 
   public void navigate(boolean requestFocus)
   {
-    ((NavigationItem) myElement).navigate(requestFocus);
+    ((NavigationItem) element).navigate(requestFocus);
   }
 
   public boolean canNavigate()
   {
-    return ((NavigationItem) myElement).canNavigate();
+    return ((NavigationItem) element).canNavigate();
   }
 
   public boolean canNavigateToSource()
   {
-    return ((NavigationItem) myElement).canNavigateToSource();
+    return ((NavigationItem) element).canNavigateToSource();
   }
 
   public StructureViewTreeElement[] getChildren()
   {
     final List<SchemePsiElementBase> childrenElements = new ArrayList<SchemePsiElementBase>();
-    myElement.acceptChildren(new PsiElementVisitor()
+    element.acceptChildren(new PsiElementVisitor()
     {
       public void visitElement(PsiElement element)
       {
@@ -112,7 +112,7 @@ public class SchemeStructureViewElement implements StructureViewTreeElement
     {
       public String getPresentableText()
       {
-        return ((PsiNamedElement) myElement).getName();
+        return ((PsiNamedElement) element).getName();
       }
 
       public TextAttributesKey getTextAttributesKey()
@@ -127,7 +127,7 @@ public class SchemeStructureViewElement implements StructureViewTreeElement
 
       public Icon getIcon(boolean open)
       {
-        return myElement.getIcon(Iconable.ICON_FLAG_OPEN);
+        return element.getIcon(Iconable.ICON_FLAG_OPEN);
       }
     };
   }

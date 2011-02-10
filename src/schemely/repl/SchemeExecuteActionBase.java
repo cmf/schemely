@@ -12,9 +12,9 @@ import com.intellij.openapi.util.IconLoader;
 public abstract class SchemeExecuteActionBase extends DumbAwareAction
 {
   public static final String ACTIONS_EXECUTE_ICON = "/actions/execute.png";
-  protected final SchemeConsole myLanguageConsole;
-  protected final ProcessHandler myProcessHandler;
-  protected final SchemeConsoleExecuteActionHandler myConsoleExecuteActionHandler;
+  protected final SchemeConsole languageConsole;
+  protected final ProcessHandler processHandler;
+  protected final SchemeConsoleExecuteActionHandler executeActionHandler;
 
   protected SchemeExecuteActionBase(SchemeConsole languageConsole,
                                     ProcessHandler processHandler,
@@ -22,23 +22,23 @@ public abstract class SchemeExecuteActionBase extends DumbAwareAction
                                     String actionId)
   {
     super(null, null, IconLoader.getIcon(ACTIONS_EXECUTE_ICON));
-    myLanguageConsole = languageConsole;
-    myProcessHandler = processHandler;
-    myConsoleExecuteActionHandler = executeActionHandler;
+    this.languageConsole = languageConsole;
+    this.processHandler = processHandler;
+    this.executeActionHandler = executeActionHandler;
     EmptyAction.setupAction(this, actionId, null);
   }
 
   @Override
   public void update(AnActionEvent e)
   {
-    EditorEx editor = myLanguageConsole.getConsoleEditor();
+    EditorEx editor = languageConsole.getConsoleEditor();
     Lookup lookup = LookupManager.getActiveLookup(editor);
     e.getPresentation()
-      .setEnabled((!myProcessHandler.isProcessTerminated()) && ((lookup == null) || (!lookup.isCompletion())));
+      .setEnabled((!processHandler.isProcessTerminated()) && ((lookup == null) || (!lookup.isCompletion())));
   }
 
   public SchemeConsoleExecuteActionHandler getExecuteActionHandler()
   {
-    return myConsoleExecuteActionHandler;
+    return executeActionHandler;
   }
 }

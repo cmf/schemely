@@ -11,37 +11,37 @@ import org.jetbrains.annotations.NotNull;
 
 public class SchemeSourceFilterScope extends GlobalSearchScope
 {
-  private final GlobalSearchScope myDelegate;
-  private final ProjectFileIndex myIndex;
+  private final GlobalSearchScope delegate;
+  private final ProjectFileIndex index;
 
   public SchemeSourceFilterScope(GlobalSearchScope delegate, Project project)
   {
-    myDelegate = delegate;
-    myIndex = ProjectRootManager.getInstance(project).getFileIndex();
+    this.delegate = delegate;
+    index = ProjectRootManager.getInstance(project).getFileIndex();
   }
 
   public boolean contains(VirtualFile file)
   {
-    if (myDelegate != null && !myDelegate.contains(file))
+    if (delegate != null && !delegate.contains(file))
     {
       return false;
     }
 
-    return myIndex.isInSourceContent(file) || myIndex.isInLibraryClasses(file);
+    return index.isInSourceContent(file) || index.isInLibraryClasses(file);
   }
 
   public int compare(VirtualFile file1, VirtualFile file2)
   {
-    return myDelegate != null ? myDelegate.compare(file1, file2) : 0;
+    return delegate != null ? delegate.compare(file1, file2) : 0;
   }
 
   public boolean isSearchInModuleContent(@NotNull Module aModule)
   {
-    return myDelegate == null || myDelegate.isSearchInModuleContent(aModule);
+    return delegate == null || delegate.isSearchInModuleContent(aModule);
   }
 
   public boolean isSearchInLibraries()
   {
-    return myDelegate == null || myDelegate.isSearchInLibraries();
+    return delegate == null || delegate.isSearchInLibraries();
   }
 }

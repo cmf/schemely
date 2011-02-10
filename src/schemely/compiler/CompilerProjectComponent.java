@@ -2,8 +2,6 @@ package schemely.compiler;
 
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import schemely.file.SchemeFileType;
@@ -13,24 +11,24 @@ import schemely.file.SchemeFileType;
  */
 public class CompilerProjectComponent implements ProjectComponent
 {
-  private final Project myProject;
+  private final Project project;
 
-  public CompilerProjectComponent(Project myProject)
+  public CompilerProjectComponent(Project project)
   {
-    this.myProject = myProject;
+    this.project = project;
   }
 
   @Override
   public void projectOpened()
   {
-    CompilerManager compilerManager = CompilerManager.getInstance(myProject);
+    CompilerManager compilerManager = CompilerManager.getInstance(project);
     compilerManager.addCompilableFileType(SchemeFileType.SCHEME_FILE_TYPE);
 
-    for (SchemeCompiler compiler : CompilerManager.getInstance(myProject).getCompilers(SchemeCompiler.class))
+    for (SchemeCompiler compiler : CompilerManager.getInstance(project).getCompilers(SchemeCompiler.class))
     {
-      CompilerManager.getInstance(myProject).removeCompiler(compiler);
+      CompilerManager.getInstance(project).removeCompiler(compiler);
     }
-    CompilerManager.getInstance(myProject).addCompiler(new SchemeCompiler(myProject));
+    CompilerManager.getInstance(project).addCompiler(new SchemeCompiler(project));
   }
 
   @Override

@@ -15,6 +15,6 @@ public class SchemeConsoleEnterAction extends SchemeExecuteActionBase
   @Override
   public void actionPerformed(AnActionEvent e)
   {
-    getExecuteActionHandler().runExecuteAction(myLanguageConsole, false);
+    getExecuteActionHandler().runExecuteAction(languageConsole, false);
   }
 }

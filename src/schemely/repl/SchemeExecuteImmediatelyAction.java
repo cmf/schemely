@@ -18,6 +18,6 @@ public class SchemeExecuteImmediatelyAction extends SchemeExecuteActionBase
   @Override
   public void actionPerformed(AnActionEvent e)
   {
-    getExecuteActionHandler().runExecuteAction(myLanguageConsole, true);
+    getExecuteActionHandler().runExecuteAction(languageConsole, true);
   }
 }

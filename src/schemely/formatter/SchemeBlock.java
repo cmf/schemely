@@ -19,14 +19,14 @@ import java.util.List;
 
 public class SchemeBlock implements Block, AST
 {
-  final protected ASTNode myNode;
-  final protected Alignment myAlignment;
-  final protected Indent myIndent;
-  final protected Wrap myWrap;
-  final protected CodeStyleSettings mySettings;
-  protected Alignment myChildAlignment = Alignment.createAlignment();
+  final protected ASTNode node;
+  final protected Alignment alignment;
+  final protected Indent indent;
+  final protected Wrap wrap;
+  final protected CodeStyleSettings settings;
+  protected Alignment childAlignment = Alignment.createAlignment();
 
-  protected List<Block> mySubBlocks = null;
+  protected List<Block> subBlocks = null;
 
 
   public SchemeBlock(@NotNull ASTNode node,
@@ -35,58 +35,58 @@ public class SchemeBlock implements Block, AST
                      @Nullable Wrap wrap,
                      CodeStyleSettings settings)
   {
-    myNode = node;
-    myAlignment = alignment;
+    this.node = node;
+    this.alignment = alignment;
     setAlignment(alignment);
-    myIndent = indent;
-    myWrap = wrap;
-    mySettings = settings;
+    this.indent = indent;
+    this.wrap = wrap;
+    this.settings = settings;
   }
 
   @NotNull
   public ASTNode getNode()
   {
-    return myNode;
+    return node;
   }
 
   @NotNull
   public CodeStyleSettings getSettings()
   {
-    return mySettings;
+    return settings;
   }
 
   @NotNull
   public TextRange getTextRange()
   {
-    return myNode.getTextRange();
+    return node.getTextRange();
   }
 
   @NotNull
   public List<Block> getSubBlocks()
   {
-    if (mySubBlocks == null)
+    if (subBlocks == null)
     {
-      mySubBlocks = SchemeBlockGenerator.generateSubBlocks(myNode, myWrap, mySettings, this);
+      subBlocks = SchemeBlockGenerator.generateSubBlocks(node, wrap, settings, this);
     }
-    return mySubBlocks;
+    return subBlocks;
   }
 
   @Nullable
   public Wrap getWrap()
   {
-    return myWrap;
+    return wrap;
   }
 
   @Nullable
   public Indent getIndent()
   {
-    return myIndent;
+    return indent;
   }
 
   @Nullable
   public Alignment getAlignment()
   {
-    return myAlignment;
+    return alignment;
   }
 
   public Spacing getSpacing(Block child1, Block child2)
@@ -110,7 +110,7 @@ public class SchemeBlock implements Block, AST
     }
     if (LIST_LIKE_FORMS.contains(astNode.getElementType()))
     {
-      return new ChildAttributes(Indent.getNormalIndent(true), myChildAlignment);
+      return new ChildAttributes(Indent.getNormalIndent(true), childAlignment);
     }
     return new ChildAttributes(Indent.getNoneIndent(), null);
   }
@@ -118,7 +118,7 @@ public class SchemeBlock implements Block, AST
 
   public boolean isIncomplete()
   {
-    return isIncomplete(myNode);
+    return isIncomplete(node);
   }
 
   /**
@@ -139,11 +139,11 @@ public class SchemeBlock implements Block, AST
 
   public boolean isLeaf()
   {
-    return myNode.getFirstChildNode() == null;
+    return node.getFirstChildNode() == null;
   }
 
   public void setAlignment(Alignment alignment)
   {
-    myChildAlignment = alignment;
+    childAlignment = alignment;
   }
 }

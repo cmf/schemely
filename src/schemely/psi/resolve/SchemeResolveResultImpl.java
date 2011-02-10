@@ -5,16 +5,16 @@ import com.intellij.psi.PsiElement;
 
 public class SchemeResolveResultImpl implements SchemeResolveResult
 {
-  private final PsiElement myElement;
+  private final PsiElement element;
 
-  public SchemeResolveResultImpl(PsiElement myElement)
+  public SchemeResolveResultImpl(PsiElement element)
   {
-    this.myElement = myElement;
+    this.element = element;
   }
 
   public PsiElement getElement()
   {
-    return myElement;
+    return element;
   }
 
   public boolean isValidResult()
