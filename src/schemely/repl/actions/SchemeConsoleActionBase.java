@@ -2,7 +2,7 @@ package schemely.repl.actions;
 
 import com.intellij.execution.ExecutionHelper;
 import com.intellij.execution.console.LanguageConsoleImpl;
-import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -32,10 +32,12 @@ public abstract class SchemeConsoleActionBase extends AnAction
   protected static SchemeConsoleProcessHandler findRunningSchemeConsole(Project project)
   {
     REPL repl = SchemeImplementation.from(project).getRepl();
-    ProcessHandler handler = ExecutionHelper.findRunningConsole(project, repl.getConsoleMatcher());
-    if ((handler instanceof SchemeConsoleProcessHandler))
+    for (RunContentDescriptor descriptor : ExecutionHelper.findRunningConsole(project, repl.getConsoleMatcher()))
     {
-      return (SchemeConsoleProcessHandler) handler;
+      if (descriptor.getProcessHandler() instanceof SchemeConsoleProcessHandler)
+      {
+        return (SchemeConsoleProcessHandler) descriptor.getProcessHandler();
+      }
     }
     return null;
   }

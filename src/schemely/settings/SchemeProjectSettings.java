@@ -17,7 +17,7 @@ import schemely.scheme.SchemeImplementation;
                                                                           scheme = StorageScheme.DIRECTORY_BASED)})
 public class SchemeProjectSettings implements PersistentStateComponent<SchemeProjectSettings>
 {
-  public SchemeImplementation schemeImplementation = SchemeImplementation.KAWA_1_11;
+  public SchemeImplementation schemeImplementation = SchemeImplementation.SISC_1_16_6;
 
   @Override
   public SchemeProjectSettings getState()

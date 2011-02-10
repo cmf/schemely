@@ -61,7 +61,6 @@ public class SchemeConsoleRunner
   public static final String EXECUTE_ACTION_ID = "Scheme.Console.Execute";
   private static final String[] EMPTY_ENV = new String[0];
 
-  private final Module module;
   private final Project project;
   private final String consoleTitle;
   private final CommandLineArgumentsProvider provider;
@@ -77,7 +76,6 @@ public class SchemeConsoleRunner
                              @NotNull CommandLineArgumentsProvider provider,
                              @Nullable String workingDir)
   {
-    this.module = module;
     project = module.getProject();
     this.consoleTitle = consoleTitle;
     this.provider = provider;
@@ -126,7 +124,7 @@ public class SchemeConsoleRunner
   public void initAndRun(String[] statements2execute) throws ExecutionException
   {
     Process process = createProcess(provider);
-    consoleView = createConsoleView();
+    consoleView = new SchemeConsoleView(project, consoleTitle, history);
     processHandler =
       new SchemeConsoleProcessHandler(process, provider.getCommandLineString(), getLanguageConsole());
     executeActionHandler =
@@ -294,11 +292,6 @@ public class SchemeConsoleRunner
   protected static AnAction createStopAction()
   {
     return ActionManager.getInstance().getAction("Stop");
-  }
-
-  protected SchemeConsoleView createConsoleView()
-  {
-    return new SchemeConsoleView(project, consoleTitle, history, executeActionHandler);
   }
 
   protected Process createProcess(CommandLineArgumentsProvider provider) throws ExecutionException
