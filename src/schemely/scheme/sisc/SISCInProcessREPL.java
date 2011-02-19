@@ -1,22 +1,32 @@
 package schemely.scheme.sisc;
 
+import com.intellij.execution.ExecutionBundle;
+import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.IdeActions;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ExportableOrderEntry;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
+import com.intellij.ui.content.Content;
 import schemely.repl.SchemeConsole;
 import schemely.repl.SchemeConsoleView;
+import schemely.repl.actions.NewSchemeConsoleAction;
 import schemely.scheme.REPLException;
 import schemely.scheme.Scheme;
 import schemely.scheme.common.ReaderThread;
@@ -45,6 +55,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -62,11 +73,9 @@ public class SISCInProcessREPL implements Scheme.REPL
 
   private final Project project;
   private final SchemeConsoleView consoleView;
-  private DynamicEnvironment dynamicEnvironment;
   private volatile State state = State.INITIAL;
   private final AtomicBoolean terminated = new AtomicBoolean(false);
-
-  private URLClassLoader classLoader;
+  private final CountDownLatch replFinished = new CountDownLatch(1);
   private Writer toREPL;
   private Reader fromREPL;
 
@@ -84,7 +93,7 @@ public class SISCInProcessREPL implements Scheme.REPL
     verifyState(State.INITIAL);
 
     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-    classLoader = new URLClassLoader(getLibraryURLs(), AppContext.class.getClassLoader());
+    URLClassLoader classLoader = new URLClassLoader(getLibraryURLs(), AppContext.class.getClassLoader());
 
     try
     {
@@ -127,7 +136,7 @@ public class SISCInProcessREPL implements Scheme.REPL
         throw new REPLException("Error opening pipe", e);
       }
 
-      dynamicEnvironment = new DynamicEnvironment(appContext, replInputStream, replOutputStream);
+      DynamicEnvironment dynamicEnvironment = new DynamicEnvironment(appContext, replInputStream, replOutputStream);
       LocalREPLThread replThread = new LocalREPLThread(dynamicEnvironment, REPL.getCliProc(appContext));
       REPL repl = new REPL(replThread);
       repl.go();
@@ -156,8 +165,14 @@ public class SISCInProcessREPL implements Scheme.REPL
 
     execute("(exit)");
 
-    hideEditor();
-
+    try
+    {
+      replFinished.await();
+    }
+    catch (InterruptedException ignored)
+    {
+      Thread.currentThread().interrupt();
+    }
     state = State.STOPPED;
   }
 
@@ -174,56 +189,6 @@ public class SISCInProcessREPL implements Scheme.REPL
     catch (IOException ignored)
     {
     }
-
-    //    ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-    //    try
-    //    {
-    //      Thread.currentThread().setContextClassLoader(classLoader);
-    //
-    //      Interpreter interpreter = Context.enter(dynamicEnvironment);
-    //      try
-    //      {
-    //        Value value = interpreter.eval(command);
-    //
-    //        if (!(value instanceof SchemeVoid))
-    //        {
-    //          StringWriter writer = new StringWriter();
-    //          value.display(new PortValueWriter(writer,
-    //                                            dynamicEnvironment.vectorLengthPrefixing,
-    //                                            dynamicEnvironment.caseSensitive));
-    //
-    //          SchemeConsole schemeConsole = consoleView.getConsole();
-    //          ConsoleViewContentType contentType = ConsoleViewContentType.NORMAL_OUTPUT;
-    //          LanguageConsoleImpl.printToConsole(schemeConsole, writer.toString() + "\n", contentType, null);
-    //        }
-    //      }
-    //      catch (IOException e)
-    //      {
-    //        SchemeConsole schemeConsole = consoleView.getConsole();
-    //        ConsoleViewContentType contentType = ConsoleViewContentType.ERROR_OUTPUT;
-    //        LanguageConsoleImpl.printToConsole(schemeConsole, e.getMessage() + "\n", contentType, null);
-    //      }
-    //      catch (SchemeException e)
-    //      {
-    //        SchemeConsole schemeConsole = consoleView.getConsole();
-    //        ConsoleViewContentType contentType = ConsoleViewContentType.ERROR_OUTPUT;
-    //        String messageText = e.getMessageText();
-    //        if (messageText.startsWith("\"") && messageText.endsWith("\""))
-    //        {
-    //          messageText = messageText.substring(1, messageText.length() - 1);
-    //        }
-    //        LanguageConsoleImpl.printToConsole(schemeConsole, messageText + "\n", contentType, null);
-    //        // TODO scheme stack trace?
-    //      }
-    //      finally
-    //      {
-    //        Context.exit();
-    //      }
-    //    }
-    //    finally
-    //    {
-    //      Thread.currentThread().setContextClassLoader(oldClassLoader);
-    //    }
   }
 
   @Override
@@ -249,8 +214,58 @@ public class SISCInProcessREPL implements Scheme.REPL
   @Override
   public AnAction[] getToolbarActions()
   {
-    // TODO
-    return AnAction.EMPTY_ARRAY;
+    return new AnAction[] { new StopAction(), new CloseAction() };
+  }
+
+  private class StopAction extends DumbAwareAction
+  {
+    private StopAction()
+    {
+      copyShortcutFrom(ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM));
+      Presentation templatePresentation = getTemplatePresentation();
+      templatePresentation.setIcon(IconLoader.getIcon("/actions/suspend.png"));
+      templatePresentation.setText("Stop REPL");
+      templatePresentation.setDescription(null);
+    }
+
+    @Override
+    public void update(AnActionEvent e)
+    {
+      e.getPresentation().setEnabled(isActive());
+    }
+
+    @Override
+    public void actionPerformed(AnActionEvent e)
+    {
+      stop();
+    }
+  }
+
+  private class CloseAction extends DumbAwareAction
+  {
+    private CloseAction()
+    {
+      copyShortcutFrom(ActionManager.getInstance().getAction(IdeActions.ACTION_CLOSE));
+      Presentation templatePresentation = getTemplatePresentation();
+      templatePresentation.setIcon(IconLoader.getIcon("/actions/cancel.png"));
+      templatePresentation.setText("Close REPL tab");
+      templatePresentation.setDescription(null);
+    }
+
+    @Override
+    public void actionPerformed(AnActionEvent e)
+    {
+      if (isActive())
+      {
+        stop();
+      }
+
+      Content content = consoleView.getConsole().getConsoleEditor().getUserData(NewSchemeConsoleAction.CONTENT_KEY);
+      if (content != null)
+      {
+        content.getManager().removeContent(content, true);
+      }
+    }
   }
 
   private void verifyState(State expected)
@@ -356,6 +371,8 @@ public class SISCInProcessREPL implements Scheme.REPL
       hideEditor();
 
       SISCInProcessREPL.this.state = State.STOPPED;
+
+      replFinished.countDown();
     }
 
   }
@@ -370,10 +387,11 @@ public class SISCInProcessREPL implements Scheme.REPL
         SchemeConsole console = consoleView.getConsole();
         JComponent component = consoleView.getComponent();
         Container parent = component.getParent();
-        parent.add(console.getHistoryViewer().getComponent());
-        parent.remove(component);
         if (parent instanceof JPanel)
         {
+          EditorEx historyViewer = console.getHistoryViewer();
+          parent.add(historyViewer.getComponent());
+          parent.remove(component);
           ((JPanel) parent).updateUI();
         }
       }

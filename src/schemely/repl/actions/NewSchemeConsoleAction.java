@@ -41,6 +41,7 @@ import java.util.Arrays;
 public class NewSchemeConsoleAction extends AnAction implements DumbAware
 {
   public static final Key<Scheme.REPL> REPL_KEY = Key.create("Scheme.REPL");
+  public static final Key<Content> CONTENT_KEY = Key.create("Scheme.REPL.Content");
 
   protected static final String CONSOLE_TITLE = "Console title";
 
@@ -96,7 +97,7 @@ public class NewSchemeConsoleAction extends AnAction implements DumbAware
     AnAction[] actions;
     try
     {
-      actions = getToolbarActions(project, repl);
+      actions = getToolbarActions(repl);
       repl.start();
     }
     catch (REPLException e)
@@ -104,6 +105,8 @@ public class NewSchemeConsoleAction extends AnAction implements DumbAware
       ExecutionHelper.showErrors(project, Arrays.<Exception>asList(e), CONSOLE_TITLE, null);
       return;
     }
+
+    toolbarActions.addAll(actions);
 
     registerActionShortcuts(actions, schemeConsole.getConsoleEditor().getComponent());
     registerActionShortcuts(actions, panel);
@@ -115,6 +118,7 @@ public class NewSchemeConsoleAction extends AnAction implements DumbAware
     contentManager.addContent(content);
     content.putUserData(REPL_KEY, repl);
     schemeConsole.getConsoleEditor().putUserData(REPL_KEY, repl);
+    schemeConsole.getConsoleEditor().putUserData(CONTENT_KEY, content);
 
     if (toolWindow.isActive())
     {
@@ -145,7 +149,7 @@ public class NewSchemeConsoleAction extends AnAction implements DumbAware
     });
   }
 
-  private AnAction[] getToolbarActions(Project project, Scheme.REPL repl) throws REPLException
+  private AnAction[] getToolbarActions(Scheme.REPL repl) throws REPLException
   {
     java.util.List<AnAction> actions = new ArrayList<AnAction>();
     actions.addAll(Arrays.asList(repl.getToolbarActions()));
