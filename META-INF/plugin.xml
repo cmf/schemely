@@ -74,12 +74,11 @@
     <projectService serviceInterface="schemely.settings.SchemeProjectSettings"
                     serviceImplementation="schemely.settings.SchemeProjectSettings"/>
 
+    <toolWindow id="Scheme.REPL" secondary="true" icon="/schemely/icons/lambda.png" anchor="right" factoryClass="schemely.repl.toolwindow.REPLToolWindowFactory"/>
+    <editorActionHandler action="EditorEnter" implementationClass="schemely.repl.toolwindow.actions.REPLEnterAction" order="FIRST"/>
   </extensions>
 
   <application-components>
-    <component>
-      <implementation-class>schemely.SchemeLoader</implementation-class>
-    </component>
     <component>
       <implementation-class>schemely.config.SchemeFacetLoader</implementation-class>
       <interface-class>schemely.config.SchemeFacetLoader</interface-class>
@@ -146,22 +145,10 @@
     </group>
 
     <action id="schemely.actions.RunSchemeConsoleAction"
-            class="schemely.repl.actions.RunSchemeConsoleAction" text="Start Scheme Console"
+            class="schemely.repl.actions.NewSchemeConsoleAction" text="Start Scheme Console"
             description="Runs Scheme REPL">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
       <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F10"/>
-    </action>
-
-    <action id="Scheme.Console.Execute"
-            class="com.intellij.openapi.actionSystem.EmptyAction"
-            text="Execute Current Scheme Statement">
-      <keyboard-shortcut keymap="$default" first-keystroke="ENTER"/>
-    </action>
-
-    <action id="Scheme.Console.Execute.Immediately"
-            class="com.intellij.openapi.actionSystem.EmptyAction"
-            text="Execute Current Scheme Statement">
-      <keyboard-shortcut keymap="$default" first-keystroke="shift ENTER"/>
     </action>
 
   </actions>

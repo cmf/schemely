@@ -2,9 +2,12 @@ package schemely.scheme;
 
 import com.intellij.execution.CantRunException;
 import com.intellij.execution.console.LanguageConsoleImpl;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.util.NotNullFunction;
+import schemely.repl.SchemeConsoleView;
 
 import java.util.List;
 
@@ -13,14 +16,43 @@ import java.util.List;
  */
 public interface Scheme
 {
-  REPL getRepl();
+  boolean supportsInProcessREPL();
+
+  REPL getNewInProcessREPL(Project project, SchemeConsoleView consoleView);
+
+//  InProcessREPLHandler getInProcessReplHandler();
+//
+//  ProcessREPLHandler getProcessReplHandler();
+//
+//  interface InProcessREPLHandler
+//  {
+//  }
+//
+//  interface ProcessREPLHandler
+//  {
+//    List<String> createRuntimeArgs(Module module, String workingDir) throws CantRunException;
+//
+//    void processOutput(LanguageConsoleImpl console, String text, Key attributes);
+//
+//    NotNullFunction<String, Boolean> getConsoleMatcher();
+//  }
 
   interface REPL
   {
-    List<String> createRuntimeArgs(Module module, String workingDir) throws CantRunException;
+    void execute(String command);
 
-    void processOutput(LanguageConsoleImpl console, String text, Key attributes);
+    void start() throws REPLException;
 
-    NotNullFunction<String, Boolean> getConsoleMatcher();
+    void stop() throws REPLException;
+
+    void clear() throws REPLException;
+
+    boolean isActive();
+
+    // TODO completion?
+
+    SchemeConsoleView getConsoleView();
+
+    AnAction[] getToolbarActions() throws REPLException;
   }
 }

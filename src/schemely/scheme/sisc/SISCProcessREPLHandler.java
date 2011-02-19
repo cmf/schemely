@@ -11,7 +11,6 @@ import com.intellij.util.NotNullFunction;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import schemely.scheme.Scheme.REPL;
 import schemely.scheme.common.REPLUtil;
 
 import java.io.File;
@@ -22,14 +21,14 @@ import java.util.regex.Pattern;
 /**
  * @author Colin Fleming
  */
-public class SISCREPL implements REPL
+public class SISCProcessREPLHandler // implements ProcessREPLHandler
 {
   @NonNls
   @Language("RegExp")
   public static final String SISC_PROMPT = "#;>\\s*";
   public static final Pattern SISC_PROMPT_PATTERN = Pattern.compile(SISC_PROMPT);
 
-  @Override
+//  @Override
   public List<String> createRuntimeArgs(Module module, String workingDir) throws CantRunException
   {
     JavaParameters params = new JavaParameters();
@@ -47,8 +46,8 @@ public class SISCREPL implements REPL
     return REPLUtil.getCommandLine(params);
   }
 
-  @Override
-  public void processOutput(LanguageConsoleImpl console, String text, Key attributes)
+//  @Override
+  public static void processOutput(LanguageConsoleImpl console, String text)
   {
     ConsoleViewContentType outputType = ConsoleViewContentType.NORMAL_OUTPUT;
     LanguageConsoleImpl.printToConsole(console, processPrompts(text), outputType, null);
@@ -71,7 +70,7 @@ public class SISCREPL implements REPL
     return text;
   }
 
-  @Override
+//  @Override
   public NotNullFunction<String, Boolean> getConsoleMatcher()
   {
     return new ConsoleMatcher();

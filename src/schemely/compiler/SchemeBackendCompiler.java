@@ -222,19 +222,19 @@ public class SchemeBackendCompiler extends ExternalCompiler
       {
         ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
         OrderEntry[] entries = moduleRootManager.getOrderEntries();
-        Set<VirtualFile> cpVFiles = new HashSet<VirtualFile>();
+        Set<VirtualFile> virtualFiles = new HashSet<VirtualFile>();
         for (OrderEntry orderEntry : entries)
         {
-          cpVFiles.addAll(Arrays.asList(orderEntry.getFiles(OrderRootType.COMPILATION_CLASSES)));
+          virtualFiles.addAll(Arrays.asList(orderEntry.getFiles(OrderRootType.COMPILATION_CLASSES)));
 
           // Add module sources
           if (orderEntry instanceof ModuleSourceOrderEntry)
           {
-            cpVFiles.addAll(Arrays.asList(orderEntry.getFiles(OrderRootType.SOURCES)));
+            virtualFiles.addAll(Arrays.asList(orderEntry.getFiles(OrderRootType.SOURCES)));
           }
         }
 
-        for (VirtualFile file : cpVFiles)
+        for (VirtualFile file : virtualFiles)
         {
           String path = file.getPath();
           int jarSeparatorIndex = path.indexOf(JarFileSystem.JAR_SEPARATOR);

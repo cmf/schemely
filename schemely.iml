@@ -37,7 +37,9 @@
           <root url="jar://$MODULE_DIR$/lib/sisc-opt-1.16.6.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../sisc-1.16.6/src/sisc/src" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>

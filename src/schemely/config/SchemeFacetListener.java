@@ -33,7 +33,7 @@ public class SchemeFacetListener extends FacetManagerAdapter implements ModuleCo
       {
         if (facet.getTypeId() == SchemeFacet.ID)
         {
-          //todo do somethig
+          //todo do something
         }
       }
     });

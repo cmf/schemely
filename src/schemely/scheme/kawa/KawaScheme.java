@@ -1,5 +1,7 @@
 package schemely.scheme.kawa;
 
+import com.intellij.openapi.project.Project;
+import schemely.repl.SchemeConsoleView;
 import schemely.scheme.Scheme;
 
 /**
@@ -7,11 +9,15 @@ import schemely.scheme.Scheme;
  */
 public class KawaScheme implements Scheme
 {
-  private final REPL repl = new KawaREPL();
+  @Override
+  public boolean supportsInProcessREPL()
+  {
+    return false;
+  }
 
   @Override
-  public REPL getRepl()
+  public REPL getNewInProcessREPL(Project project, SchemeConsoleView consoleView)
   {
-    return repl;
+    throw new UnsupportedOperationException("Kawa does not support in-process REPL");
   }
 }

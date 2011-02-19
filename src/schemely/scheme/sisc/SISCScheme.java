@@ -1,5 +1,7 @@
 package schemely.scheme.sisc;
 
+import com.intellij.openapi.project.Project;
+import schemely.repl.SchemeConsoleView;
 import schemely.scheme.Scheme;
 
 /**
@@ -7,11 +9,15 @@ import schemely.scheme.Scheme;
  */
 public class SISCScheme implements Scheme
 {
-  private final REPL repl = new SISCREPL();
+  @Override
+  public boolean supportsInProcessREPL()
+  {
+    return true;
+  }
 
   @Override
-  public REPL getRepl()
+  public REPL getNewInProcessREPL(Project project, SchemeConsoleView consoleView)
   {
-    return repl;
+    return new SISCInProcessREPL(project, consoleView);
   }
 }

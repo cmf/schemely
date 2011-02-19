@@ -1,66 +1,47 @@
 package schemely.repl.actions;
 
-import com.intellij.execution.ExecutionHelper;
 import com.intellij.execution.console.LanguageConsoleImpl;
-import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightVirtualFile;
-import schemely.SchemeBundle;
+import com.intellij.ui.content.Content;
 import schemely.psi.impl.SchemeFile;
 import schemely.repl.SchemeConsole;
-import schemely.repl.SchemeConsoleExecuteActionHandler;
-import schemely.repl.SchemeConsoleProcessHandler;
-import schemely.scheme.Scheme.REPL;
-import schemely.scheme.SchemeImplementation;
+import schemely.repl.toolwindow.REPLToolWindowFactory;
+import schemely.scheme.Scheme;
 
 public abstract class SchemeConsoleActionBase extends AnAction
 {
   private static final Logger LOG = Logger.getInstance(SchemeConsoleActionBase.class.getName());
 
-  protected static SchemeConsoleProcessHandler findRunningSchemeConsole(Project project)
-  {
-    REPL repl = SchemeImplementation.from(project).getRepl();
-    for (RunContentDescriptor descriptor : ExecutionHelper.findRunningConsole(project, repl.getConsoleMatcher()))
-    {
-      if (descriptor.getProcessHandler() instanceof SchemeConsoleProcessHandler)
-      {
-        return (SchemeConsoleProcessHandler) descriptor.getProcessHandler();
-      }
-    }
-    return null;
-  }
-
   protected static void executeCommand(Project project, String command)
   {
-    SchemeConsoleProcessHandler processHandler = findRunningSchemeConsole(project);
+    Scheme.REPL activeRepl = findActiveRepl(project);
+    LOG.assertTrue(activeRepl != null);
 
-    LOG.assertTrue(processHandler != null);
+    SchemeConsole languageConsole = activeRepl.getConsoleView().getConsole();
+    languageConsole.printToHistory(languageConsole.getPrompt(), ConsoleViewContentType.USER_INPUT.getAttributes());
+    languageConsole.printToHistory(command + "\n", ConsoleViewContentType.NORMAL_OUTPUT.getAttributes());
 
-    LanguageConsoleImpl languageConsole = processHandler.getLanguageConsole();
-    languageConsole.setInputText(command);
+    if (!StringUtil.isEmptyOrSpaces(command))
+    {
+      languageConsole.getHistoryModel().addToHistory(command);
+    }
 
-    Editor editor = languageConsole.getCurrentEditor();
-    CaretModel caretModel = editor.getCaretModel();
-    caretModel.moveToOffset(command.length());
-
-    LOG.assertTrue(languageConsole instanceof SchemeConsole);
-
-    SchemeConsole console = (SchemeConsole) languageConsole;
-    SchemeConsoleExecuteActionHandler handler = console.getExecuteHandler();
-
-    handler.runExecuteAction(console, true);
+    activeRepl.execute(command);
   }
 
   @Override
@@ -103,14 +84,14 @@ public abstract class SchemeConsoleActionBase extends AnAction
       return;
     }
 
-    SchemeConsoleProcessHandler handler = findRunningSchemeConsole(project);
-    if (handler == null)
+    Scheme.REPL activeRepl = findActiveRepl(project);
+    if (activeRepl == null)
     {
       presentation.setEnabled(false);
       return;
     }
 
-    LanguageConsoleImpl console = handler.getLanguageConsole();
+    LanguageConsoleImpl console = activeRepl.getConsoleView().getConsole();
     if (!(console instanceof SchemeConsole))
     {
       presentation.setEnabled(false);
@@ -120,8 +101,17 @@ public abstract class SchemeConsoleActionBase extends AnAction
     presentation.setEnabled(true);
   }
 
-  protected static void showError(String msg)
+  protected static Scheme.REPL findActiveRepl(Project project)
   {
-    Messages.showErrorDialog(msg, SchemeBundle.message("scheme.repl.actions.load.text.title"));
+    ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
+    ToolWindow toolWindow = toolWindowManager.getToolWindow(REPLToolWindowFactory.TOOL_WINDOW_ID);
+    Content content = toolWindow.getContentManager().getSelectedContent();
+
+    if (content != null)
+    {
+      return content.getUserData(NewSchemeConsoleAction.REPL_KEY);
+    }
+
+    return null;
   }
 }

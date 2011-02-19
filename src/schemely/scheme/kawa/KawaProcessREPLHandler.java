@@ -11,7 +11,6 @@ import com.intellij.util.NotNullFunction;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import schemely.scheme.Scheme.REPL;
 import schemely.scheme.common.REPLUtil;
 import schemely.scheme.kawa.impl.KawaREPLMain;
 
@@ -23,14 +22,14 @@ import java.util.regex.Pattern;
 /**
  * @author Colin Fleming
  */
-public class KawaREPL implements REPL
+public class KawaProcessREPLHandler // implements ProcessREPLHandler
 {
   @NonNls
   @Language("RegExp")
   public static final String KAWA_PROMPT = "#\\|[^\\|]*\\|#\\s*";
   public static final Pattern KAWA_PROMPT_PATTERN = Pattern.compile(KAWA_PROMPT);
 
-  @Override
+//  @Override
   public List<String> createRuntimeArgs(Module module, String workingDir) throws CantRunException
   {
     JavaParameters params = new JavaParameters();
@@ -46,7 +45,7 @@ public class KawaREPL implements REPL
     return REPLUtil.getCommandLine(params);
   }
 
-  @Override
+//  @Override
   public void processOutput(LanguageConsoleImpl console, String text, Key attributes)
   {
     ConsoleViewContentType outputType = ConsoleViewContentType.NORMAL_OUTPUT;
@@ -58,7 +57,7 @@ public class KawaREPL implements REPL
     if (text != null)
     {
       String trimmed = text;
-      Matcher matcher = KawaREPL.KAWA_PROMPT_PATTERN.matcher(trimmed);
+      Matcher matcher = KawaProcessREPLHandler.KAWA_PROMPT_PATTERN.matcher(trimmed);
       while (matcher.lookingAt())
       {
         String prefix = matcher.group();
@@ -70,7 +69,7 @@ public class KawaREPL implements REPL
     return text;
   }
 
-  @Override
+//  @Override
   public NotNullFunction<String, Boolean> getConsoleMatcher()
   {
     return new ConsoleMatcher();

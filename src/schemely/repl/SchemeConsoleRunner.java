@@ -39,7 +39,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import schemely.SchemeBundle;
 import schemely.scheme.Scheme;
-import schemely.scheme.Scheme.REPL;
 import schemely.scheme.SchemeImplementation;
 
 import javax.swing.*;
@@ -86,7 +85,8 @@ public class SchemeConsoleRunner
   public static void run(@NotNull Module module, String workingDir, String[] statements2execute) throws CantRunException
   {
     Scheme scheme = SchemeImplementation.from(module.getProject());
-    final List<String> args = scheme.getRepl().createRuntimeArgs(module, workingDir);
+    // TODO
+    final List<String> args = null; // scheme.getProcessReplHandler().createRuntimeArgs(module, workingDir);
 
     CommandLineArgumentsProvider provider = new CommandLineArgumentsProvider()
     {
@@ -155,6 +155,7 @@ public class SchemeConsoleRunner
     consoleView.attachToProcess(processHandler);
 
     Executor defaultExecutor = ExecutorRegistry.getInstance().getExecutorById(DefaultRunExecutor.EXECUTOR_ID);
+
     DefaultActionGroup toolbarActions = new DefaultActionGroup();
     ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar("unknown", toolbarActions, false);
 
@@ -189,11 +190,11 @@ public class SchemeConsoleRunner
     SchemeConsole console = consoleView.getConsole();
     for (String statement : statements2execute)
     {
-      String st = statement + '\n';
-      REPL repl = SchemeImplementation.from(project).getRepl();
-      repl.processOutput(console, st, ProcessOutputTypes.SYSTEM);
+      String line = statement + '\n';
+//      Scheme.ProcessREPLHandler processReplHandler = SchemeImplementation.from(project).getProcessReplHandler();
+//      processReplHandler.processOutput(console, line, ProcessOutputTypes.SYSTEM);
       SchemeConsoleExecuteActionHandler actionHandler = executeActionHandler;
-      actionHandler.processLine(st);
+      actionHandler.processLine(line);
     }
   }
 

@@ -19,11 +19,6 @@ public class LoadSchemeFileInConsoleAction extends SchemeConsoleActionBase
     getTemplatePresentation().setIcon(SchemeIcons.SCHEME_ICON);
   }
 
-  public void update(AnActionEvent e)
-  {
-    super.update(e);
-  }
-
   public void actionPerformed(AnActionEvent e)
   {
     Editor editor = e.getData(DataKeys.EDITOR);

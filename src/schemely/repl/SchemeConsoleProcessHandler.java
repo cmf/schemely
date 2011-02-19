@@ -24,7 +24,8 @@ public class SchemeConsoleProcessHandler extends ColoredProcessHandler
   {
     // This is where we process input from the process
     Scheme scheme = SchemeImplementation.from(languageConsole.getProject());
-    scheme.getRepl().processOutput(languageConsole, StringUtil.convertLineSeparators(text), attributes);
+//    TODO
+//    scheme.getProcessReplHandler().processOutput(languageConsole, StringUtil.convertLineSeparators(text), attributes);
     EditorEx historyViewer = languageConsole.getHistoryViewer();
     SchemeConsoleExecuteActionHandler.scrollDown(historyViewer);
   }
