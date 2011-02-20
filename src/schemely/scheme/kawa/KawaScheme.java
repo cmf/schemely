@@ -10,6 +10,12 @@ import schemely.scheme.Scheme;
 public class KawaScheme implements Scheme
 {
   @Override
+  public boolean supportsSquareBracesForLists()
+  {
+    return false;
+  }
+
+  @Override
   public boolean supportsInProcessREPL()
   {
     return false;

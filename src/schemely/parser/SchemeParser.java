@@ -7,13 +7,19 @@ import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import schemely.SchemeBundle;
 import schemely.lexer.Tokens;
+import schemely.scheme.Scheme;
+import schemely.scheme.SchemeImplementation;
 
 
 public class SchemeParser implements PsiParser, Tokens
 {
+  private Scheme scheme;
+
   @NotNull
   public ASTNode parse(IElementType root, PsiBuilder builder)
   {
+    scheme = SchemeImplementation.from(builder.getProject());
+
     builder.setDebugMode(true);
     PsiBuilder.Marker marker = builder.mark();
     for (IElementType token = builder.getTokenType(); token != null; token = builder.getTokenType())
@@ -29,7 +35,11 @@ public class SchemeParser implements PsiParser, Tokens
     IElementType token = builder.getTokenType();
     if (LEFT_PAREN == token)
     {
-      parseList(builder);
+      parseList(builder, LEFT_PAREN, RIGHT_PAREN);
+    }
+    else if (LEFT_SQUARE == token && scheme.supportsSquareBracesForLists())
+    {
+      parseList(builder, LEFT_SQUARE, RIGHT_SQUARE);
     }
     else if (OPEN_VECTOR == token)
     {
@@ -160,16 +170,16 @@ public class SchemeParser implements PsiParser, Tokens
    * Enter: Lexer is pointed at the opening left paren
    * Exit: Lexer is pointed immediately after the closing right paren, or at the end-of-file
    */
-  private void parseList(PsiBuilder builder)
+  private void parseList(PsiBuilder builder, IElementType open, IElementType close)
   {
-    if (builder.getTokenType() != LEFT_PAREN)
+    if (builder.getTokenType() != open)
     {
       internalError(SchemeBundle.message("expected.lparen"));
     }
     PsiBuilder.Marker marker = markAndAdvance(builder);
 
     IElementType token = builder.getTokenType();
-    while (token != RIGHT_PAREN && token != null)
+    while (token != close && token != null)
     {
       if (token == DOT)
       {
@@ -184,9 +194,9 @@ public class SchemeParser implements PsiParser, Tokens
       }
     }
 
-    if (builder.getTokenType() != RIGHT_PAREN)
+    if (builder.getTokenType() != close)
     {
-      builder.error(SchemeBundle.message("expected.token", RIGHT_PAREN.toString()));
+      builder.error(SchemeBundle.message("expected.token", close.toString()));
     }
     else
     {

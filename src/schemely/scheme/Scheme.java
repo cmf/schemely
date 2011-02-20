@@ -14,26 +14,11 @@ import java.util.Collection;
  */
 public interface Scheme
 {
+  boolean supportsSquareBracesForLists();
+
   boolean supportsInProcessREPL();
 
   REPL getNewInProcessREPL(Project project, SchemeConsoleView consoleView);
-
-//  InProcessREPLHandler getInProcessReplHandler();
-//
-//  ProcessREPLHandler getProcessReplHandler();
-//
-//  interface InProcessREPLHandler
-//  {
-//  }
-//
-//  interface ProcessREPLHandler
-//  {
-//    List<String> createRuntimeArgs(Module module, String workingDir) throws CantRunException;
-//
-//    void processOutput(LanguageConsoleImpl console, String text, Key attributes);
-//
-//    NotNullFunction<String, Boolean> getConsoleMatcher();
-//  }
 
   interface REPL
   {

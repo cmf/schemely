@@ -10,6 +10,12 @@ import schemely.scheme.Scheme;
 public class SISCScheme implements Scheme
 {
   @Override
+  public boolean supportsSquareBracesForLists()
+  {
+    return true;
+  }
+
+  @Override
   public boolean supportsInProcessREPL()
   {
     return true;
