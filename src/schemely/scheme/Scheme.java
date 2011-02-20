@@ -1,15 +1,13 @@
 package schemely.scheme;
 
-import com.intellij.execution.CantRunException;
-import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
-import com.intellij.util.NotNullFunction;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiManager;
+import schemely.psi.impl.symbols.SchemeIdentifier;
 import schemely.repl.SchemeConsoleView;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author Colin Fleming
@@ -49,10 +47,10 @@ public interface Scheme
 
     boolean isActive();
 
-    // TODO completion?
-
     SchemeConsoleView getConsoleView();
 
     AnAction[] getToolbarActions() throws REPLException;
+
+    Collection<PsiElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol);
   }
 }

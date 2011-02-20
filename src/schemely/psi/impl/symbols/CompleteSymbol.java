@@ -1,23 +1,16 @@
 package schemely.psi.impl.symbols;
 
+import com.intellij.codeInsight.completion.CompletionInitializationContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.codeInsight.lookup.LookupItem;
-import com.intellij.codeInsight.lookup.LookupItemUtil;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.*;
-import com.intellij.psi.util.MethodSignature;
-import com.intellij.util.Function;
-import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.containers.HashMap;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
 import com.intellij.util.containers.HashSet;
-import schemely.SchemeIcons;
 import schemely.psi.api.SchemePsiElement;
-import schemely.psi.resolve.ResolveUtil;
-import schemely.psi.resolve.SchemeResolveResult;
-import schemely.psi.resolve.completion.CompletionProcessor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
 
 
 public class CompleteSymbol
@@ -51,7 +44,10 @@ public class CompleteSymbol
     Collection<LookupElement> ret = new ArrayList<LookupElement>(elements.size());
     for (PsiElement element : elements)
     {
-      ret.add(mapToLookupElement(element));
+      if (element.getText().indexOf(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED) < 0)
+      {
+        ret.add(mapToLookupElement(element));
+      }
     }
     return ret;
   }

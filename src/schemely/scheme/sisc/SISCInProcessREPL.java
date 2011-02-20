@@ -1,6 +1,5 @@
 package schemely.scheme.sisc;
 
-import com.intellij.execution.ExecutionBundle;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -23,8 +22,12 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiManager;
 import com.intellij.ui.content.Content;
+import schemely.psi.impl.symbols.SchemeIdentifier;
 import schemely.repl.SchemeConsole;
+import schemely.repl.SchemeConsoleElement;
 import schemely.repl.SchemeConsoleView;
 import schemely.repl.actions.NewSchemeConsoleAction;
 import schemely.scheme.REPLException;
@@ -33,9 +36,18 @@ import schemely.scheme.common.ReaderThread;
 import sisc.REPL;
 import sisc.data.Procedure;
 import sisc.data.SchemeThread;
+import sisc.data.SchemeVoid;
+import sisc.data.Symbol;
+import sisc.data.Value;
 import sisc.env.DynamicEnvironment;
+import sisc.env.MemorySymEnv;
+import sisc.env.SymbolicEnvironment;
 import sisc.interpreter.AppContext;
 import sisc.interpreter.Context;
+import sisc.interpreter.Interpreter;
+import sisc.interpreter.SchemeCaller;
+import sisc.interpreter.SchemeException;
+import sisc.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,8 +64,13 @@ import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -78,6 +95,7 @@ public class SISCInProcessREPL implements Scheme.REPL
   private final CountDownLatch replFinished = new CountDownLatch(1);
   private Writer toREPL;
   private Reader fromREPL;
+  private AppContext appContext;
 
   ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -99,7 +117,7 @@ public class SISCInProcessREPL implements Scheme.REPL
     {
       Thread.currentThread().setContextClassLoader(classLoader);
 
-      AppContext appContext = new AppContext();
+      appContext = new AppContext();
       Context.setDefaultAppContext(appContext);
       URL heap = AppContext.findHeap(null);
       if (heap == null)
@@ -214,58 +232,22 @@ public class SISCInProcessREPL implements Scheme.REPL
   @Override
   public AnAction[] getToolbarActions()
   {
-    return new AnAction[] { new StopAction(), new CloseAction() };
+    return new AnAction[]{new StopAction(), new CloseAction()};
   }
 
-  private class StopAction extends DumbAwareAction
+  @Override
+  public Collection<PsiElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol)
   {
-    private StopAction()
+    GetCompletions getCompletions = new GetCompletions(manager);
+    try
     {
-      copyShortcutFrom(ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM));
-      Presentation templatePresentation = getTemplatePresentation();
-      templatePresentation.setIcon(IconLoader.getIcon("/actions/suspend.png"));
-      templatePresentation.setText("Stop REPL");
-      templatePresentation.setDescription(null);
+      Context.execute(appContext, getCompletions);
     }
-
-    @Override
-    public void update(AnActionEvent e)
+    catch (SchemeException ignored)
     {
-      e.getPresentation().setEnabled(isActive());
+      // TODO
     }
-
-    @Override
-    public void actionPerformed(AnActionEvent e)
-    {
-      stop();
-    }
-  }
-
-  private class CloseAction extends DumbAwareAction
-  {
-    private CloseAction()
-    {
-      copyShortcutFrom(ActionManager.getInstance().getAction(IdeActions.ACTION_CLOSE));
-      Presentation templatePresentation = getTemplatePresentation();
-      templatePresentation.setIcon(IconLoader.getIcon("/actions/cancel.png"));
-      templatePresentation.setText("Close REPL tab");
-      templatePresentation.setDescription(null);
-    }
-
-    @Override
-    public void actionPerformed(AnActionEvent e)
-    {
-      if (isActive())
-      {
-        stop();
-      }
-
-      Content content = consoleView.getConsole().getConsoleEditor().getUserData(NewSchemeConsoleAction.CONTENT_KEY);
-      if (content != null)
-      {
-        content.getManager().removeContent(content, true);
-      }
-    }
+    return getCompletions.getCompletions();
   }
 
   private void verifyState(State expected)
@@ -396,5 +378,197 @@ public class SISCInProcessREPL implements Scheme.REPL
         }
       }
     });
+  }
+
+  private static class GetCompletions implements SchemeCaller
+  {
+    private final Collection<PsiElement> completions = new ArrayList<PsiElement>();
+    private final PsiManager psiManager;
+
+    public GetCompletions(PsiManager psiManager)
+    {
+      this.psiManager = psiManager;
+    }
+
+    @Override
+    public Object execute(Interpreter r) throws SchemeException
+    {
+      SymbolicEnvironment symbolicEnvironment = r.getContextEnv(Util.TOPLEVEL);
+
+      while (symbolicEnvironment != null)
+      {
+        SymbolicEnvironment syntaxEnvironment = symbolicEnvironment.getSidecarEnvironment(Util.EXPSC);
+        addCompletions(syntaxEnvironment);
+
+        SymbolicEnvironment topEnvironment = symbolicEnvironment.getSidecarEnvironment(Util.EXPTOP);
+        addCompletions(topEnvironment);
+
+        addCompletions(symbolicEnvironment);
+        symbolicEnvironment = symbolicEnvironment.getParent();
+      }
+
+      return new SchemeVoid();
+    }
+
+    private void addCompletions(SymbolicEnvironment symbolicEnvironment)
+    {
+      if (symbolicEnvironment instanceof MemorySymEnv)
+      {
+        MemorySymEnv symEnv = (MemorySymEnv) symbolicEnvironment;
+        Map symbolMap = symEnv.symbolMap;
+        for (Object object : symbolMap.keySet())
+        {
+          if (object instanceof Symbol)
+          {
+            String name = object.toString();
+            if (!hasCompletion(name))
+            {
+              completions.add(new SchemeConsoleElement(psiManager, name));
+            }
+          }
+        }
+      }
+    }
+
+    private boolean hasCompletion(String name)
+    {
+      for (PsiElement completion : completions)
+      {
+        if (((SchemeConsoleElement) completion).getName().equals(name))
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void dump(SymbolicEnvironment environment)
+    {
+      Set<SymbolicEnvironment> seen = Collections.newSetFromMap(new IdentityHashMap<SymbolicEnvironment, Boolean>());
+      dump(environment, seen, "");
+    }
+
+    private void dump(SymbolicEnvironment environment, Set<SymbolicEnvironment> seen, String indent)
+    {
+      if (environment == null)
+      {
+        return;
+      }
+
+      if (seen.contains(environment))
+      {
+        System.out.println(indent + environment.getName() + ": already seen");
+        return;
+      }
+
+      seen.add(environment);
+      if (environment.getName() != null)
+      {
+        System.out.println(indent + environment.getName());
+      }
+
+      if (environment instanceof MemorySymEnv)
+      {
+        MemorySymEnv symEnv = (MemorySymEnv) environment;
+        Map<Symbol, Integer> symbolMap = symEnv.symbolMap;
+        for (Symbol key : sortSymbols(symbolMap.keySet()))
+        {
+          Value value = symEnv.env[symbolMap.get(key)];
+          System.out.println(indent + key + ": " + value.getClass().getSimpleName());
+        }
+
+        if (environment.getParent() != null)
+        {
+          System.out.println(indent + "Parent:");
+          dump(environment.getParent(), seen, indent + "  ");
+        }
+
+        Map<Symbol, SymbolicEnvironment> sidecarMap = symEnv.sidecars;
+        if (!sidecarMap.isEmpty())
+        {
+          String nextIndent = indent + "  ";
+          System.out.println(nextIndent + "Sidecars:");
+          for (Symbol key : sortSymbols(sidecarMap.keySet()))
+          {
+            System.out.println(nextIndent + key);
+            dump(sidecarMap.get(key), seen, nextIndent + "  ");
+          }
+        }
+      }
+      else
+      {
+        System.out.println(indent + environment.getName() + ": is a " + environment.getClass().getSimpleName());
+      }
+    }
+
+    public Collection<Symbol> sortSymbols(Collection<Symbol> unsorted)
+    {
+      List<Symbol> symbols = new ArrayList<Symbol>(unsorted);
+      Collections.sort(symbols, new Comparator<Symbol>()
+      {
+        @Override
+        public int compare(Symbol o1, Symbol o2)
+        {
+          return o1.toString().compareTo(o2.toString());
+        }
+      });
+      return symbols;
+    }
+
+    public Collection<PsiElement> getCompletions()
+    {
+      return completions;
+    }
+  }
+
+  private class StopAction extends DumbAwareAction
+  {
+    private StopAction()
+    {
+      copyShortcutFrom(ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM));
+      Presentation templatePresentation = getTemplatePresentation();
+      templatePresentation.setIcon(IconLoader.getIcon("/actions/suspend.png"));
+      templatePresentation.setText("Stop REPL");
+      templatePresentation.setDescription(null);
+    }
+
+    @Override
+    public void update(AnActionEvent e)
+    {
+      e.getPresentation().setEnabled(isActive());
+    }
+
+    @Override
+    public void actionPerformed(AnActionEvent e)
+    {
+      stop();
+    }
+  }
+
+  private class CloseAction extends DumbAwareAction
+  {
+    private CloseAction()
+    {
+      copyShortcutFrom(ActionManager.getInstance().getAction(IdeActions.ACTION_CLOSE));
+      Presentation templatePresentation = getTemplatePresentation();
+      templatePresentation.setIcon(IconLoader.getIcon("/actions/cancel.png"));
+      templatePresentation.setText("Close REPL tab");
+      templatePresentation.setDescription(null);
+    }
+
+    @Override
+    public void actionPerformed(AnActionEvent e)
+    {
+      if (isActive())
+      {
+        stop();
+      }
+
+      Content content = consoleView.getConsole().getConsoleEditor().getUserData(NewSchemeConsoleAction.CONTENT_KEY);
+      if (content != null)
+      {
+        content.getManager().removeContent(content, true);
+      }
+    }
   }
 }

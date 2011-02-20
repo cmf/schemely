@@ -21,11 +21,6 @@ public class SchemeConsole extends LanguageConsoleImpl
     return this.historyModel;
   }
 
-  public SchemeConsoleExecuteActionHandler getExecuteHandler()
-  {
-    return this.executeHandler;
-  }
-
   public void setExecuteHandler(SchemeConsoleExecuteActionHandler handler)
   {
     this.executeHandler = handler;

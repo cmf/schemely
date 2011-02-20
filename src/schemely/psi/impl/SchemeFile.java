@@ -22,6 +22,8 @@ import schemely.psi.resolve.ResolveResult;
 import schemely.psi.resolve.ResolveUtil;
 import schemely.psi.util.SchemePsiUtil;
 import schemely.psi.util.SchemeTextUtil;
+import schemely.repl.actions.NewSchemeConsoleAction;
+import schemely.scheme.Scheme;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -138,6 +140,12 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
   @Override
   public Collection<PsiElement> getSymbolVariants(SchemeIdentifier symbol)
   {
+    Scheme.REPL repl = this.getCopyableUserData(NewSchemeConsoleAction.REPL_KEY);
+    if (repl != null)
+    {
+      return repl.getSymbolVariants(getManager(), symbol);
+    }
+
     Collection<PsiElement> ret = new ArrayList<PsiElement>();
 
     PsiElement next = getFirstChild();

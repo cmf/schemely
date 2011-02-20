@@ -119,6 +119,7 @@ public class NewSchemeConsoleAction extends AnAction implements DumbAware
     content.putUserData(REPL_KEY, repl);
     schemeConsole.getConsoleEditor().putUserData(REPL_KEY, repl);
     schemeConsole.getConsoleEditor().putUserData(CONTENT_KEY, content);
+    schemeConsole.getFile().putCopyableUserData(REPL_KEY, repl);
 
     if (toolWindow.isActive())
     {
