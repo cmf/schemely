@@ -32,8 +32,6 @@
 
 * Allow case-sensitivity
 
-* Allow use of square brackets/braces
-
 * Internationalise
 
 * Fix quoting of lists
