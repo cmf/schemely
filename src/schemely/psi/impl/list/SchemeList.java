@@ -185,7 +185,8 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
 
     PsiElement body = ResolveUtil.getNextNonLeafElement(formals);
 
-    if ((PsiTreeUtil.findCommonParent(place, define) != define.getParent()) &&
+    if (place.getContainingFile().equals(define.getContainingFile()) &&
+        (PsiTreeUtil.findCommonParent(place, define) != define.getParent()) &&
         !PsiTreeUtil.isAncestor(body, place, false))
     {
       return Collections.emptyList();

@@ -28,6 +28,7 @@ import schemely.SchemeIcons;
 import schemely.repl.SchemeConsole;
 import schemely.repl.SchemeConsoleView;
 import schemely.repl.toolwindow.REPLToolWindowFactory;
+import schemely.scheme.REPL;
 import schemely.scheme.REPLException;
 import schemely.scheme.Scheme;
 import schemely.scheme.SchemeImplementation;
@@ -40,7 +41,7 @@ import java.util.Arrays;
 
 public class NewSchemeConsoleAction extends AnAction implements DumbAware
 {
-  public static final Key<Scheme.REPL> REPL_KEY = Key.create("Scheme.REPL");
+  public static final Key<REPL> REPL_KEY = Key.create("Scheme.REPL");
   public static final Key<Content> CONTENT_KEY = Key.create("Scheme.REPL.Content");
 
   protected static final String CONSOLE_TITLE = "Console title";
@@ -92,7 +93,7 @@ public class NewSchemeConsoleAction extends AnAction implements DumbAware
     panel.add(consoleView.getComponent(), "Center");
 
     Scheme scheme = SchemeImplementation.from(project);
-    Scheme.REPL repl = scheme.getNewInProcessREPL(project, consoleView);
+    REPL repl = scheme.getNewInProcessREPL(project, consoleView);
 
     AnAction[] actions;
     try
@@ -150,7 +151,7 @@ public class NewSchemeConsoleAction extends AnAction implements DumbAware
     });
   }
 
-  private AnAction[] getToolbarActions(Scheme.REPL repl) throws REPLException
+  private AnAction[] getToolbarActions(REPL repl) throws REPLException
   {
     java.util.List<AnAction> actions = new ArrayList<AnAction>();
     actions.addAll(Arrays.asList(repl.getToolbarActions()));

@@ -1,7 +1,10 @@
 package schemely.scheme.kawa;
 
 import com.intellij.openapi.project.Project;
+import schemely.parser.DefaultPsiCreator;
+import schemely.parser.SchemePsiCreator;
 import schemely.repl.SchemeConsoleView;
+import schemely.scheme.REPL;
 import schemely.scheme.Scheme;
 
 /**
@@ -9,6 +12,12 @@ import schemely.scheme.Scheme;
  */
 public class KawaScheme implements Scheme
 {
+  @Override
+  public SchemePsiCreator getPsiCreator()
+  {
+    return new DefaultPsiCreator();
+  }
+
   @Override
   public boolean supportsSquareBracesForLists()
   {

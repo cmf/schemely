@@ -31,7 +31,6 @@ import schemely.repl.SchemeConsoleElement;
 import schemely.repl.SchemeConsoleView;
 import schemely.repl.actions.NewSchemeConsoleAction;
 import schemely.scheme.REPLException;
-import schemely.scheme.Scheme;
 import schemely.scheme.common.ReaderThread;
 import sisc.REPL;
 import sisc.data.Procedure;
@@ -81,7 +80,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author Colin Fleming
  */
-public class SISCInProcessREPL implements Scheme.REPL
+public class SISCInProcessREPL implements schemely.scheme.REPL
 {
   private enum State
   {
@@ -207,14 +206,6 @@ public class SISCInProcessREPL implements Scheme.REPL
     catch (IOException ignored)
     {
     }
-  }
-
-  @Override
-  public void clear()
-  {
-    verifyState(State.RUNNING);
-
-    throw new UnsupportedOperationException();
   }
 
   @Override

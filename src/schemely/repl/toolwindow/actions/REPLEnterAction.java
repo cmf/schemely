@@ -19,7 +19,7 @@ import schemely.file.SchemeFileType;
 import schemely.psi.util.SchemePsiUtil;
 import schemely.repl.SchemeConsole;
 import schemely.repl.actions.NewSchemeConsoleAction;
-import schemely.scheme.Scheme;
+import schemely.scheme.REPL;
 import schemely.utils.Editors;
 
 /**
@@ -38,7 +38,7 @@ public class REPLEnterAction extends EditorWriteActionHandler implements DumbAwa
   @Override
   public void executeWriteAction(Editor editor, DataContext dataContext)
   {
-    Scheme.REPL repl = editor.getUserData(NewSchemeConsoleAction.REPL_KEY);
+    REPL repl = editor.getUserData(NewSchemeConsoleAction.REPL_KEY);
     if (repl == null)
     {
       originalHandler.execute(editor, dataContext);
@@ -49,7 +49,7 @@ public class REPLEnterAction extends EditorWriteActionHandler implements DumbAwa
     }
   }
 
-  protected void runExecuteAction(Scheme.REPL repl, boolean executeImmediately)
+  protected void runExecuteAction(REPL repl, boolean executeImmediately)
   {
     final SchemeConsole console = repl.getConsoleView().getConsole();
     if (executeImmediately)
@@ -115,7 +115,7 @@ public class REPLEnterAction extends EditorWriteActionHandler implements DumbAwa
     return builder.toString();
   }
 
-  private void execute(Scheme.REPL repl)
+  private void execute(REPL repl)
   {
     SchemeConsole console = repl.getConsoleView().getConsole();
     ConsoleHistoryModel consoleHistoryModel = console.getHistoryModel();

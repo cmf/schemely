@@ -90,6 +90,14 @@ public class SchemeAnnotator implements Annotator
     {
       annotateList((SchemeList) element, holder);
     }
+//    else if (element instanceof SchemeIdentifier)
+//    {
+//      SchemeIdentifier identifier = (SchemeIdentifier) element;
+//      if (identifier.resolve() == null)
+//      {
+//        holder.createWarningAnnotation(identifier, "Can't resolve");
+//      }
+//    }
   }
 
   private void annotateList(SchemeList list, AnnotationHolder holder)

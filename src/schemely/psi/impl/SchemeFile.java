@@ -23,7 +23,7 @@ import schemely.psi.resolve.ResolveUtil;
 import schemely.psi.util.SchemePsiUtil;
 import schemely.psi.util.SchemeTextUtil;
 import schemely.repl.actions.NewSchemeConsoleAction;
-import schemely.scheme.Scheme;
+import schemely.scheme.REPL;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,20 +90,11 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
   @NotNull
   public ResolveResult resolve(SchemeIdentifier place)
   {
-    PsiElement next = getFirstChild();
-    while (next != null)
-    {
-      if ((PsiTreeUtil.findCommonParent(place, next) != next) && SchemeList.isDefinition(next))
-      {
-        ResolveResult identifier =
-          ResolveUtil.resolveFrom(place, SchemeList.processDefineDeclaration((SchemeList) next, place));
-        if (identifier.isDone())
-        {
-          return identifier;
-        }
-      }
+    ResolveResult result = resolveFile(place);
 
-      next = next.getNextSibling();
+    if (result.isDone())
+    {
+      return result;
     }
 
     String url = VfsUtil.pathToUrl(PathUtil.getJarPathForClass(SchemeFile.class));
@@ -119,6 +110,27 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
       {
         return resolveFrom(place, getR5RSFile(sdkFile));
       }
+    }
+
+    return ResolveResult.CONTINUE;
+  }
+
+  public ResolveResult resolveFile(SchemeIdentifier place)
+  {
+    PsiElement next = getFirstChild();
+    while (next != null)
+    {
+      if ((PsiTreeUtil.findCommonParent(place, next) != next) && SchemeList.isDefinition(next))
+      {
+        ResolveResult identifier =
+          ResolveUtil.resolveFrom(place, SchemeList.processDefineDeclaration((SchemeList) next, place));
+        if (identifier.isDone())
+        {
+          return identifier;
+        }
+      }
+
+      next = next.getNextSibling();
     }
 
     return ResolveResult.CONTINUE;
@@ -140,7 +152,7 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
   @Override
   public Collection<PsiElement> getSymbolVariants(SchemeIdentifier symbol)
   {
-    Scheme.REPL repl = this.getCopyableUserData(NewSchemeConsoleAction.REPL_KEY);
+    REPL repl = this.getCopyableUserData(NewSchemeConsoleAction.REPL_KEY);
     if (repl != null)
     {
       return repl.getSymbolVariants(getManager(), symbol);
@@ -148,16 +160,7 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
 
     Collection<PsiElement> ret = new ArrayList<PsiElement>();
 
-    PsiElement next = getFirstChild();
-    while (next != null)
-    {
-      if (SchemeList.isDefinition(next))
-      {
-        ret.addAll(SchemeList.processDefineDeclaration((SchemeList) next, symbol));
-      }
-
-      next = next.getNextSibling();
-    }
+    getTopLevelDefinitions(symbol, ret);
 
     String url = VfsUtil.pathToUrl(PathUtil.getJarPathForClass(SchemeFile.class));
     VirtualFile sdkFile = VirtualFileManager.getInstance().findFileByUrl(url);
@@ -175,6 +178,20 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
     }
 
     return ret;
+  }
+
+  public void getTopLevelDefinitions(SchemeIdentifier symbol, Collection<PsiElement> ret)
+  {
+    PsiElement next = getFirstChild();
+    while (next != null)
+    {
+      if (SchemeList.isDefinition(next))
+      {
+        ret.addAll(SchemeList.processDefineDeclaration((SchemeList) next, symbol));
+      }
+
+      next = next.getNextSibling();
+    }
   }
 
   private Collection<PsiElement> getCompletionItems(SchemeFile schemeFile)
@@ -217,16 +234,13 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
 
   private SchemeFile getR5RSFile(VirtualFile virtualFile)
   {
-    VirtualFile r5rsFile = virtualFile.findFileByRelativePath("r5rs.scm");
+    VirtualFile r5rsFile = virtualFile.findFileByRelativePath("sisc.scm");
     if (r5rsFile != null)
     {
       PsiFile file = PsiManager.getInstance(getProject()).findFile(r5rsFile);
-      if (file != null)
+      if (file instanceof SchemeFile)
       {
-        if (file instanceof SchemeFile)
-        {
-          return (SchemeFile) file;
-        }
+        return (SchemeFile) file;
       }
     }
     return null;

@@ -21,7 +21,7 @@ import com.intellij.ui.content.Content;
 import schemely.psi.impl.SchemeFile;
 import schemely.repl.SchemeConsole;
 import schemely.repl.toolwindow.REPLToolWindowFactory;
-import schemely.scheme.Scheme;
+import schemely.scheme.REPL;
 
 public abstract class SchemeConsoleActionBase extends AnAction
 {
@@ -29,7 +29,7 @@ public abstract class SchemeConsoleActionBase extends AnAction
 
   protected static void executeCommand(Project project, String command)
   {
-    Scheme.REPL activeRepl = findActiveRepl(project);
+    REPL activeRepl = findActiveRepl(project);
     LOG.assertTrue(activeRepl != null);
 
     SchemeConsole languageConsole = activeRepl.getConsoleView().getConsole();
@@ -84,7 +84,7 @@ public abstract class SchemeConsoleActionBase extends AnAction
       return;
     }
 
-    Scheme.REPL activeRepl = findActiveRepl(project);
+    REPL activeRepl = findActiveRepl(project);
     if (activeRepl == null)
     {
       presentation.setEnabled(false);
@@ -101,7 +101,7 @@ public abstract class SchemeConsoleActionBase extends AnAction
     presentation.setEnabled(true);
   }
 
-  protected static Scheme.REPL findActiveRepl(Project project)
+  protected static REPL findActiveRepl(Project project)
   {
     ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
     ToolWindow toolWindow = toolWindowManager.getToolWindow(REPLToolWindowFactory.TOOL_WINDOW_ID);

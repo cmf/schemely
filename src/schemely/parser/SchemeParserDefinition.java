@@ -13,19 +13,24 @@ import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 import schemely.lexer.SchemeLexer;
 import schemely.lexer.Tokens;
-import schemely.psi.impl.SchemeFile;
+import schemely.scheme.Scheme;
+import schemely.scheme.SchemeImplementation;
 
 
 public class SchemeParserDefinition implements ParserDefinition
 {
+  private Scheme scheme = null;
+
   @NotNull
   public Lexer createLexer(Project project)
   {
+    Scheme scheme = getScheme(project);
     return new SchemeLexer();
   }
 
   public PsiParser createParser(Project project)
   {
+    Scheme scheme = getScheme(project);
     return new SchemeParser();
   }
 
@@ -55,7 +60,9 @@ public class SchemeParserDefinition implements ParserDefinition
   @NotNull
   public PsiElement createElement(ASTNode node)
   {
-    return SchemePsiCreator.createElement(node);
+    Scheme scheme = getScheme();
+    SchemePsiCreator psiCreator = scheme.getPsiCreator();
+    return psiCreator.createElement(node);
   }
 
   public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right)
@@ -88,7 +95,31 @@ public class SchemeParserDefinition implements ParserDefinition
 
   public PsiFile createFile(FileViewProvider viewProvider)
   {
-    return new SchemeFile(viewProvider);
+    Scheme scheme = getScheme(viewProvider.getManager().getProject());
+    SchemePsiCreator psiCreator = scheme.getPsiCreator();
+    return psiCreator.createFile(viewProvider);
+  }
+
+  private Scheme getScheme()
+  {
+    if (scheme == null)
+    {
+      throw new IllegalStateException("Scheme implementation not initialised");
+    }
+    return scheme;
+  }
+
+  private Scheme getScheme(Project project)
+  {
+    if (scheme == null)
+    {
+      initScheme(project);
+    }
+    return scheme;
+  }
+
+  private void initScheme(Project project)
+  {
+    scheme = SchemeImplementation.from(project);
   }
 }
-
