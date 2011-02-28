@@ -8,15 +8,12 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
 import schemely.psi.impl.SchemeFile;
-import schemely.psi.impl.symbols.SchemeIdentifier;
-import schemely.psi.resolve.ResolveResult;
-import schemely.repl.actions.NewSchemeConsoleAction;
-import schemely.scheme.REPL;
 import schemely.scheme.sisc.SISCConfigUtil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -39,14 +36,15 @@ public class SISCFile extends SchemeFile
     super(viewProvider);
   }
 
-  @NotNull
-  public ResolveResult resolve(SchemeIdentifier place)
+  @Override
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor,
+                                     @NotNull ResolveState state,
+                                     PsiElement lastParent,
+                                     @NotNull PsiElement place)
   {
-    ResolveResult result = resolveFile(place);
-
-    if (result.isDone())
+    if (!processTopLevelDefinitions(processor, state, lastParent, place))
     {
-      return result;
+      return false;
     }
 
     String sourcePath = SISCConfigUtil.getJarPathForResource(sisc.REPL.class, "sisc/boot/repl.scm");
@@ -66,57 +64,16 @@ public class SISCFile extends SchemeFile
             if (psiFile instanceof SchemeFile)
             {
               SchemeFile schemeFile = (SchemeFile) psiFile;
-              ResolveResult fileResult = schemeFile.resolveFile(place);
-              if (fileResult.isDone())
+              if (!schemeFile.processTopLevelDefinitions(processor, state, lastParent, place))
               {
-                return fileResult;
+                return false;
               }
             }
           }
         }
       }
     }
-
-    return ResolveResult.CONTINUE;
+    return true;
   }
 
-  @Override
-  public Collection<PsiElement> getSymbolVariants(SchemeIdentifier symbol)
-  {
-    REPL repl = this.getCopyableUserData(NewSchemeConsoleAction.REPL_KEY);
-    if (repl != null)
-    {
-      return repl.getSymbolVariants(getManager(), symbol);
-    }
-
-    Collection<PsiElement> ret = new ArrayList<PsiElement>();
-
-    getTopLevelDefinitions(symbol, ret);
-
-    String sourcePath = SISCConfigUtil.getJarPathForResource(sisc.REPL.class, "sisc/boot/repl.scm");
-    String sourceURL = VfsUtil.pathToUrl(sourcePath);
-    VirtualFile sourceFile = VirtualFileManager.getInstance().findFileByUrl(sourceURL);
-    if (sourceFile != null)
-    {
-      VirtualFile jarFile = JarFileSystem.getInstance().getJarRootForLocalFile(sourceFile);
-      if (jarFile != null)
-      {
-        for (String bootFile : bootFiles)
-        {
-          VirtualFile file = jarFile.findFileByRelativePath(bootFile);
-          if (file != null)
-          {
-            PsiFile psiFile = PsiManager.getInstance(getProject()).findFile(file);
-            if (psiFile instanceof SchemeFile)
-            {
-              SchemeFile schemeFile = (SchemeFile) psiFile;
-              schemeFile.getTopLevelDefinitions(symbol, ret);
-            }
-          }
-        }
-      }
-    }
-
-    return ret;
-  }
 }

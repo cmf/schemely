@@ -2,15 +2,14 @@ package schemely.psi.resolve.completion;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
-import schemely.psi.impl.symbols.SchemeIdentifier;
 import schemely.psi.resolve.processors.SymbolResolveProcessor;
 
 
 public class CompletionProcessor extends SymbolResolveProcessor
 {
-  public CompletionProcessor(SchemeIdentifier place)
+  public CompletionProcessor()
   {
-    super(null, place);
+    super(null);
   }
 
   public boolean execute(PsiElement element, ResolveState state)

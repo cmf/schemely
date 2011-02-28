@@ -2,18 +2,16 @@ package schemely.psi.impl.list;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import schemely.lexer.Tokens;
 import schemely.psi.api.SchemeBraced;
 import schemely.psi.impl.SchemePsiElementBase;
 import schemely.psi.impl.symbols.SchemeIdentifier;
-import schemely.psi.resolve.ResolveResult;
 import schemely.psi.resolve.ResolveUtil;
-
-import static schemely.psi.resolve.ResolveUtil.resolveFrom;
-
-import java.util.*;
 
 
 public class SchemeList extends SchemeListBase implements SchemeBraced
@@ -57,55 +55,33 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
     return findChildByType(Tokens.RIGHT_PAREN);
   }
 
-  @NotNull
   @Override
-  public ResolveResult resolve(SchemeIdentifier place)
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor,
+                                     @NotNull ResolveState state,
+                                     PsiElement lastParent,
+                                     @NotNull PsiElement place)
   {
     if (isLambda())
     {
-      return resolveFrom(place, processLambdaDeclaration(this, place));
+      return processLambdaDeclaration(processor, this, place);
     }
     else if (isDefinition())
     {
-      return resolveFrom(place, processDefineDeclaration(this, place));
+      return processDefineDeclaration(processor, this, place);
     }
     else if (isSyntaxDefinition())
     {
-      return resolveFrom(place, processDefineSyntaxDeclaration(this, place));
+      return processDefineSyntaxDeclaration(processor, this, place);
     }
     else if (isLet())
     {
-      return resolveFrom(place, processLetDeclaration(this, place));
+      return processLetDeclaration(processor, this, place);
     }
     else if (isDo())
     {
-      return resolveFrom(place, processDoDeclaration(this, place));
+      return processDoDeclaration(processor, this, place);
     }
-    return ResolveResult.CONTINUE;
-  }
-
-  @Override
-  public Collection<PsiElement> getSymbolVariants(SchemeIdentifier symbol)
-  {
-    String headText = getHeadText();
-    if (headText == null)
-    {
-      return Collections.emptyList();
-    }
-    if (headText.equals(LAMBDA))
-    {
-      return new ArrayList<PsiElement>(processLambdaDeclaration(this, symbol));
-    }
-    else if (isDefinition())
-    {
-      return new ArrayList<PsiElement>(processDefineDeclaration(this, symbol));
-    }
-    else if (isLet())
-    {
-      return new ArrayList<PsiElement>(processLetDeclaration(this, symbol));
-    }
-
-    return Collections.emptyList();
+    return true;
   }
 
   @Override
@@ -123,64 +99,82 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
     return 0;
   }
 
-  @NotNull
-  private static List<SchemeIdentifier> processLambdaDeclaration(SchemeList lambda, SchemeIdentifier place)
+  private static boolean processLambdaDeclaration(PsiScopeProcessor scopeProcessor, SchemeList lambda, PsiElement place)
   {
     if (!PsiTreeUtil.isAncestor(lambda, place, false))
     {
-      return Collections.emptyList();
+      return true;
     }
 
     PsiElement formals = lambda.getSecondNonLeafElement();
     if (formals == null)
     {
-      return Collections.emptyList();
+      return true;
     }
 
     // Lambda formals resolve to the symbol itself
     if (PsiTreeUtil.isAncestor(formals, place, false))
     {
-      return Collections.singletonList(place);
+      if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) place))
+      {
+        return false;
+      }
     }
 
-    List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
+    // Process internal definitions first to get shadowing
+    if (!processInternalDefinitions(scopeProcessor, (SchemePsiElementBase) formals, place))
+    {
+      return false;
+    }
 
     if (formals instanceof SchemeIdentifier)
     {
       // (lambda x (head x))
       if (place == formals)
       {
-        return Collections.singletonList(place);
+        if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) place))
+        {
+          return false;
+        }
       }
 
-      ret.add((SchemeIdentifier) formals);
+      if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) formals))
+      {
+        return false;
+      }
     }
     else if (formals instanceof SchemeList)
     {
       // (lambda (x) (+ x 3))
       SchemeList args = (SchemeList) formals;
 
-      ret.addAll(Arrays.asList(args.getAllIdentifiers()));
+      for (SchemeIdentifier identifier : args.getAllIdentifiers())
+      {
+        if (!ResolveUtil.processElement(scopeProcessor, identifier))
+        {
+          return false;
+        }
+      }
     }
 
-    ret.addAll(processInternalDefinitions((SchemePsiElementBase) formals, place));
-
-    return ret;
+    return true;
   }
 
-  @NotNull
-  public static List<SchemeIdentifier> processDefineDeclaration(SchemeList define, SchemeIdentifier place)
+  private static boolean processDefineDeclaration(PsiScopeProcessor scopeProcessor, SchemeList define, PsiElement place)
   {
     PsiElement formals = define.getSecondNonLeafElement();
     if (formals == null)
     {
-      return Collections.emptyList();
+      return true;
     }
 
     // Define variables resolve to the symbol itself
     if ((PsiTreeUtil.isAncestor(formals, place, false)))
     {
-      return Collections.singletonList(place);
+      if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) place))
+      {
+        return false;
+      }
     }
 
     PsiElement body = ResolveUtil.getNextNonLeafElement(formals);
@@ -189,82 +183,96 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
         (PsiTreeUtil.findCommonParent(place, define) != define.getParent()) &&
         !PsiTreeUtil.isAncestor(body, place, false))
     {
-      return Collections.emptyList();
+      return true;
     }
 
     if ((place != formals) && (formals instanceof SchemeIdentifier))
     {
       // (define x 3)
       SchemeIdentifier identifier = (SchemeIdentifier) formals;
-      return Collections.singletonList(identifier);
+      if (!ResolveUtil.processElement(scopeProcessor, identifier))
+      {
+        return false;
+      }
     }
     else if (formals instanceof SchemeList)
     {
       // (define (plus3 x) (+ x 3))
       SchemeList args = (SchemeList) formals;
 
-      List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
       if (PsiTreeUtil.isAncestor(body, place, false))
       {
         // Arguments are only visible in the define body
-        ret.addAll(Arrays.asList(args.getAllIdentifiers()));
+        for (SchemeIdentifier identifier : args.getAllIdentifiers())
+        {
+          if (!ResolveUtil.processElement(scopeProcessor, identifier))
+          {
+            return false;
+          }
+        }
       }
       else
       {
         // Function name is visible everywhere
-        ret.add(args.getFirstIdentifier());
+        if (!ResolveUtil.processElement(scopeProcessor, args.getFirstIdentifier()))
+        {
+          return false;
+        }
       }
-
-      return ret;
     }
 
-    return Collections.emptyList();
+    return true;
   }
 
-  @NotNull
-  public static List<SchemeIdentifier> processDefineSyntaxDeclaration(SchemeList define, SchemeIdentifier place)
+  private static boolean processDefineSyntaxDeclaration(PsiScopeProcessor scopeProcessor,
+                                                        SchemeList define,
+                                                        PsiElement place)
   {
     PsiElement formals = define.getSecondNonLeafElement();
     if (formals == null)
     {
-      return Collections.emptyList();
+      return true;
     }
 
     // Define variables resolve to the symbol itself
     if ((PsiTreeUtil.isAncestor(formals, place, false)))
     {
-      return Collections.singletonList(place);
+      if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) place))
+      {
+        return false;
+      }
     }
 
     if ((place != formals) && (formals instanceof SchemeIdentifier))
     {
       // (define-syntax x <whatever>)
       SchemeIdentifier identifier = (SchemeIdentifier) formals;
-      return Collections.singletonList(identifier);
+      if (!ResolveUtil.processElement(scopeProcessor, identifier))
+      {
+        return false;
+      }
     }
 
-    return Collections.emptyList();
+    return true;
   }
 
-  @NotNull
-  private static List<SchemeIdentifier> processLetDeclaration(SchemeList declaration, SchemeIdentifier place)
+  private static boolean processLetDeclaration(PsiScopeProcessor scopeProcessor,
+                                               SchemeList declaration,
+                                               PsiElement place)
   {
     if (!PsiTreeUtil.isAncestor(declaration, place, false))
     {
-      return Collections.emptyList();
+      return true;
     }
 
     PsiElement vars = declaration.getSecondNonLeafElement();
     if (vars == null)
     {
-      return Collections.emptyList();
+      return true;
     }
 
     String style = declaration.getHeadText();
-    if (style == null)
-    {
-      return Collections.emptyList();
-    }
+    assert style != null;
 
     SchemeIdentifier namedLetName = null;
     if (vars instanceof SchemeIdentifier && style.equals(LET))
@@ -272,14 +280,11 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       namedLetName = (SchemeIdentifier) vars;
       vars = ResolveUtil.getNextNonLeafElement(vars);
 
-      // Named let name resolves to itself
-      if (place == namedLetName)
+      if (!ResolveUtil.processElement(scopeProcessor, namedLetName))
       {
-        return Collections.singletonList(place);
+        return false;
       }
     }
-
-    List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
 
     if ((PsiTreeUtil.isAncestor(vars, place, false)))
     {
@@ -290,16 +295,20 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
         // If place is the first identifier in a list which is a sub-list of the let vars, it's a let-bound
         // variable so it only resolves to itself
         SchemeList parentList = (SchemeList) placeParent;
-        if (place == parentList.getFirstIdentifier())
+        SchemeIdentifier firstIdentifier = parentList.getFirstIdentifier();
+        if (place == firstIdentifier)
         {
-          return Collections.singletonList(place);
+          if (!ResolveUtil.processElement(scopeProcessor, firstIdentifier))
+          {
+            return false;
+          }
         }
       }
 
       if (style.equals(LET) || style.equals(LET_SYNTAX))
       {
         // It's part of a value for a let-bound variable, nothing in the let is in scope
-        return Collections.emptyList();
+        return true;
       }
       else if (style.equals(LET_STAR))
       {
@@ -311,20 +320,20 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
           for (SchemeList binding : args.getSubLists())
           {
             SchemeIdentifier var = binding.getFirstIdentifier();
-            if (var != null)
+            if (!ResolveUtil.processElement(scopeProcessor, var))
             {
-              ret.add(var);
+              return false;
             }
 
             // Variables are only visible in later bindings
             if (PsiTreeUtil.isAncestor(binding, place, false))
             {
-              return ret;
+              return true;
             }
           }
         }
         // Should never get this far
-        return ret;
+        return true;
       }
       else if (style.equals(LETREC) || style.equals(LETREC_SYNTAX))
       {
@@ -336,14 +345,20 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
           for (SchemeList binding : bindings)
           {
             SchemeIdentifier var = binding.getFirstIdentifier();
-            if (var != null)
+            if (!ResolveUtil.processElement(scopeProcessor, var))
             {
-              ret.add(var);
+              return false;
             }
           }
         }
-        return ret;
+        return true;
       }
+    }
+
+    // Process internal definitions first to get shadowing
+    if (!processInternalDefinitions(scopeProcessor, (SchemePsiElementBase) vars, place))
+    {
+      return false;
     }
 
     if (vars instanceof SchemeList)
@@ -353,39 +368,35 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       for (SchemeList binding : args.getSubLists())
       {
         SchemeIdentifier var = binding.getFirstIdentifier();
-        if (var != null)
+        if (!ResolveUtil.processElement(scopeProcessor, var))
         {
-          ret.add(var);
+          return false;
         }
       }
 
-      if (namedLetName != null)
+      if (!ResolveUtil.processElement(scopeProcessor, namedLetName))
       {
-        ret.add(namedLetName);
+        return false;
       }
     }
 
-    // Process internal definitions first to get shadowing
-    ret.addAll(processInternalDefinitions((SchemePsiElementBase) vars, place));
-
-    return ret;
+    return true;
   }
 
-  @NotNull
-  private static List<SchemeIdentifier> processDoDeclaration(SchemeList declaration, SchemeIdentifier place)
+  private static boolean processDoDeclaration(PsiScopeProcessor scopeProcessor,
+                                              SchemeList declaration,
+                                              PsiElement place)
   {
     if (!PsiTreeUtil.isAncestor(declaration, place, false))
     {
-      return Collections.emptyList();
+      return true;
     }
 
     PsiElement vars = declaration.getSecondNonLeafElement();
     if (vars == null)
     {
-      return Collections.emptyList();
+      return true;
     }
-
-    List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
 
     // Are we somewhere within the variable declarations?
     if ((PsiTreeUtil.isAncestor(vars, place, false)))
@@ -397,16 +408,20 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
         // If place is the first identifier in a list which is a sub-list of the do vars,
         // it's a do-bound variable so it only resolves to itself
         SchemeList parentList = (SchemeList) placeParent;
+
         if (place == parentList.getFirstIdentifier())
         {
-          return Collections.singletonList(place);
+          if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) place))
+          {
+            return false;
+          }
         }
 
         // Init expressions are not in scope
         PsiElement init = parentList.getSecondNonLeafElement();
         if (init != null && PsiTreeUtil.isAncestor(init, place, false))
         {
-          return Collections.emptyList();
+          return true;
         }
       }
     }
@@ -419,24 +434,27 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       for (SchemeList binding : args.getSubLists())
       {
         SchemeIdentifier var = binding.getFirstIdentifier();
-        if (var != null)
+        if (!ResolveUtil.processElement(scopeProcessor, var))
         {
-          ret.add(var);
+          return false;
         }
       }
     }
 
-    return ret;
+    return true;
   }
 
-  private static List<SchemeIdentifier> processInternalDefinitions(SchemePsiElementBase after, SchemeIdentifier place)
+  private static boolean processInternalDefinitions(PsiScopeProcessor scopeProcessor,
+                                                    SchemePsiElementBase after,
+                                                    PsiElement place)
   {
-    List<SchemeIdentifier> ret = new ArrayList<SchemeIdentifier>();
-
     PsiElement next = ResolveUtil.getNextNonLeafElement(after);
     while ((next != null) && isDefinition(next))
     {
-      ret.addAll(processDefineDeclaration((SchemeList) next, place));
+      if (!processDefineDeclaration(scopeProcessor, (SchemeList) next, place))
+      {
+        return false;
+      }
 
       // Don't process following definitions
       if (PsiTreeUtil.isAncestor(next, place, false))
@@ -447,39 +465,7 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       next = ResolveUtil.getNextNonLeafElement(next);
     }
 
-    return ret;
-  }
-
-  public static boolean isLocal(PsiElement element)
-  {
-    if (element instanceof SchemeIdentifier)
-    {
-      SchemeIdentifier symbol = (SchemeIdentifier) element;
-      PsiElement parent = symbol.getParent();
-
-      if (isDefinition(parent))
-      {
-        return true;
-      }
-      else if (parent != null)
-      {
-        PsiElement grandparent = parent.getParent();
-        if (isDefinition(grandparent))
-        {
-          return true;
-        }
-        else if (grandparent != null)
-        {
-          PsiElement greatGrandparent = grandparent.getParent();
-          if (isLet(greatGrandparent))
-          {
-            return true;
-          }
-        }
-      }
-    }
-
-    return false;
+    return true;
   }
 
   public static boolean isDefinition(PsiElement element)
@@ -492,17 +478,6 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
 
     SchemeList list = (SchemeList) element;
     return list.isDefinition();
-  }
-
-  public static boolean isLet(PsiElement element)
-  {
-    if (!(element instanceof SchemeList))
-    {
-      return false;
-    }
-
-    SchemeList list = (SchemeList) element;
-    return list.isLet();
   }
 
   public boolean isDefinition()

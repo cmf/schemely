@@ -8,11 +8,6 @@ import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.jetbrains.annotations.NotNull;
 import schemely.psi.api.SchemePsiElement;
-import schemely.psi.impl.symbols.SchemeIdentifier;
-import schemely.psi.resolve.ResolveResult;
-
-import java.util.Collection;
-import java.util.Collections;
 
 
 public abstract class SchemePsiElementBase extends ASTWrapperPsiElement implements SchemePsiElement
@@ -75,18 +70,6 @@ public abstract class SchemePsiElementBase extends ASTWrapperPsiElement implemen
   public String toString()
   {
     return name == null ? super.toString() : name;
-  }
-
-  @NotNull
-  public ResolveResult resolve(SchemeIdentifier place)
-  {
-    return ResolveResult.CONTINUE;
-  }
-
-  @Override
-  public Collection<PsiElement> getSymbolVariants(SchemeIdentifier symbol)
-  {
-    return Collections.emptyList();
   }
 
   @Override

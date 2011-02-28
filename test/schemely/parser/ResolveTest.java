@@ -135,7 +135,7 @@ public class ResolveTest extends ParserTestBase
     PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(second(file, "x"));
-    assert resolvesTo(third(file, "x"), second(file, "x"));
+    assert resolvesTo(third(file, "x"), second(file, "x"));//
   }
 
   @Test
@@ -147,7 +147,7 @@ public class ResolveTest extends ParserTestBase
     assert resolvesToSelf(first(file, "y"));
     assert resolvesToSelf(second(file, "x"));
     assert resolvesToSelf(second(file, "y"));
-    assert resolvesTo(third(file, "x"), second(file, "x"));
+    assert resolvesTo(third(file, "x"), second(file, "x"));//
     assert resolvesTo(fourth(file, "x"), second(file, "x"));
     assert resolvesTo(third(file, "y"), second(file, "y"));
   }
@@ -180,6 +180,16 @@ public class ResolveTest extends ParserTestBase
   public void testLetShadowing()
   {
     @Language("Scheme") String contents = "(let ((x 3)) (let ((x 5)) x))";
+    PsiFile file = parse(contents);
+    assert resolvesToSelf(first(file, "x"));
+    assert resolvesToSelf(second(file, "x"));
+    assert resolvesTo(third(file, "x"), second(file, "x"));
+  }
+
+  @Test
+  public void testLetInternalDefineShadowing()
+  {
+    @Language("Scheme") String contents = "(let ((x 3)) (define x 10) x)";
     PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(second(file, "x"));

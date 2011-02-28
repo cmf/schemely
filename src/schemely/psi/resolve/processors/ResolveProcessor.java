@@ -22,20 +22,6 @@ public abstract class ResolveProcessor implements PsiScopeProcessor, NameHint, E
     return candidates.toArray(new SchemeResolveResult[candidates.size()]);
   }
 
-  public <T> T getHint(Class<T> hintClass)
-  {
-    if (NameHint.class == hintClass && name != null)
-    {
-      return (T) this;
-    }
-    else if (ElementClassHint.class == hintClass)
-    {
-      return (T) this;
-    }
-
-    return null;
-  }
-
   public void handleEvent(Event event, Object o)
   {
   }

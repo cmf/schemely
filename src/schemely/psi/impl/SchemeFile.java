@@ -7,10 +7,14 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl;
-import com.intellij.psi.*;
+import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.ResolveState;
 import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.impl.source.PsiFileWithStubSupport;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.util.PathUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -18,12 +22,9 @@ import schemely.file.SchemeFileType;
 import schemely.psi.api.SchemePsiElement;
 import schemely.psi.impl.list.SchemeList;
 import schemely.psi.impl.symbols.SchemeIdentifier;
-import schemely.psi.resolve.ResolveResult;
 import schemely.psi.resolve.ResolveUtil;
 import schemely.psi.util.SchemePsiUtil;
 import schemely.psi.util.SchemeTextUtil;
-import schemely.repl.actions.NewSchemeConsoleAction;
-import schemely.scheme.REPL;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,8 +32,6 @@ import java.util.Collection;
 public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubSupport, SchemePsiElement
 {
   private PsiElement context = null;
-  private PsiClass psiClass;
-  private boolean scriptClassInitialized = false;
 
   @Override
   public String toString()
@@ -82,19 +81,15 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
     }
   }
 
-  public boolean isScript()
+  @Override
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor,
+                                     @NotNull ResolveState state,
+                                     PsiElement lastParent,
+                                     @NotNull PsiElement place)
   {
-    return true;
-  }
-
-  @NotNull
-  public ResolveResult resolve(SchemeIdentifier place)
-  {
-    ResolveResult result = resolveFile(place);
-
-    if (result.isDone())
+    if (!processTopLevelDefinitions(processor, state, lastParent, place))
     {
-      return result;
+      return false;
     }
 
     String url = VfsUtil.pathToUrl(PathUtil.getJarPathForClass(SchemeFile.class));
@@ -104,94 +99,49 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
       VirtualFile jarFile = JarFileSystem.getInstance().getJarRootForLocalFile(sdkFile);
       if (jarFile != null)
       {
-        return resolveFrom(place, getR5RSFile(jarFile));
+        return resolveFrom(processor, getR5RSFile(jarFile));
       }
       else if (sdkFile instanceof VirtualDirectoryImpl)
       {
-        return resolveFrom(place, getR5RSFile(sdkFile));
+        return resolveFrom(processor, getR5RSFile(sdkFile));
       }
     }
-
-    return ResolveResult.CONTINUE;
+    return true;
   }
 
-  public ResolveResult resolveFile(SchemeIdentifier place)
-  {
-    PsiElement next = getFirstChild();
-    while (next != null)
-    {
-      if ((PsiTreeUtil.findCommonParent(place, next) != next) && SchemeList.isDefinition(next))
-      {
-        ResolveResult identifier =
-          ResolveUtil.resolveFrom(place, SchemeList.processDefineDeclaration((SchemeList) next, place));
-        if (identifier.isDone())
-        {
-          return identifier;
-        }
-      }
-
-      next = next.getNextSibling();
-    }
-
-    return ResolveResult.CONTINUE;
-  }
-
-  private ResolveResult resolveFrom(SchemeIdentifier place, SchemeFile schemeFile)
+  private boolean resolveFrom(PsiScopeProcessor scopeProcessor, SchemeFile schemeFile)
   {
     for (SchemeList item : getSchemeCompleteItems(schemeFile))
     {
       SchemeIdentifier identifier = item.findFirstChildByClass(SchemeIdentifier.class);
-      if (place.couldReference(identifier))
+      if (!ResolveUtil.processElement(scopeProcessor, identifier))
       {
-        return ResolveResult.of(identifier);
+        return false;
       }
     }
-    return ResolveResult.CONTINUE;
+    return true;
   }
 
-  @Override
-  public Collection<PsiElement> getSymbolVariants(SchemeIdentifier symbol)
-  {
-    REPL repl = this.getCopyableUserData(NewSchemeConsoleAction.REPL_KEY);
-    if (repl != null)
-    {
-      return repl.getSymbolVariants(getManager(), symbol);
-    }
-
-    Collection<PsiElement> ret = new ArrayList<PsiElement>();
-
-    getTopLevelDefinitions(symbol, ret);
-
-    String url = VfsUtil.pathToUrl(PathUtil.getJarPathForClass(SchemeFile.class));
-    VirtualFile sdkFile = VirtualFileManager.getInstance().findFileByUrl(url);
-    if (sdkFile != null)
-    {
-      VirtualFile jarFile = JarFileSystem.getInstance().getJarRootForLocalFile(sdkFile);
-      if (jarFile != null)
-      {
-        ret.addAll(getCompletionItems(getR5RSFile(jarFile)));
-      }
-      else if (sdkFile instanceof VirtualDirectoryImpl)
-      {
-        ret.addAll(getCompletionItems(getR5RSFile(sdkFile)));
-      }
-    }
-
-    return ret;
-  }
-
-  public void getTopLevelDefinitions(SchemeIdentifier symbol, Collection<PsiElement> ret)
+  public boolean processTopLevelDefinitions(@NotNull PsiScopeProcessor processor,
+                                            @NotNull ResolveState state,
+                                            PsiElement lastParent,
+                                            @NotNull PsiElement place)
   {
     PsiElement next = getFirstChild();
     while (next != null)
     {
       if (SchemeList.isDefinition(next))
       {
-        ret.addAll(SchemeList.processDefineDeclaration((SchemeList) next, symbol));
+        if (!next.processDeclarations(processor, state, lastParent, place))
+        {
+          return false;
+        }
       }
 
       next = next.getNextSibling();
     }
+
+    return true;
   }
 
   private Collection<PsiElement> getCompletionItems(SchemeFile schemeFile)
