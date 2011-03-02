@@ -87,11 +87,14 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testDefunReturnArgument()
   {
-    @Language("Scheme") String contents = "(define (f x) x) (f 5) x";
+    @Language("Scheme") String contents = "(define (f x y) x y) (f 5) x";
     PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "f"));
+    assert resolvesToSelf(first(file, "x"));
+    assert resolvesToSelf(first(file, "y"));
     assert resolvesTo(second(file, "f"), first(file, "f"));
     assert resolvesTo(second(file, "x"), first(file, "x"));
+    assert resolvesTo(second(file, "y"), first(file, "y"));
     assert !resolvesTo(third(file, "x"), first(file, "x"));
   }
 
@@ -135,7 +138,7 @@ public class ResolveTest extends ParserTestBase
     PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(second(file, "x"));
-    assert resolvesTo(third(file, "x"), second(file, "x"));//
+    assert resolvesTo(third(file, "x"), second(file, "x"));
   }
 
   @Test
@@ -147,7 +150,7 @@ public class ResolveTest extends ParserTestBase
     assert resolvesToSelf(first(file, "y"));
     assert resolvesToSelf(second(file, "x"));
     assert resolvesToSelf(second(file, "y"));
-    assert resolvesTo(third(file, "x"), second(file, "x"));//
+    assert resolvesTo(third(file, "x"), second(file, "x"));
     assert resolvesTo(fourth(file, "x"), second(file, "x"));
     assert resolvesTo(third(file, "y"), second(file, "y"));
   }
@@ -189,11 +192,14 @@ public class ResolveTest extends ParserTestBase
   @Test
   public void testLetInternalDefineShadowing()
   {
-    @Language("Scheme") String contents = "(let ((x 3)) (define x 10) x)";
+    @Language("Scheme") String contents = "(let ((x 3)) (define x x) (define x x) x)";
     PsiFile file = parse(contents);
     assert resolvesToSelf(first(file, "x"));
     assert resolvesToSelf(second(file, "x"));
-    assert resolvesTo(third(file, "x"), second(file, "x"));
+    assert resolvesTo(third(file, "x"), first(file, "x"));
+    assert resolvesToSelf(fourth(file, "x"));
+    assert resolvesTo(fifth(file, "x"), second(file, "x"));
+    assert resolvesTo(sixth(file, "x"), fourth(file, "x"));
   }
 
   @Test

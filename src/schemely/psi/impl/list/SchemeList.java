@@ -177,11 +177,9 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       }
     }
 
-    PsiElement body = ResolveUtil.getNextNonLeafElement(formals);
-
     if (place.getContainingFile().equals(define.getContainingFile()) &&
         (PsiTreeUtil.findCommonParent(place, define) != define.getParent()) &&
-        !PsiTreeUtil.isAncestor(body, place, false))
+        !PsiTreeUtil.isAncestor(define, place, false))
     {
       return true;
     }
@@ -189,6 +187,10 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
     if ((place != formals) && (formals instanceof SchemeIdentifier))
     {
       // (define x 3)
+      if (PsiTreeUtil.isAncestor(define, place, false))
+      {
+        return true;
+      }
       SchemeIdentifier identifier = (SchemeIdentifier) formals;
       if (!ResolveUtil.processElement(scopeProcessor, identifier))
       {
@@ -200,7 +202,7 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       // (define (plus3 x) (+ x 3))
       SchemeList args = (SchemeList) formals;
 
-      if (PsiTreeUtil.isAncestor(body, place, false))
+      if (PsiTreeUtil.isAncestor(define, place, false))
       {
         // Arguments are only visible in the define body
         for (SchemeIdentifier identifier : args.getAllIdentifiers())
@@ -448,23 +450,26 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
                                                     SchemePsiElementBase after,
                                                     PsiElement place)
   {
+    // Process later ones first to get shadowing
     PsiElement next = ResolveUtil.getNextNonLeafElement(after);
-    while ((next != null) && isDefinition(next))
+    while ((next != null) && isDefinition(next) && !PsiTreeUtil.isAncestor(next, place, false))
+    {
+      next = ResolveUtil.getNextNonLeafElement(next);
+    }
+
+    if (next != null)
+    {
+      next = ResolveUtil.getPrevNonLeafElement(next);
+    }
+
+    while ((next != null) && (next != after) && isDefinition(next))
     {
       if (!processDefineDeclaration(scopeProcessor, (SchemeList) next, place))
       {
         return false;
       }
-
-      // Don't process following definitions
-      if (PsiTreeUtil.isAncestor(next, place, false))
-      {
-        break;
-      }
-
-      next = ResolveUtil.getNextNonLeafElement(next);
+      next = ResolveUtil.getPrevNonLeafElement(next);
     }
-
     return true;
   }
 
