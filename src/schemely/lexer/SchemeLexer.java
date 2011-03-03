@@ -40,7 +40,7 @@ public class SchemeLexer extends LexerBase
     if (end >= bufferEnd)
     {
       start = end;
-      type = Tokens.EOF;
+      type = null;
       return;
     }
     start = end;

@@ -112,8 +112,6 @@ public class LexerTest
       lexer.advance();
     }
 
-    assert EOF.equals(lexer.getTokenType()) : "Expected final EOF, got " + lexer.getTokenType();
-    lexer.advance();
     assert lexer.getTokenType() == null : "Expected final null, got " + lexer.getTokenType();
   }
 
