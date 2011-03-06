@@ -25,8 +25,9 @@ public interface Tokens
 
   // Comments
   IElementType COMMENT = new SchemeElementType("comment");
+  IElementType BLOCK_COMMENT = new SchemeElementType("block comment");
 
-  TokenSet COMMENTS = TokenSet.create(COMMENT);
+  TokenSet COMMENTS = TokenSet.create(COMMENT, BLOCK_COMMENT);
 
   // Literals
   IElementType STRING_LITERAL = new SchemeElementType("string literal");
@@ -39,8 +40,6 @@ public interface Tokens
   IElementType IDENTIFIER = new SchemeElementType("identifier");
 
   IElementType DOT = new SchemeElementType(".");
-
-  IElementType ARROW = new SchemeElementType("=>");
 
   IElementType SPECIAL = new SchemeElementType("special");
 

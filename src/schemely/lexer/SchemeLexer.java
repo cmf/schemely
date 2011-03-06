@@ -59,7 +59,6 @@ public class SchemeLexer extends LexerBase
              test(']', Tokens.RIGHT_SQUARE) ||
              test("#(", Tokens.OPEN_VECTOR) ||
              test("...", Tokens.IDENTIFIER) ||
-             test("=>", Tokens.ARROW) ||
              test("#\\newline", Tokens.CHAR_LITERAL) ||
              test("#\\space", Tokens.CHAR_LITERAL) ||
              test("#\\tab", Tokens.CHAR_LITERAL) ||
@@ -99,6 +98,10 @@ public class SchemeLexer extends LexerBase
     else if (next == ';')
     {
       readSingleLineComment();
+    }
+    else if (lookingAt("#|") && supportsLongComments())
+    {
+      readMultiLineComment();
     }
     else if (next == '"')
     {
@@ -279,6 +282,31 @@ public class SchemeLexer extends LexerBase
     type = Tokens.COMMENT;
   }
 
+  private void readMultiLineComment()
+  {
+    cursor += 2;
+    int depth = 1;
+
+    while (has(2) && (depth > 0))
+    {
+      if (lookingAt("#|"))
+      {
+        depth++;
+        cursor += 2;
+      }
+      else if (lookingAt("|#"))
+      {
+        depth--;
+        cursor += 2;
+      }
+      else
+      {
+        cursor++;
+      }
+    }
+    type = Tokens.BLOCK_COMMENT;
+  }
+
   private void readString()
   {
     cursor++;
@@ -298,6 +326,11 @@ public class SchemeLexer extends LexerBase
       cursor++;
     }
     type = Tokens.STRING_LITERAL;
+  }
+
+  protected boolean supportsLongComments()
+  {
+    return true;
   }
 
   private boolean lookingAt(String str)

@@ -37,6 +37,8 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
   @NonNls
   static final String COMMENT_ID = "Scheme Comment";
   @NonNls
+  static final String BLOCK_COMMENT_ID = "Scheme Block Comment";
+  @NonNls
   static final String IDENTIFIER_ID = "Identifier";
   @NonNls
   static final String NUMBER_ID = "Scheme Numbers";
@@ -69,6 +71,7 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
   static
   {
     createTextAttributesKey(COMMENT_ID, defaultFor(SyntaxHighlighterColors.LINE_COMMENT));
+    createTextAttributesKey(BLOCK_COMMENT_ID, defaultFor(SyntaxHighlighterColors.JAVA_BLOCK_COMMENT));
     createTextAttributesKey(IDENTIFIER_ID, defaultFor(SyntaxHighlighterColors.KEYWORD));
     createTextAttributesKey(NUMBER_ID, defaultFor(SyntaxHighlighterColors.NUMBER));
     createTextAttributesKey(STRING_ID, defaultFor(SyntaxHighlighterColors.STRING));
@@ -85,6 +88,7 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
   }
 
   public static TextAttributesKey LINE_COMMENT = createTextAttributesKey(COMMENT_ID);
+  public static TextAttributesKey BLOCK_COMMENT = createTextAttributesKey(BLOCK_COMMENT_ID);
   public static TextAttributesKey IDENTIFIER = createTextAttributesKey(IDENTIFIER_ID);
   public static TextAttributesKey NUMBER = createTextAttributesKey(NUMBER_ID);
   public static TextAttributesKey STRING = createTextAttributesKey(STRING_ID);
@@ -102,6 +106,7 @@ public class SchemeSyntaxHighlighter extends SyntaxHighlighterBase implements To
   static
   {
     fillMap(ATTRIBUTES, LINE_COMMENT, Tokens.COMMENT);
+    fillMap(ATTRIBUTES, BLOCK_COMMENT, Tokens.BLOCK_COMMENT);
     fillMap(ATTRIBUTES, NUMBER, NUMBER_LITERAL);
     fillMap(ATTRIBUTES, Tokens.STRINGS, STRING);
     fillMap(ATTRIBUTES, BRACE, Tokens.LEFT_SQUARE, Tokens.RIGHT_SQUARE, Tokens.LEFT_CURLY, Tokens.RIGHT_CURLY);

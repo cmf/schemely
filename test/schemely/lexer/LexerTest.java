@@ -35,6 +35,12 @@ public class LexerTest
                      testCase("; comment\r\n", COMMENT),
                      testCase("; comment\r", COMMENT),
 
+                     testCase("#||#", BLOCK_COMMENT),
+                     testCase("#| |#", BLOCK_COMMENT),
+                     testCase("#| \n |#", BLOCK_COMMENT),
+                     testCase("#| comment |#", BLOCK_COMMENT),
+                     testCase("#| #| comment |# |#", BLOCK_COMMENT),
+
                      testCase("\"string\"", STRING_LITERAL),
                      testCase("\"\"", STRING_LITERAL),
                      testCase("\"string", STRING_LITERAL),

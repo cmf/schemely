@@ -16,24 +16,24 @@ public class SchemeCommenter implements CodeDocumentationAwareCommenter, Tokens
 
   public String getBlockCommentPrefix()
   {
-    return null;
+    return "#|";
   }
 
   public String getBlockCommentSuffix()
   {
-    return null;
+    return "|#";
   }
 
   @Override
   public String getCommentedBlockCommentPrefix()
   {
-    return null;
+    return "#|";
   }
 
   @Override
   public String getCommentedBlockCommentSuffix()
   {
-    return null;
+    return "|#";
   }
 
   @Nullable
@@ -45,7 +45,7 @@ public class SchemeCommenter implements CodeDocumentationAwareCommenter, Tokens
   @Nullable
   public IElementType getBlockCommentTokenType()
   {
-    return null;
+    return BLOCK_COMMENT;
   }
 
   @Nullable

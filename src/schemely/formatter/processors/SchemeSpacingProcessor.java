@@ -33,7 +33,7 @@ public class SchemeSpacingProcessor implements AST
     {
       return NO_SPACING;
     }
-    else if (type1 == COMMENT)
+    else if ((type1 == COMMENT) || (type1 == BLOCK_COMMENT))
     {
       return NO_SPACING_WITH_NEWLINE;
     }
