@@ -4,10 +4,10 @@ import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.execution.process.ColoredProcessHandler;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import schemely.scheme.Scheme;
 import schemely.scheme.SchemeImplementation;
+import schemely.utils.Editors;
 
 public class SchemeConsoleProcessHandler extends ColoredProcessHandler
 {
@@ -27,7 +27,7 @@ public class SchemeConsoleProcessHandler extends ColoredProcessHandler
 //    TODO
 //    scheme.getProcessReplHandler().processOutput(languageConsole, StringUtil.convertLineSeparators(text), attributes);
     EditorEx historyViewer = languageConsole.getHistoryViewer();
-    SchemeConsoleExecuteActionHandler.scrollDown(historyViewer);
+    Editors.scrollDown(historyViewer);
   }
 
   public LanguageConsoleImpl getLanguageConsole()

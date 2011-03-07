@@ -3,7 +3,6 @@ package schemely.repl;
 import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.execution.process.ProcessHandler;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.CaretModel;
@@ -16,6 +15,7 @@ import com.intellij.psi.impl.source.codeStyle.HelperFactory;
 import com.intellij.psi.impl.source.codeStyle.IndentHelper;
 import schemely.file.SchemeFileType;
 import schemely.psi.util.SchemePsiUtil;
+import schemely.utils.Editors;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -92,7 +92,7 @@ public class SchemeConsoleExecuteActionHandler
     if ((SchemePsiUtil.isValidSchemeExpression(candidate, project)) || ("".equals(candidate)))
     {
       execute(console, consoleHistoryModel);
-      scrollDown(editor);
+      Editors.scrollDown(editor);
     }
     else
     {
@@ -115,17 +115,5 @@ public class SchemeConsoleExecuteActionHandler
     }
 
     processLine(text);
-  }
-
-  static void scrollDown(final Editor editor)
-  {
-    ApplicationManager.getApplication().invokeLater(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        editor.getCaretModel().moveToOffset(editor.getDocument().getTextLength());
-      }
-    });
   }
 }

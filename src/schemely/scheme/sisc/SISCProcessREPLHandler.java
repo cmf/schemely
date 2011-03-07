@@ -5,13 +5,13 @@ import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.NotNullFunction;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import schemely.scheme.common.REPLUtil;
+import schemely.utils.Editors;
 
 import java.io.File;
 import java.util.List;
@@ -51,6 +51,7 @@ public class SISCProcessREPLHandler // implements ProcessREPLHandler
   {
     ConsoleViewContentType outputType = ConsoleViewContentType.NORMAL_OUTPUT;
     LanguageConsoleImpl.printToConsole(console, processPrompts(text), outputType, null);
+    Editors.scrollDown(console.getHistoryViewer());
   }
 
   private static String processPrompts(String text)
