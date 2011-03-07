@@ -518,4 +518,9 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
     String headText = getHeadText();
     return DO.equals(headText);
   }
+
+  public boolean isTopLevelDefinition()
+  {
+    return isDefinition() || isSyntaxDefinition();
+  }
 }

@@ -16,7 +16,6 @@ import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.impl.source.PsiFileWithStubSupport;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.util.PathUtil;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import schemely.file.SchemeFileType;
 import schemely.psi.api.SchemePsiElement;
@@ -130,12 +129,18 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
     PsiElement next = getFirstChild();
     while (next != null)
     {
-      if (SchemeList.isDefinition(next))
+      if (next instanceof SchemeList)
       {
-        if (!next.processDeclarations(processor, state, lastParent, place))
+        SchemeList list = (SchemeList) next;
+
+        if (list.isTopLevelDefinition())
         {
-          return false;
+          if (!next.processDeclarations(processor, state, lastParent, place))
+          {
+            return false;
+          }
         }
+
       }
 
       next = next.getNextSibling();
@@ -184,7 +189,7 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
 
   private SchemeFile getR5RSFile(VirtualFile virtualFile)
   {
-    VirtualFile r5rsFile = virtualFile.findFileByRelativePath("sisc.scm");
+    VirtualFile r5rsFile = virtualFile.findFileByRelativePath("heap.scm");
     if (r5rsFile != null)
     {
       PsiFile file = PsiManager.getInstance(getProject()).findFile(r5rsFile);
@@ -227,11 +232,5 @@ public class SchemeFile extends PsiFileBase implements PsiFile, PsiFileWithStubS
   {
     // TODO CMF
     return null; //SchemePsiUtil.findFormByNameSet(this, SchemeParser.NS_TOKENS);
-  }
-
-  public PsiElement setClassName(@NonNls String s)
-  {
-    //todo implement me!
-    return null;
   }
 }

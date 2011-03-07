@@ -1,8 +1,8 @@
 package schemely.scheme;
 
 import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiNamedElement;
 import schemely.psi.impl.symbols.SchemeIdentifier;
 import schemely.repl.SchemeConsoleView;
 
@@ -25,5 +25,5 @@ public interface REPL
 
   AnAction[] getToolbarActions() throws REPLException;
 
-  Collection<PsiElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol);
+  Collection<PsiNamedElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol);
 }

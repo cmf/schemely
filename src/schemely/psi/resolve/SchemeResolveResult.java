@@ -1,18 +1,18 @@
 package schemely.psi.resolve;
 
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
 
 
 public class SchemeResolveResult implements com.intellij.psi.ResolveResult
 {
-  private final PsiElement element;
+  private final PsiNamedElement element;
 
-  public SchemeResolveResult(PsiElement element)
+  public SchemeResolveResult(PsiNamedElement element)
   {
     this.element = element;
   }
 
-  public PsiElement getElement()
+  public PsiNamedElement getElement()
   {
     return element;
   }

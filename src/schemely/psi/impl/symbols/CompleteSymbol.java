@@ -3,20 +3,22 @@ package schemely.psi.impl.symbols;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.ResolveState;
-import com.intellij.util.containers.HashSet;
 import schemely.psi.resolve.SchemeResolveResult;
 import schemely.psi.resolve.completion.CompletionProcessor;
+import schemely.repl.actions.NewSchemeConsoleAction;
+import schemely.scheme.REPL;
 
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class CompleteSymbol
 {
   public static Object[] getVariants(SchemeIdentifier symbol)
   {
-
     PsiElement lastParent = null;
     PsiElement current = symbol;
     CompletionProcessor processor = new CompletionProcessor();
@@ -36,14 +38,25 @@ public class CompleteSymbol
       return PsiNamedElement.EMPTY_ARRAY;
     }
 
-    Set<LookupElement> variants = new HashSet<LookupElement>();
+    Map<String, LookupElement> variants = new HashMap<String, LookupElement>();
 
     for (SchemeResolveResult candidate : candidates)
     {
-      variants.add(mapToLookupElement(candidate.getElement()));
+      PsiNamedElement element = candidate.getElement();
+      variants.put(element.getName(), mapToLookupElement(element));
     }
 
-    return variants.toArray(new Object[variants.size()]);
+    PsiFile file = symbol.getContainingFile();
+    REPL repl = file.getCopyableUserData(NewSchemeConsoleAction.REPL_KEY);
+    if (repl != null)
+    {
+      for (PsiNamedElement namedElement : repl.getSymbolVariants(symbol.getManager(), symbol))
+      {
+        variants.put(namedElement.getName(), mapToLookupElement(namedElement));
+      }
+    }
+
+    return variants.values().toArray(new Object[variants.size()]);
   }
 
   private static LookupElement mapToLookupElement(PsiElement element)

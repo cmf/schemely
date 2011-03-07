@@ -24,6 +24,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiNamedElement;
 import com.intellij.ui.content.Content;
 import schemely.psi.impl.symbols.SchemeIdentifier;
 import schemely.repl.SchemeConsole;
@@ -227,7 +228,7 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
   }
 
   @Override
-  public Collection<PsiElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol)
+  public Collection<PsiNamedElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol)
   {
     GetCompletions getCompletions = new GetCompletions(manager);
     try
@@ -373,7 +374,7 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
 
   private static class GetCompletions implements SchemeCaller
   {
-    private final Collection<PsiElement> completions = new ArrayList<PsiElement>();
+    private final Collection<PsiNamedElement> completions = new ArrayList<PsiNamedElement>();
     private final PsiManager psiManager;
 
     public GetCompletions(PsiManager psiManager)
@@ -386,17 +387,13 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
     {
       SymbolicEnvironment symbolicEnvironment = r.getContextEnv(Util.TOPLEVEL);
 
-      while (symbolicEnvironment != null)
-      {
-        SymbolicEnvironment syntaxEnvironment = symbolicEnvironment.getSidecarEnvironment(Util.EXPSC);
-        addCompletions(syntaxEnvironment);
+      SymbolicEnvironment syntaxEnvironment = symbolicEnvironment.getSidecarEnvironment(Util.EXPSC);
+      addCompletions(syntaxEnvironment);
 
-        SymbolicEnvironment topEnvironment = symbolicEnvironment.getSidecarEnvironment(Util.EXPTOP);
-        addCompletions(topEnvironment);
+      SymbolicEnvironment topEnvironment = symbolicEnvironment.getSidecarEnvironment(Util.EXPTOP);
+      addCompletions(topEnvironment);
 
-        addCompletions(symbolicEnvironment);
-        symbolicEnvironment = symbolicEnvironment.getParent();
-      }
+      addCompletions(symbolicEnvironment);
 
       return new SchemeVoid();
     }
@@ -506,7 +503,7 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
       return symbols;
     }
 
-    public Collection<PsiElement> getCompletions()
+    public Collection<PsiNamedElement> getCompletions()
     {
       return completions;
     }
