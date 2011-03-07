@@ -100,6 +100,12 @@ public class SISCLexer extends SchemeLexer
       }
       return true;
     }
+    else if (has(3) && lookingAt("->") && isIdentifierInitial(peek(2)))
+    {
+      cursor += 2;
+      readIdentifier();
+      return true;
+    }
 
     return test("#!eof", Tokens.SPECIAL) ||
            test("#!+inf", Tokens.SPECIAL) ||

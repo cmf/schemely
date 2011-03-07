@@ -375,7 +375,7 @@ public class SchemeLexer extends LexerBase
     return cursor < bufferEnd;
   }
 
-  private boolean has(int n)
+  protected boolean has(int n)
   {
     return (cursor + n) <= bufferEnd;
   }

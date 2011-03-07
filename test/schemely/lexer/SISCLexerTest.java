@@ -19,7 +19,8 @@ public class SISCLexerTest extends LexerTestBase
                               testCase("#0(", Tokens.OPEN_VECTOR),
                               testCase("#'", SISCTokens.SYNTAX_QUOTE),
                               testCase(".token", Tokens.IDENTIFIER),
-                              testCase("|token|", Tokens.IDENTIFIER));
+                              testCase("|token|", Tokens.IDENTIFIER),
+                              testCase("->int", Tokens.IDENTIFIER));
   }
 
   @Override
