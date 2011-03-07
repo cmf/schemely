@@ -10,8 +10,8 @@
   <id>schemely</id>
   <description>Plugin for Scheme language support</description>
   <category>Custom Languages</category>
-  <version>0.0.1</version>
-  <vendor logo="/schemely/icons/scheme_icon_16x16.png" url="https://github.com/cmf/schemely">Colin Fleming</vendor>
+  <version>0.0.2</version>
+  <vendor logo="/schemely/icons/lambda.png" url="https://github.com/cmf/schemely">Colin Fleming</vendor>
   <idea-version since-build="103.72"/>
 
   <extensions defaultExtensionNs="com.intellij">
@@ -116,7 +116,7 @@
 
       <action id="schemely.repl.actions.LoadSchemeFileInConsoleAction"
               class="schemely.repl.actions.LoadSchemeFileInConsoleAction"
-              text="Load file to REPL">
+              text="Load file in REPL">
         <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift L"/>
       </action>
 
