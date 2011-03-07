@@ -4,14 +4,18 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiPolyVariantReference;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveResult;
 import com.intellij.psi.impl.DebugUtil;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 import com.intellij.util.IncorrectOperationException;
 import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,21 +29,24 @@ public class ParserTestBase
   protected Module module;
   protected IdeaProjectTestFixture fixture;
 
-  @BeforeTest
   protected void setUp()
   {
-    fixture = createFixture();
+    if (fixture == null)
+    {
+      System.out.println("Running setUp for " + this.getClass().getSimpleName());
+      fixture = createFixture();
 
-    try
-    {
-      fixture.setUp();
+      try
+      {
+        fixture.setUp();
+      }
+      catch (Exception e)
+      {
+        throw new Error(e);
+      }
+      module = fixture.getModule();
+      project = module.getProject();
     }
-    catch (Exception e)
-    {
-      throw new Error(e);
-    }
-    module = fixture.getModule();
-    project = module.getProject();
   }
 
   protected IdeaProjectTestFixture createFixture()
@@ -72,6 +79,7 @@ public class ParserTestBase
 
   public PsiFile parse(String contents)
   {
+    assert project != null : "Project is null";
     PsiFile psiFile = createPseudoPhysicalFile(project, "test.scm", contents);
     System.out.println(contents);
     dump(psiFile);

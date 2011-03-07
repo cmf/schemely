@@ -127,7 +127,7 @@ public class SchemePsiUtil
     return true;
   }
 
-  private static boolean containsSyntaxErrors(PsiElement elem)
+  public static boolean containsSyntaxErrors(PsiElement elem)
   {
     if ((elem instanceof PsiErrorElement))
     {

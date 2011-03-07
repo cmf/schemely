@@ -25,13 +25,13 @@ public class SchemeParserDefinition implements ParserDefinition
   public Lexer createLexer(Project project)
   {
     Scheme scheme = getScheme(project);
-    return new SchemeLexer();
+    return scheme.getLexer();
   }
 
   public PsiParser createParser(Project project)
   {
     Scheme scheme = getScheme(project);
-    return new SchemeParser();
+    return scheme.getParser();
   }
 
   public IFileElementType getFileNodeType()

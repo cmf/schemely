@@ -4,7 +4,9 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.tree.IElementType;
 import schemely.parser.SchemePsiCreator;
+import schemely.scheme.sisc.parser.SISCAST;
 
 /**
  * @author Colin Fleming
@@ -21,6 +23,16 @@ public class SISCPsiCreator implements SchemePsiCreator
   @Override
   public PsiElement createElement(ASTNode node)
   {
+    IElementType elementType = node.getElementType();
+
+    if (elementType == SISCAST.PTR_DEF)
+    {
+      return new SISCPointerDef(node);
+    }
+    else if (elementType == SISCAST.PTR_REF)
+    {
+      return new SISCPointerRef(node);
+    }
     return original.createElement(node);
   }
 

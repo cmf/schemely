@@ -14,9 +14,9 @@ public class SchemeLexer extends LexerBase
   private CharSequence buffer;
   private int start;
   private int end;
-  private int cursor;
+  protected int cursor;
   private int bufferEnd;
-  private IElementType type;
+  protected IElementType type;
 
   @Override
   public void start(CharSequence buffer, int startOffset, int endOffset, int initialState)
@@ -51,6 +51,10 @@ public class SchemeLexer extends LexerBase
     {
       readWhitespace();
     }
+    else if (implementationSpecific())
+    {
+      // done
+    }
     else if (test('(', Tokens.LEFT_PAREN) ||
              test(')', Tokens.RIGHT_PAREN) ||
              test('{', Tokens.LEFT_CURLY) ||
@@ -61,15 +65,14 @@ public class SchemeLexer extends LexerBase
              test("...", Tokens.IDENTIFIER) ||
              test("#\\newline", Tokens.CHAR_LITERAL) ||
              test("#\\space", Tokens.CHAR_LITERAL) ||
-             test("#\\tab", Tokens.CHAR_LITERAL) ||
              test("#t", Tokens.BOOLEAN_LITERAL) ||
-             test("#f", Tokens.BOOLEAN_LITERAL) ||
-             test("#!eof", Tokens.SPECIAL) ||
+             test("#f", Tokens.BOOLEAN_LITERAL)
+             ||
+             // TODO probably Kawa-specific
+             test("#!null", Tokens.SPECIAL) ||
              test("#!optional", Tokens.SPECIAL) ||
              test("#!rest", Tokens.SPECIAL) ||
-             test("#!key", Tokens.SPECIAL) ||
-             test("#!void", Tokens.SPECIAL) ||
-             test("#!null", Tokens.SPECIAL))
+             test("#!key", Tokens.SPECIAL))
     {
       // done
     }
@@ -103,6 +106,7 @@ public class SchemeLexer extends LexerBase
     {
       readMultiLineComment();
     }
+    // TODO sexp comments
     else if (next == '"')
     {
       readString();
@@ -151,7 +155,7 @@ public class SchemeLexer extends LexerBase
     else if (next == '#')
     {
       // TODO whole lexer should be case insensitive
-      if (in(peek(1), "iexobd"))
+      if (in(peek(1), "iexobdIEXOBD"))
       {
         readNumber();
       }
@@ -190,7 +194,12 @@ public class SchemeLexer extends LexerBase
     assert end >= start;
   }
 
-  private boolean test(char ch, IElementType type)
+  protected boolean implementationSpecific()
+  {
+    return false;
+  }
+
+  protected boolean test(char ch, IElementType type)
   {
     if (peek() == ch)
     {
@@ -201,7 +210,7 @@ public class SchemeLexer extends LexerBase
     return false;
   }
 
-  private boolean test(String str, IElementType type)
+  protected boolean test(String str, IElementType type)
   {
     if (lookingAt(str))
     {
@@ -226,7 +235,7 @@ public class SchemeLexer extends LexerBase
     }
   }
 
-  private void readIdentifier()
+  protected void readIdentifier()
   {
     cursor++;
     while (isIdentifierSubsequent(peek()))
@@ -236,12 +245,12 @@ public class SchemeLexer extends LexerBase
     this.type = Tokens.IDENTIFIER;
   }
 
-  private boolean isIdentifierInitial(char ch)
+  protected boolean isIdentifierInitial(char ch)
   {
     return Character.isLetter(ch) || in(ch, "!$%&*/:<=>?~_^@");
   }
 
-  private boolean isIdentifierSubsequent(char ch)
+  protected boolean isIdentifierSubsequent(char ch)
   {
     return isIdentifierInitial(ch) || Character.isDigit(ch) || in(ch, ".+-");
   }
@@ -333,9 +342,9 @@ public class SchemeLexer extends LexerBase
     return true;
   }
 
-  private boolean lookingAt(String str)
+  protected boolean lookingAt(String str)
   {
-    return has(str.length()) && buffer.subSequence(cursor, cursor + str.length()).equals(str);
+    return has(str.length()) && buffer.subSequence(cursor, cursor + str.length()).toString().equalsIgnoreCase(str);
   }
 
   private boolean in(char ch, String options)
@@ -343,7 +352,7 @@ public class SchemeLexer extends LexerBase
     return options.indexOf(ch) >= 0;
   }
 
-  private char peek()
+  protected char peek()
   {
     if (more())
     {
@@ -352,7 +361,7 @@ public class SchemeLexer extends LexerBase
     return 0;
   }
 
-  private char peek(int offset)
+  protected char peek(int offset)
   {
     if (has(offset + 1))
     {
@@ -371,7 +380,7 @@ public class SchemeLexer extends LexerBase
     return (cursor + n) <= bufferEnd;
   }
 
-  private void bad()
+  protected void bad()
   {
     cursor++;
     this.type = Tokens.BAD_CHARACTER;

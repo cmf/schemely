@@ -21,21 +21,21 @@ public class SchemeNumber
   static
   {
     decimal("digit", "[0-9]");
-    decimal("radix", "(\\#d)?");
+    decimal("radix", "(\\#[dD])?");
 
-    hex("digit", "[0-9a-f]");
-    hex("radix", "\\#x");
+    hex("digit", "[0-9a-fA-F]");
+    hex("radix", "\\#[xX]");
 
     octal("digit", "[0-7]");
-    octal("radix", "\\#o");
+    octal("radix", "\\#[oO]");
 
     binary("digit", "[0-1]");
-    binary("radix", "\\#b");
+    binary("radix", "\\#[bB]");
 
-    all("exactness", "(\\#i|\\#e)?");
+    all("exactness", "(\\#[iI]|\\#[eE])?");
     all("sign", "[-+]?");
 
-    all("exponent", "(e|s|f|d|l)<sign><digit>+");
+    all("exponent", "(e|s|f|d|l|E|S|F|D|L)<sign><digit>+");
     all("suffix", "(<exponent>?)");
     all("prefix", "(<exactness><radix>)|(<radix><exactness>)");
     all("uinteger", "(<digit>+\\#*)");
@@ -52,7 +52,7 @@ public class SchemeNumber
 
     all("ureal", "(<uinteger>|(<uinteger>/<uinteger>)|<decimal>)");
     all("real", "(<sign><ureal>)");
-    all("imag", "(<ureal>i)");
+    all("imag", "(<ureal>[iI])");
     all("complex",
         "<real>|" + "(<real>\\@<real>)|" + "(<real>\\+<imag>)|" + "(<real>\\-<imag>)|" + "(\\+<imag>)|" + "(\\-<imag>)");
 

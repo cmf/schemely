@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 import schemely.SchemeBundle;
 import schemely.lexer.Tokens;
@@ -30,7 +31,7 @@ public class SchemeParser implements PsiParser, Tokens
     return builder.getTreeBuilt();
   }
 
-  private void parseDatum(PsiBuilder builder)
+  protected void parseDatum(PsiBuilder builder)
   {
     IElementType token = builder.getTokenType();
     if (LEFT_PAREN == token)
@@ -57,7 +58,7 @@ public class SchemeParser implements PsiParser, Tokens
     {
       parseSpecial(builder);
     }
-    else if (PREFIXES.contains(token))
+    else if (getPrefixes().contains(token))
     {
       parseAbbreviation(builder);
     }
@@ -214,5 +215,10 @@ public class SchemeParser implements PsiParser, Tokens
     PsiBuilder.Marker marker = markAndAdvance(builder);
     parseExpressions(RIGHT_PAREN, builder);
     marker.done(AST.VECTOR);
+  }
+
+  protected TokenSet getPrefixes()
+  {
+    return PREFIXES;
   }
 }

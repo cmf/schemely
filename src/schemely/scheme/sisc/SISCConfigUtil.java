@@ -22,6 +22,8 @@ public class SISCConfigUtil
   @NonNls
   public static final String SISC_LIB = getJarPathForResource(REPL.class, "sisc/libs/srfi.scc");
   @NonNls
+  public static final String SISC_SRC = getJarPathForResource(REPL.class, "sisc/boot/repl.scm");
+  @NonNls
   public static final String SISC_OPT = PathUtil.getJarPathForClass(Types.class);
 
   public static String getJarPathForResource(Class<?> aClass, String resourceName) {
