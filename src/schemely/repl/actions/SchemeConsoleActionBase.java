@@ -22,6 +22,7 @@ import schemely.psi.impl.SchemeFile;
 import schemely.repl.SchemeConsole;
 import schemely.repl.toolwindow.REPLToolWindowFactory;
 import schemely.scheme.REPL;
+import schemely.utils.Editors;
 
 public abstract class SchemeConsoleActionBase extends AnAction
 {
@@ -35,6 +36,7 @@ public abstract class SchemeConsoleActionBase extends AnAction
     SchemeConsole languageConsole = activeRepl.getConsoleView().getConsole();
     languageConsole.printToHistory(languageConsole.getPrompt(), ConsoleViewContentType.USER_INPUT.getAttributes());
     languageConsole.printToHistory(command + "\n", ConsoleViewContentType.NORMAL_OUTPUT.getAttributes());
+    Editors.scrollDown(languageConsole.getHistoryViewer());
 
     if (!StringUtil.isEmptyOrSpaces(command))
     {
