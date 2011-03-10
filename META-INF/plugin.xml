@@ -1,17 +1,11 @@
 <!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
-<idea-plugin>
-  <module-components>
-    <component>
-      <implementation-class>schemely.config.SchemeFacetListener</implementation-class>
-    </component>
-  </module-components>
-
+<idea-plugin url="https://github.com/cmf/schemely/" version="2">
   <name>Schemely</name>
   <id>schemely</id>
   <description>Plugin for Scheme language support</description>
   <category>Custom Languages</category>
   <version>0.0.2</version>
-  <vendor logo="/schemely/icons/lambda.png" url="https://github.com/cmf/schemely">Colin Fleming</vendor>
+  <vendor logo="/schemely/icons/lambda.png" url="https://github.com/cmf/">Colin Fleming</vendor>
   <idea-version since-build="103.72"/>
 
   <extensions defaultExtensionNs="com.intellij">
@@ -94,6 +88,12 @@
       <implementation-class>schemely.compiler.CompilerProjectComponent</implementation-class>
     </component>
   </project-components>
+
+  <module-components>
+    <component>
+      <implementation-class>schemely.config.SchemeFacetListener</implementation-class>
+    </component>
+  </module-components>
 
   <actions>
     <!-- Create file actions -->
