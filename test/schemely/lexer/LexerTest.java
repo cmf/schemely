@@ -33,9 +33,9 @@ public class LexerTest extends LexerTestBase
 
                               testCase(";", COMMENT),
                               testCase("; comment", COMMENT),
-                              testCase("; comment\n", COMMENT),
-                              testCase("; comment\r\n", COMMENT),
-                              testCase("; comment\r", COMMENT),
+                              testCase("; comment\n", COMMENT, WHITESPACE),
+                              testCase("; comment\r\n", COMMENT, WHITESPACE),
+                              testCase("; comment\r", COMMENT, WHITESPACE),
 
                               testCase("#||#", BLOCK_COMMENT),
                               testCase("#| |#", BLOCK_COMMENT),

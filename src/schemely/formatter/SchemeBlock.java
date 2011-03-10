@@ -66,7 +66,7 @@ public class SchemeBlock implements Block, AST
   {
     if (subBlocks == null)
     {
-      subBlocks = SchemeBlockGenerator.generateSubBlocks(node, wrap, settings, this);
+      subBlocks = SchemeBlockGenerator.generateSubBlocks(node, wrap, settings);
     }
     return subBlocks;
   }

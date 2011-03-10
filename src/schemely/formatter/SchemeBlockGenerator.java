@@ -12,7 +12,11 @@ import schemely.psi.impl.SchemeVector;
 import schemely.psi.impl.list.SchemeList;
 import schemely.psi.impl.symbols.SchemeIdentifier;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class SchemeBlockGenerator
@@ -61,7 +65,7 @@ public class SchemeBlockGenerator
     schemeFormIndent.put("dynamic-wind", 3);
   }
 
-  public static List<Block> generateSubBlocks(ASTNode node, Wrap wrap, CodeStyleSettings settings, SchemeBlock block)
+  public static List<Block> generateSubBlocks(ASTNode node, Wrap wrap, CodeStyleSettings settings)
   {
     PsiElement blockPsi = node.getPsi();
 
@@ -102,7 +106,7 @@ public class SchemeBlockGenerator
           Alignment align = null;
           Indent indent;
 
-          if (Tokens.BRACES.contains(childNode.getElementType()))
+          if (Tokens.OPEN_BRACES.contains(childNode.getElementType()))
           {
             indent = Indent.getNoneIndent();
           }
@@ -122,7 +126,10 @@ public class SchemeBlockGenerator
               align = bodyAlignment;
               indent = Indent.getNormalIndent(true);
             }
-            childIndex++;
+            if (!Tokens.COMMENTS.contains(childNode.getElementType()))
+            {
+              childIndex++;
+            }
           }
           subBlocks.add(new SchemeBlock(childNode, align, indent, wrap, settings));
         }

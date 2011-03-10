@@ -54,4 +54,5 @@ public interface Tokens
 
   TokenSet PREFIXES = TokenSet.create(QUOTE_MARK, BACKQUOTE, COMMA, COMMA_AT);
   TokenSet BRACES = TokenSet.create(LEFT_PAREN, LEFT_CURLY, LEFT_SQUARE, RIGHT_PAREN, RIGHT_CURLY, RIGHT_SQUARE);
+  TokenSet OPEN_BRACES = TokenSet.create(LEFT_PAREN, LEFT_CURLY, LEFT_SQUARE);
 }

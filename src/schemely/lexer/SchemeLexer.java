@@ -280,14 +280,6 @@ public class SchemeLexer extends LexerBase
       cursor++;
       next = peek();
     }
-    if ((next == '\r') || (next == '\n'))
-    {
-      cursor++;
-    }
-    if ((next == '\r') && (peek() == '\n'))
-    {
-      cursor++;
-    }
     type = Tokens.COMMENT;
   }
 
