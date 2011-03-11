@@ -41,6 +41,7 @@
     <fileTypeIndentOptionsProvider
       implementation="schemely.formatter.SchemeIndentOptionsProvider"/>
     <quoteHandler fileType="Scheme" className="schemely.editor.SchemeQuoteHandler"/>
+    <typedHandler implementation="schemely.editor.SchemeTypedHandler"/>
     <annotator language="Scheme" implementationClass="schemely.annotator.SchemeAnnotator"/>
 
     <gotoSymbolContributor implementation="schemely.gotoclass.SchemeGoToSymbolContributor"/>
