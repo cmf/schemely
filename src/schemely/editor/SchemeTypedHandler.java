@@ -36,15 +36,15 @@ public class SchemeTypedHandler extends TypedHandlerDelegate
     int lineStart = document.getLineStartOffset(line);
     int initLineEnd = document.getLineEndOffset(line);
 
-    // Check that the line is blank except for the new char
+    // Check that the line is blank up to the cursor except for the new char
     TextRange textRange = new TextRange(lineStart, startOffset);
     String lineText = document.getText(textRange);
     if (shouldApplyTo(c, lineText))
     {
       try
       {
+        // Commit the document in order to be able to reformat
         PsiDocumentManager.getInstance(project).commitDocument(document);
-        PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
 
         CodeStyleManager codeStyleManager = CodeStyleManager.getInstance(project);
         int newPos = codeStyleManager.adjustLineIndent(file, lineStart);
