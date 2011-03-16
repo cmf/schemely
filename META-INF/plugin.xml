@@ -82,9 +82,6 @@
     <component>
       <implementation-class>schemely.compiler.SchemeCompilerSettings</implementation-class>
     </component>
-    <!--<component>-->
-    <!--<implementation-class>schemely.repl.ReplToolWindow</implementation-class>-->
-    <!--</component>-->
     <component>
       <implementation-class>schemely.compiler.CompilerProjectComponent</implementation-class>
     </component>

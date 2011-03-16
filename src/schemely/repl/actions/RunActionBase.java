@@ -9,7 +9,9 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -37,6 +39,22 @@ public abstract class RunActionBase extends AnAction
     languageConsole.printToHistory(languageConsole.getPrompt(), ConsoleViewContentType.USER_INPUT.getAttributes());
     languageConsole.printToHistory(command + "\n", ConsoleViewContentType.NORMAL_OUTPUT.getAttributes());
     Editors.scrollDown(languageConsole.getHistoryViewer());
+
+    if (!StringUtil.isEmptyOrSpaces(command))
+    {
+      languageConsole.getHistoryModel().addToHistory(command);
+    }
+
+    activeRepl.execute(command);
+  }
+
+  protected static void executeTextRange(Editor editor, TextRange textRange)
+  {
+    REPL activeRepl = findActiveRepl(editor.getProject());
+    LOG.assertTrue(activeRepl != null);
+
+    SchemeConsole languageConsole = activeRepl.getConsoleView().getConsole();
+    String command = languageConsole.addTextRangeToHistory((EditorEx) editor, textRange);
 
     if (!StringUtil.isEmptyOrSpaces(command))
     {

@@ -5,7 +5,11 @@ import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.TextRange;
+import schemely.SchemeBundle;
 import schemely.SchemeIcons;
+import schemely.psi.util.SchemePsiElementFactory;
 
 public class RunSelectedTextAction extends RunActionBase
 {
@@ -30,17 +34,15 @@ public class RunSelectedTextAction extends RunActionBase
     String text = selectedText.trim();
     Project project = editor.getProject();
 
-//    TODO
-//    String msg = SchemePsiElementFactory.getInstance(project).getErrorMessage(text);
-//    if (msg != null)
-//    {
-//      Messages.showErrorDialog(project,
-//                               SchemeBundle.message("evaluate.incorrect.form", new Object[]{msg}),
-//                               SchemeBundle.message("evaluate.incorrect.cannot.evaluate", new Object[0]));
-//
-//      return;
-//    }
+    if (SchemePsiElementFactory.getInstance(project).hasSyntacticalErrors(text))
+    {
+      Messages.showErrorDialog(project,
+                               SchemeBundle.message("evaluate.incorrect.form"),
+                               SchemeBundle.message("evaluate.incorrect.cannot.evaluate", new Object[0]));
 
-    executeCommand(project, text);
+      return;
+    }
+
+    executeTextRange(editor, new TextRange(selectionModel.getSelectionStart(), selectionModel.getSelectionEnd()));
   }
 }

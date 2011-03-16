@@ -38,8 +38,7 @@ public final class RunTopSExprAction extends RunActionBase
       return;
     }
 
-    String text = sexp.getText();
-    if (SchemePsiElementFactory.getInstance(project).hasSyntacticalErrors(text))
+    if (SchemePsiElementFactory.getInstance(project).hasSyntacticalErrors(sexp))
     {
       Messages.showErrorDialog(project,
                                SchemeBundle.message("evaluate.incorrect.sexp"),
@@ -48,6 +47,6 @@ public final class RunTopSExprAction extends RunActionBase
       return;
     }
 
-    executeCommand(project, text);
+    executeTextRange(editor, sexp.getTextRange());
   }
 }

@@ -41,10 +41,11 @@ public class SchemePsiElementFactoryImpl extends SchemePsiElementFactory
   {
     SchemeFile schemeFile = (SchemeFile) PsiFileFactory.getInstance(getProject())
       .createFileFromText(DUMMY + SchemeFileType.SCHEME_FILE_TYPE.getDefaultExtension(), text);
-    return hasErrorElement(schemeFile);
+    return hasSyntacticalErrors(schemeFile);
   }
 
-  private static boolean hasErrorElement(PsiElement element)
+  @Override
+  public boolean hasSyntacticalErrors(@NotNull PsiElement element)
   {
     if ((element instanceof PsiErrorElement))
     {
@@ -52,7 +53,7 @@ public class SchemePsiElementFactoryImpl extends SchemePsiElementFactory
     }
     for (PsiElement child : element.getChildren())
     {
-      if (hasErrorElement(child))
+      if (hasSyntacticalErrors(child))
       {
         return true;
       }
