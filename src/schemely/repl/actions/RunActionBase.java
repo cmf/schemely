@@ -24,9 +24,9 @@ import schemely.repl.toolwindow.REPLToolWindowFactory;
 import schemely.scheme.REPL;
 import schemely.utils.Editors;
 
-public abstract class SchemeConsoleActionBase extends AnAction
+public abstract class RunActionBase extends AnAction
 {
-  private static final Logger LOG = Logger.getInstance(SchemeConsoleActionBase.class.getName());
+  private static final Logger LOG = Logger.getInstance(RunActionBase.class.getName());
 
   protected static void executeCommand(Project project, String command)
   {
@@ -111,7 +111,7 @@ public abstract class SchemeConsoleActionBase extends AnAction
 
     if (content != null)
     {
-      return content.getUserData(NewSchemeConsoleAction.REPL_KEY);
+      return content.getUserData(REPL.REPL_KEY);
     }
 
     return null;

@@ -1,37 +1,28 @@
 package schemely.scheme.sisc;
 
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.IdeActions;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.codeInsight.completion.CompletionInitializationContext;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ExportableOrderEntry;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiNamedElement;
-import com.intellij.ui.content.Content;
 import schemely.psi.impl.symbols.SchemeIdentifier;
-import schemely.repl.SchemeConsole;
+import schemely.repl.REPLProviderBase;
 import schemely.repl.SchemeConsoleElement;
 import schemely.repl.SchemeConsoleView;
-import schemely.repl.actions.NewSchemeConsoleAction;
 import schemely.scheme.REPLException;
+import schemely.scheme.common.REPLBase;
 import schemely.scheme.common.ReaderThread;
 import sisc.REPL;
 import sisc.data.Procedure;
@@ -49,8 +40,6 @@ import sisc.interpreter.SchemeCaller;
 import sisc.interpreter.SchemeException;
 import sisc.util.Util;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -81,15 +70,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author Colin Fleming
  */
-public class SISCInProcessREPL implements schemely.scheme.REPL
+public class SISCInProcessREPL extends REPLBase
 {
   private enum State
   {
     INITIAL, RUNNING, STOPPED
   }
 
-  private final Project project;
-  private final SchemeConsoleView consoleView;
   private volatile State state = State.INITIAL;
   private final AtomicBoolean terminated = new AtomicBoolean(false);
   private final CountDownLatch replFinished = new CountDownLatch(1);
@@ -101,8 +88,7 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
 
   public SISCInProcessREPL(Project project, SchemeConsoleView consoleView)
   {
-    this.project = project;
-    this.consoleView = consoleView;
+    super(consoleView, project);
   }
 
   @Override
@@ -164,7 +150,7 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
         @Override
         protected void textAvailable(String text)
         {
-          SISCProcessREPLHandler.processOutput(consoleView.getConsole(), text);
+          SISCREPLUtil.processOutput(consoleView.getConsole(), text);
         }
       });
     }
@@ -213,18 +199,6 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
   public boolean isActive()
   {
     return state == State.RUNNING;
-  }
-
-  @Override
-  public SchemeConsoleView getConsoleView()
-  {
-    return consoleView;
-  }
-
-  @Override
-  public AnAction[] getToolbarActions()
-  {
-    return new AnAction[]{new StopAction(), new CloseAction()};
   }
 
   @Override
@@ -351,27 +325,6 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
 
   }
 
-  private void hideEditor()
-  {
-    ApplicationManager.getApplication().invokeLater(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        SchemeConsole console = consoleView.getConsole();
-        JComponent component = consoleView.getComponent();
-        Container parent = component.getParent();
-        if (parent instanceof JPanel)
-        {
-          EditorEx historyViewer = console.getHistoryViewer();
-          parent.add(historyViewer.getComponent());
-          parent.remove(component);
-          ((JPanel) parent).updateUI();
-        }
-      }
-    });
-  }
-
   private static class GetCompletions implements SchemeCaller
   {
     private final Collection<PsiNamedElement> completions = new ArrayList<PsiNamedElement>();
@@ -409,7 +362,7 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
           if (object instanceof Symbol)
           {
             String name = object.toString();
-            if (!hasCompletion(name))
+            if (!hasCompletion(name) && !name.endsWith(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED))
             {
               completions.add(new SchemeConsoleElement(psiManager, name));
             }
@@ -509,54 +462,27 @@ public class SISCInProcessREPL implements schemely.scheme.REPL
     }
   }
 
-  private class StopAction extends DumbAwareAction
+  static class Provider extends REPLProviderBase
   {
-    private StopAction()
+    @Override
+    public boolean isSupported()
     {
-      copyShortcutFrom(ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM));
-      Presentation templatePresentation = getTemplatePresentation();
-      templatePresentation.setIcon(IconLoader.getIcon("/actions/suspend.png"));
-      templatePresentation.setText("Stop REPL");
-      templatePresentation.setDescription(null);
+      return true;
     }
 
     @Override
-    public void update(AnActionEvent e)
+    public schemely.scheme.REPL newREPL(Project project,
+                                        Module module,
+                                        SchemeConsoleView consoleView,
+                                        String workingDir)
     {
-      e.getPresentation().setEnabled(isActive());
+      return new SISCInProcessREPL(project, consoleView);
     }
 
     @Override
-    public void actionPerformed(AnActionEvent e)
+    protected String getTabName()
     {
-      stop();
-    }
-  }
-
-  private class CloseAction extends DumbAwareAction
-  {
-    private CloseAction()
-    {
-      copyShortcutFrom(ActionManager.getInstance().getAction(IdeActions.ACTION_CLOSE));
-      Presentation templatePresentation = getTemplatePresentation();
-      templatePresentation.setIcon(IconLoader.getIcon("/actions/cancel.png"));
-      templatePresentation.setText("Close REPL tab");
-      templatePresentation.setDescription(null);
-    }
-
-    @Override
-    public void actionPerformed(AnActionEvent e)
-    {
-      if (isActive())
-      {
-        stop();
-      }
-
-      Content content = consoleView.getConsole().getConsoleEditor().getUserData(NewSchemeConsoleAction.CONTENT_KEY);
-      if (content != null)
-      {
-        content.getManager().removeContent(content, true);
-      }
+      return "Local";
     }
   }
 }

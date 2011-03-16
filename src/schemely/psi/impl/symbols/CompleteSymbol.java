@@ -8,7 +8,6 @@ import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.ResolveState;
 import schemely.psi.resolve.SchemeResolveResult;
 import schemely.psi.resolve.completion.CompletionProcessor;
-import schemely.repl.actions.NewSchemeConsoleAction;
 import schemely.scheme.REPL;
 
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class CompleteSymbol
     }
 
     PsiFile file = symbol.getContainingFile();
-    REPL repl = file.getCopyableUserData(NewSchemeConsoleAction.REPL_KEY);
+    REPL repl = file.getCopyableUserData(REPL.REPL_KEY);
     if (repl != null)
     {
       for (PsiNamedElement namedElement : repl.getSymbolVariants(symbol.getManager(), symbol))

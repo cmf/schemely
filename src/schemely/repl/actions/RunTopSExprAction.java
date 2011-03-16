@@ -11,7 +11,7 @@ import schemely.SchemeIcons;
 import schemely.psi.util.SchemePsiElementFactory;
 import schemely.psi.util.SchemePsiUtil;
 
-public final class RunTopSExprAction extends SchemeConsoleActionBase
+public final class RunTopSExprAction extends RunActionBase
 {
   public RunTopSExprAction()
   {

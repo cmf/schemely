@@ -2,13 +2,12 @@ package schemely.scheme.kawa;
 
 import com.intellij.lang.PsiParser;
 import com.intellij.lexer.Lexer;
-import com.intellij.openapi.project.Project;
 import schemely.lexer.SchemeLexer;
 import schemely.parser.DefaultPsiCreator;
 import schemely.parser.SchemeParser;
 import schemely.parser.SchemePsiCreator;
-import schemely.repl.SchemeConsoleView;
-import schemely.scheme.REPL;
+import schemely.repl.REPLProvider;
+import schemely.repl.UnsupportedREPLProvider;
 import schemely.scheme.Scheme;
 
 /**
@@ -16,6 +15,9 @@ import schemely.scheme.Scheme;
  */
 public class KawaScheme implements Scheme
 {
+  private static final UnsupportedREPLProvider IN_PROCESS_PROVIDER = new UnsupportedREPLProvider();
+  private static final UnsupportedREPLProvider EXTERNAL_PROVIDER = new UnsupportedREPLProvider();
+
   @Override
   public Lexer getLexer()
   {
@@ -41,14 +43,14 @@ public class KawaScheme implements Scheme
   }
 
   @Override
-  public boolean supportsInProcessREPL()
+  public REPLProvider getInProcessREPLProvider()
   {
-    return false;
+    return IN_PROCESS_PROVIDER;
   }
 
   @Override
-  public REPL getNewInProcessREPL(Project project, SchemeConsoleView consoleView)
+  public REPLProvider getExternalREPLProvider()
   {
-    throw new UnsupportedOperationException("Kawa does not support in-process REPL");
+    return EXTERNAL_PROVIDER;
   }
 }

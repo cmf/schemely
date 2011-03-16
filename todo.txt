@@ -8,8 +8,6 @@
 
 * Better AST?
 
-* Switch to Java resolution
-
 * Macro resolution
 
 * Customisable indentation - how to create scheme editor in code style panel?
@@ -18,12 +16,11 @@
 
 * Compiler - check for SDK, use built in if not, warn
 
-* Fix Facet
+* Remove Facet
 
 * Runner creation
 
 * Scheme Implementation
-- Lexer, Parser, PSIBuilder
 - Symbol resolution (identifier, file)
 - Completion symbols
 - Compiler (SchemeBackendCompiler)
@@ -34,6 +31,8 @@
 
 * Internationalise
 
-* Fix quoting of lists
+* Fix highlighting w/quoting of lists
 
-* Block comments
+* REPL
+- prefix output
+- investigate

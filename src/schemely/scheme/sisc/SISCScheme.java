@@ -2,11 +2,9 @@ package schemely.scheme.sisc;
 
 import com.intellij.lang.PsiParser;
 import com.intellij.lexer.Lexer;
-import com.intellij.openapi.project.Project;
 import schemely.parser.DefaultPsiCreator;
 import schemely.parser.SchemePsiCreator;
-import schemely.repl.SchemeConsoleView;
-import schemely.scheme.REPL;
+import schemely.repl.REPLProvider;
 import schemely.scheme.Scheme;
 import schemely.scheme.sisc.lexer.SISCLexer;
 import schemely.scheme.sisc.parser.SISCParser;
@@ -17,6 +15,9 @@ import schemely.scheme.sisc.psi.SISCPsiCreator;
  */
 public class SISCScheme implements Scheme
 {
+  private static final SISCInProcessREPL.Provider IN_PROCESS_PROVIDER = new SISCInProcessREPL.Provider();
+  private static final SISCProcessREPL.Provider EXTERNAL_PROVIDER = new SISCProcessREPL.Provider();
+
   @Override
   public Lexer getLexer()
   {
@@ -42,14 +43,14 @@ public class SISCScheme implements Scheme
   }
 
   @Override
-  public boolean supportsInProcessREPL()
+  public REPLProvider getInProcessREPLProvider()
   {
-    return true;
+    return IN_PROCESS_PROVIDER;
   }
 
   @Override
-  public REPL getNewInProcessREPL(Project project, SchemeConsoleView consoleView)
+  public REPLProvider getExternalREPLProvider()
   {
-    return new SISCInProcessREPL(project, consoleView);
+    return EXTERNAL_PROVIDER;
   }
 }

@@ -1,5 +1,6 @@
 package schemely.psi.resolve;
 
+import com.intellij.codeInsight.completion.CompletionInitializationContext;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.ResolveState;
@@ -38,7 +39,9 @@ public abstract class ResolveUtil
     }
     NameHint nameHint = processor.getHint(NameHint.KEY);
     String name = nameHint == null ? null : nameHint.getName(ResolveState.initial());
-    if (name == null || name.equals(namedElement.getName()))
+    String elementName = namedElement.getName();
+    if ((name == null || name.equals(elementName)) &&
+        !elementName.endsWith(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED))
     {
       return processor.execute(namedElement, ResolveState.initial());
     }

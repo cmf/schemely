@@ -143,11 +143,35 @@
 
     </group>
 
-    <action id="schemely.actions.RunSchemeConsoleAction"
-            class="schemely.repl.actions.NewSchemeConsoleAction" text="Start Scheme Console"
+    <action id="schemely.repl.toolwindow.actions.NewInProcessConsoleAction"
+            class="schemely.repl.toolwindow.actions.NewInProcessConsoleAction" text="Start In-Process Scheme Console"
             description="Runs Scheme REPL">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
       <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F10"/>
+    </action>
+
+    <action id="schemely.repl.toolwindow.actions.NewExternalConsoleAction"
+            class="schemely.repl.toolwindow.actions.NewExternalConsoleAction" text="Start External Scheme Console"
+            description="Runs Scheme REPL">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+
+    <action id="Scheme.REPL.Execute.Immediately"
+            class="com.intellij.openapi.actionSystem.EmptyAction"
+            text="Execute Current Statement">
+      <keyboard-shortcut keymap="$default" first-keystroke="shift ENTER"/>
+    </action>
+
+    <action id="Scheme.REPL.History.Previous"
+            class="com.intellij.openapi.actionSystem.EmptyAction"
+            text="Select Previous History Item">
+      <keyboard-shortcut keymap="$default" first-keystroke="shift UP"/>
+    </action>
+
+    <action id="Scheme.REPL.History.Next"
+            class="com.intellij.openapi.actionSystem.EmptyAction"
+            text="Select Next History Item">
+      <keyboard-shortcut keymap="$default" first-keystroke="shift DOWN"/>
     </action>
 
   </actions>

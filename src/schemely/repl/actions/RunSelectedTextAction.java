@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.Project;
 import schemely.SchemeIcons;
 
-public class RunSelectedTextAction extends SchemeConsoleActionBase
+public class RunSelectedTextAction extends RunActionBase
 {
   public RunSelectedTextAction()
   {

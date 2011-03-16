@@ -12,7 +12,7 @@ import com.intellij.psi.PsiFile;
 import schemely.SchemeIcons;
 import schemely.psi.impl.SchemeFile;
 
-public class LoadSchemeFileInConsoleAction extends SchemeConsoleActionBase
+public class LoadSchemeFileInConsoleAction extends RunActionBase
 {
   public LoadSchemeFileInConsoleAction()
   {

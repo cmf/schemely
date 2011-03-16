@@ -2,9 +2,8 @@ package schemely.scheme;
 
 import com.intellij.lang.PsiParser;
 import com.intellij.lexer.Lexer;
-import com.intellij.openapi.project.Project;
 import schemely.parser.SchemePsiCreator;
-import schemely.repl.SchemeConsoleView;
+import schemely.repl.REPLProvider;
 
 /**
  * @author Colin Fleming
@@ -20,7 +19,7 @@ public interface Scheme
 
   boolean supportsSquareBracesForLists();
 
-  boolean supportsInProcessREPL();
+  REPLProvider getInProcessREPLProvider();
 
-  REPL getNewInProcessREPL(Project project, SchemeConsoleView consoleView);
+  REPLProvider getExternalREPLProvider();
 }
