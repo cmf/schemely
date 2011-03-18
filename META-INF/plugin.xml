@@ -160,19 +160,19 @@
     <action id="Scheme.REPL.Execute.Immediately"
             class="com.intellij.openapi.actionSystem.EmptyAction"
             text="Execute Current Statement">
-      <keyboard-shortcut keymap="$default" first-keystroke="shift ENTER"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="control ENTER"/>
     </action>
 
     <action id="Scheme.REPL.History.Previous"
             class="com.intellij.openapi.actionSystem.EmptyAction"
             text="Select Previous History Item">
-      <keyboard-shortcut keymap="$default" first-keystroke="shift UP"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="control UP"/>
     </action>
 
     <action id="Scheme.REPL.History.Next"
             class="com.intellij.openapi.actionSystem.EmptyAction"
             text="Select Next History Item">
-      <keyboard-shortcut keymap="$default" first-keystroke="shift DOWN"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="control DOWN"/>
     </action>
 
   </actions>
