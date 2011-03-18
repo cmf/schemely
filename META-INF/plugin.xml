@@ -55,6 +55,10 @@
       implementation="schemely.editor.selection.SchemeListSelectioner"/>
     <extendWordSelectionHandler
       implementation="schemely.editor.selection.SchemeLiteralSelectioner"/>
+    <extendWordSelectionHandler
+      implementation="schemely.editor.selection.SchemeIdentifierSelectioner"/>
+    <basicWordSelectionFilter
+      implementation="schemely.editor.selection.SchemeIdentifierSelectioner$BasicWordRestriction"/>
 
     <frameworkSupport implementation="schemely.config.SchemeFacetSupportProvider"/>
     <applicationService serviceInterface="schemely.settings.SchemeProjectSettings"

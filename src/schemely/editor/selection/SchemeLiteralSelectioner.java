@@ -1,14 +1,16 @@
 package schemely.editor.selection;
 
+import com.intellij.codeInsight.editorActions.ExtendWordSelectionHandler;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import schemely.psi.util.SchemePsiUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
-public class SchemeLiteralSelectioner extends SchemeBasicSelectioner
+public class SchemeLiteralSelectioner implements ExtendWordSelectionHandler
 {
   public boolean canSelect(PsiElement e)
   {
@@ -18,7 +20,7 @@ public class SchemeLiteralSelectioner extends SchemeBasicSelectioner
 
   public List<TextRange> select(PsiElement e, CharSequence editorText, int cursorOffset, Editor editor)
   {
-    List<TextRange> result = super.select(e, editorText, cursorOffset, editor);
+    List<TextRange> result = new ArrayList<TextRange>();
 
     TextRange range = e.getTextRange();
     if (range.getLength() <= 2)
