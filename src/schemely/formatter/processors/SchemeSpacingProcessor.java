@@ -26,6 +26,11 @@ public class SchemeSpacingProcessor implements AST
     ASTNode node1 = block1.getNode();
     ASTNode node2 = block2.getNode();
 
+    return getSpacingForAST(node1, node2);
+  }
+
+  public static Spacing getSpacingForAST(ASTNode node1, ASTNode node2)
+  {
     IElementType type1 = node1.getElementType();
     IElementType type2 = node2.getElementType();
 

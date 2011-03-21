@@ -23,7 +23,6 @@ import schemely.repl.SchemeConsoleElement;
 import schemely.repl.SchemeConsoleView;
 import schemely.scheme.REPLException;
 import schemely.scheme.common.REPLBase;
-import schemely.scheme.common.ReaderThread;
 import sisc.REPL;
 import sisc.data.Procedure;
 import sisc.data.SchemeThread;
@@ -41,16 +40,17 @@ import sisc.interpreter.SchemeException;
 import sisc.util.Util;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,9 +61,11 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -72,6 +74,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SISCInProcessREPL extends REPLBase
 {
+  private SISCOutputProcessor outputProcessor;
+
   private enum State
   {
     INITIAL, RUNNING, STOPPED
@@ -80,8 +84,8 @@ public class SISCInProcessREPL extends REPLBase
   private volatile State state = State.INITIAL;
   private final AtomicBoolean terminated = new AtomicBoolean(false);
   private final CountDownLatch replFinished = new CountDownLatch(1);
-  private Writer toREPL;
-  private Reader fromREPL;
+  private ToReplInputStream toREPL;
+  private FromREPLOutputStream fromREPL;
   private AppContext appContext;
 
   ExecutorService executor = Executors.newCachedThreadPool();
@@ -126,33 +130,23 @@ public class SISCInProcessREPL extends REPLBase
         throw new REPLException("Error opening heap", e);
       }
 
-      PipedInputStream replInputStream = new PipedInputStream();
-      PipedOutputStream replOutputStream = new PipedOutputStream();
+      outputProcessor = new SISCOutputProcessor(consoleView.getConsole());
 
       Charset charset = EncodingManager.getInstance().getDefaultCharset();
-      try
-      {
-        toREPL = new OutputStreamWriter(new PipedOutputStream(replInputStream), charset);
-        fromREPL = new InputStreamReader(new PipedInputStream(replOutputStream), charset);
-      }
-      catch (IOException e)
-      {
-        throw new REPLException("Error opening pipe", e);
-      }
-
-      DynamicEnvironment dynamicEnvironment = new DynamicEnvironment(appContext, replInputStream, replOutputStream);
-      LocalREPLThread replThread = new LocalREPLThread(dynamicEnvironment, REPL.getCliProc(appContext));
-      REPL repl = new REPL(replThread);
-      repl.go();
-
-      executor.execute(new ReaderThread(fromREPL, terminated)
+      toREPL = new ToReplInputStream(charset);
+      fromREPL = new FromREPLOutputStream(charset)
       {
         @Override
         protected void textAvailable(String text)
         {
-          SISCREPLUtil.processOutput(consoleView.getConsole(), text);
+          outputProcessor.processOutput(text);
         }
-      });
+      };
+
+      DynamicEnvironment dynamicEnvironment = new DynamicEnvironment(appContext, toREPL, fromREPL);
+      LocalREPLThread replThread = new LocalREPLThread(dynamicEnvironment, REPL.getCliProc(appContext));
+      REPL repl = new REPL(replThread);
+      repl.go();
     }
     finally
     {
@@ -172,6 +166,7 @@ public class SISCInProcessREPL extends REPLBase
     try
     {
       replFinished.await();
+      outputProcessor.flush();
     }
     catch (InterruptedException ignored)
     {
@@ -185,14 +180,7 @@ public class SISCInProcessREPL extends REPLBase
   {
     verifyState(State.RUNNING);
 
-    try
-    {
-      toREPL.write(command + "\n");
-      toREPL.flush();
-    }
-    catch (IOException ignored)
-    {
-    }
+    toREPL.enqueue(command + "\n");
   }
 
   @Override
@@ -484,5 +472,178 @@ public class SISCInProcessREPL extends REPLBase
     {
       return "Local";
     }
+  }
+
+  static class ToReplInputStream extends InputStream
+  {
+    private final BlockingQueue<byte[]> queue = new LinkedBlockingQueue<byte[]>();
+    private final Charset charset;
+    private int cursor = 0;
+    private byte[] current = null;
+
+    public ToReplInputStream(Charset charset)
+    {
+      this.charset = charset;
+    }
+
+    public void enqueue(String data)
+    {
+      try
+      {
+        queue.put(data.getBytes(charset));
+      }
+      catch (InterruptedException e)
+      {
+        Thread.currentThread().interrupt();
+      }
+    }
+
+    @Override
+    public synchronized int read() throws IOException
+    {
+      ensureCurrent();
+
+      int ret = current[cursor];
+      incrementBy(1);
+
+      return ret;
+    }
+
+    @Override
+    public int read(byte[] b) throws IOException
+    {
+      return read(b, 0, b.length);
+    }
+
+    @Override
+    public synchronized int read(byte[] b, int off, int len) throws IOException
+    {
+      ensureCurrent();
+
+      int length = Math.min(current.length - cursor, len);
+      System.arraycopy(current, cursor, b, off, length);
+      incrementBy(length);
+
+      return length;
+    }
+
+    private void incrementBy(int count)
+    {
+      cursor += count;
+      if (cursor >= current.length)
+      {
+        current = null;
+      }
+    }
+
+    private void ensureCurrent() throws IOException
+    {
+      if (current == null)
+      {
+        try
+        {
+          current = queue.take();
+          cursor = 0;
+        }
+        catch (InterruptedException e)
+        {
+          Thread.currentThread().interrupt();
+          throw new IOException(e);
+        }
+      }
+    }
+  }
+
+  static abstract class FromREPLOutputStream extends OutputStream
+  {
+    private final CharsetDecoder decoder;
+    private final ByteBuffer input = ByteBuffer.allocate(8192);
+    private final CharBuffer output = CharBuffer.allocate(8192);
+    private final StringBuilder buffer = new StringBuilder();
+    private boolean skipLF = false;
+
+    public FromREPLOutputStream(Charset charset)
+    {
+      this.decoder = charset.newDecoder();
+    }
+
+    // TODO more efficient forms
+    @Override
+    public synchronized void write(int b) throws IOException
+    {
+      input.put((byte) b);
+      decodeAndProcess();
+    }
+
+    @Override
+    public void write(byte[] b) throws IOException
+    {
+      write(b, 0, b.length);
+    }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException
+    {
+      int cursor = off;
+      while (cursor < (off + len))
+      {
+        int toCopy = Math.min(input.remaining(), len - (cursor - off));
+        if (toCopy == 0)
+        {
+          throw new IOException("Can't write - buffer overflow");
+        }
+        input.put(b, cursor, toCopy);
+        decodeAndProcess();
+        cursor += toCopy;
+      }
+    }
+
+    @Override
+    public synchronized void flush() throws IOException
+    {
+      decodeAndProcess();
+      if (buffer.length() > 0)
+      {
+        textAvailable(buffer.toString());
+        buffer.setLength(0);
+      }
+    }
+
+    private void decodeAndProcess() throws CharacterCodingException
+    {
+      input.flip();
+      CoderResult result = decoder.decode(input, output, true);
+      if (result.isError())
+      {
+        result.throwException();
+      }
+      output.flip();
+      while (output.hasRemaining())
+      {
+        char ch = output.get();
+        if (skipLF && ch != '\n')
+        {
+          buffer.append('\r');
+        }
+        if (ch == '\r')
+        {
+          skipLF = true;
+        }
+        else
+        {
+          skipLF = false;
+          buffer.append(ch);
+        }
+        if (ch == '\n')
+        {
+          textAvailable(buffer.toString());
+          buffer.setLength(0);
+        }
+      }
+      input.compact();
+      output.compact();
+    }
+
+    protected abstract void textAvailable(String text);
   }
 }

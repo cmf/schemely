@@ -31,9 +31,8 @@ import schemely.utils.Editors;
 public class SchemeConsole extends LanguageConsoleImpl
 {
   private final ConsoleHistoryModel historyModel;
-  private final String inputPrompt = ">  ";
-  private final String outputPrompt = "=> ";
-  private final String continuationPrompt = "   ";
+  private final String inputPrompt = "> ";
+  private final String continuationPrompt = "  ";
 
   public SchemeConsole(Project project, String title, ConsoleHistoryModel historyModel)
   {

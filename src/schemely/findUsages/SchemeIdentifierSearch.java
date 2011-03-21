@@ -22,6 +22,7 @@ import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Processor;
 import com.intellij.util.QueryExecutor;
 import com.intellij.util.text.StringSearcher;
+import org.jetbrains.annotations.NotNull;
 import schemely.psi.impl.symbols.SchemeIdentifier;
 
 import java.util.*;
@@ -36,8 +37,8 @@ public class SchemeIdentifierSearch implements QueryExecutor<PsiReference, Refer
     Project project = DataKeys.PROJECT.getData(dataContext);
   }
 
-  public boolean execute(final ReferencesSearch.SearchParameters queryParameters,
-                         final Processor<PsiReference> consumer)
+  public boolean execute(@NotNull final ReferencesSearch.SearchParameters queryParameters,
+                         @NotNull final Processor<PsiReference> consumer)
   {
     final PsiElement refElement = queryParameters.getElementToSearch();
     Project project = refElement.getProject();

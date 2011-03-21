@@ -45,6 +45,7 @@ public class SISCProcessREPL extends REPLBase
   private final Module module;
   private final String workingDir;
   private ProcessHandler processHandler;
+  private SISCOutputProcessor outputProcessor;
 
   public SISCProcessREPL(Project project, Module module, SchemeConsoleView consoleView, String workingDir)
   {
@@ -68,6 +69,7 @@ public class SISCProcessREPL extends REPLBase
       throw new REPLException(e);
     }
 
+    outputProcessor = new SISCOutputProcessor(consoleView.getConsole());
     processHandler = new SchemeProcessHandler(process, provider);
     ProcessTerminatedListener.attach(processHandler);
     processHandler.addProcessListener(new ProcessAdapter()
@@ -90,6 +92,7 @@ public class SISCProcessREPL extends REPLBase
     if (processHandler instanceof KillableProcess && processHandler.isProcessTerminating())
     {
       ((KillableProcess) processHandler).killProcess();
+      outputProcessor.flush();
       return;
     }
 
@@ -101,6 +104,7 @@ public class SISCProcessREPL extends REPLBase
     {
       processHandler.destroyProcess();
     }
+    outputProcessor.flush();
   }
 
   @Override
@@ -208,7 +212,7 @@ public class SISCProcessREPL extends REPLBase
     protected void textAvailable(String text, Key attributes)
     {
       // TODO use attributes?
-      SISCREPLUtil.processOutput(consoleView.getConsole(), text);
+      outputProcessor.processOutput(text);
     }
   }
 
