@@ -36,7 +36,7 @@
                          implementationClass="schemely.utils.SchemeNamesValidator"/>
     <completion.contributor language="Scheme"
                             implementationClass="schemely.completion.SchemeCompletionContributor"/>
-    <compilerSettingsFactory implementation="schemely.compiler.SchemeCompilerSettingsFactory"/>
+    <!--<compilerSettingsFactory implementation="schemely.compiler.SchemeCompilerSettingsFactory"/>-->
     <fileTemplateGroup implementation="schemely.actions.SchemeTemplatesFactory"/>
     <fileTypeIndentOptionsProvider
       implementation="schemely.formatter.SchemeIndentOptionsProvider"/>
@@ -82,14 +82,14 @@
     </component>
   </application-components>
 
-  <project-components>
-    <component>
-      <implementation-class>schemely.compiler.SchemeCompilerSettings</implementation-class>
-    </component>
-    <component>
-      <implementation-class>schemely.compiler.CompilerProjectComponent</implementation-class>
-    </component>
-  </project-components>
+  <!--<project-components>-->
+    <!--<component>-->
+      <!--<implementation-class>schemely.compiler.SchemeCompilerSettings</implementation-class>-->
+    <!--</component>-->
+    <!--<component>-->
+      <!--<implementation-class>schemely.compiler.CompilerProjectComponent</implementation-class>-->
+    <!--</component>-->
+  <!--</project-components>-->
 
   <module-components>
     <component>
