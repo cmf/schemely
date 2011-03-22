@@ -1,13 +1,10 @@
 package schemely.utils;
 
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import schemely.config.SchemeFacet;
-import schemely.config.SchemeFacetType;
 
 /**
  * @author Colin Fleming
@@ -32,16 +29,16 @@ public class Actions
       }
       else
       {
-        for (Module m : modules)
-        {
-          FacetManager manager = FacetManager.getInstance(m);
-          SchemeFacet clFacet = manager.getFacetByType(SchemeFacetType.INSTANCE.getId());
-          if (clFacet != null)
-          {
-            module = m;
-            break;
-          }
-        }
+//        for (Module m : modules)
+//        {
+//          FacetManager manager = FacetManager.getInstance(m);
+//          SchemeFacet clFacet = manager.getFacetByType(SchemeFacetType.INSTANCE.getId());
+//          if (clFacet != null)
+//          {
+//            module = m;
+//            break;
+//          }
+//        }
         if (module == null)
         {
           module = modules[0];

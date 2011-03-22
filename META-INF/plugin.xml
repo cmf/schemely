@@ -60,7 +60,6 @@
     <basicWordSelectionFilter
       implementation="schemely.editor.selection.SchemeIdentifierSelectioner$BasicWordRestriction"/>
 
-    <frameworkSupport implementation="schemely.config.SchemeFacetSupportProvider"/>
     <applicationService serviceInterface="schemely.settings.SchemeProjectSettings"
                         serviceImplementation="schemely.settings.SchemeProjectSettings"/>
 
@@ -75,13 +74,6 @@
     <editorActionHandler action="EditorEnter" implementationClass="schemely.repl.toolwindow.actions.REPLEnterAction" order="FIRST"/>
   </extensions>
 
-  <application-components>
-    <component>
-      <implementation-class>schemely.config.SchemeFacetLoader</implementation-class>
-      <interface-class>schemely.config.SchemeFacetLoader</interface-class>
-    </component>
-  </application-components>
-
   <!--<project-components>-->
     <!--<component>-->
       <!--<implementation-class>schemely.compiler.SchemeCompilerSettings</implementation-class>-->
@@ -90,12 +82,6 @@
       <!--<implementation-class>schemely.compiler.CompilerProjectComponent</implementation-class>-->
     <!--</component>-->
   <!--</project-components>-->
-
-  <module-components>
-    <component>
-      <implementation-class>schemely.config.SchemeFacetListener</implementation-class>
-    </component>
-  </module-components>
 
   <actions>
     <!-- Create file actions -->

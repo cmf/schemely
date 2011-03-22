@@ -1,7 +1,6 @@
 package schemely.actions;
 
 import com.intellij.CommonBundle;
-import com.intellij.facet.FacetManager;
 import com.intellij.ide.IdeView;
 import com.intellij.ide.actions.CreateElementActionBase;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -14,15 +13,17 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaDirectoryService;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiNameHelper;
+import com.intellij.psi.PsiPackage;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import schemely.utils.SchemeUtils;
-import schemely.utils.SchemeNamesUtil;
-import schemely.SchemeBundle;
-import schemely.config.SchemeFacetType;
-import schemely.config.SchemeFacet;
 
 import javax.swing.*;
 
@@ -64,10 +65,10 @@ public abstract class NewSchemeActionBase extends CreateElementActionBase
       return;
     }
 
-    FacetManager manager = FacetManager.getInstance(module);
-    SchemeFacet facet = manager.getFacetByType(SchemeFacetType.INSTANCE.getId());
+//    FacetManager manager = FacetManager.getInstance(module);
+//    SchemeFacet facet = manager.getFacetByType(SchemeFacetType.INSTANCE.getId());
 
-    if (facet == null ||
+    if ( // facet == null ||
         !SchemeUtils.isSuitableModule(module) ||
         !presentation.isEnabled() ||
         !isUnderSourceRoots(event))
