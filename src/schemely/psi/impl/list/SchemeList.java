@@ -523,4 +523,33 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
   {
     return isDefinition() || isSyntaxDefinition();
   }
+
+  public PsiElement getFunctionNavigationItem()
+  {
+    if (!isDefinition())
+    {
+      return null;
+    }
+
+    PsiElement formals = getSecondNonLeafElement();
+    if (formals == null)
+    {
+      return null;
+    }
+
+    if (formals instanceof SchemeList)
+    {
+      return ((SchemeList)formals).getFirstNonLeafElement();
+    }
+    else if (formals instanceof SchemeIdentifier)
+    {
+      PsiElement body = ResolveUtil.getNextNonLeafElement(formals);
+      if (body instanceof SchemeList && ((SchemeList) body).isLambda())
+      {
+        return formals;
+      }
+    }
+
+    return null;
+  }
 }
