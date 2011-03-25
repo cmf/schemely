@@ -55,7 +55,6 @@ public abstract class REPLProviderBase implements REPLProvider
     ConsoleHistoryModel history = new ConsoleHistoryModel();
     SchemeConsoleView consoleView = new SchemeConsoleView(project, CONSOLE_TITLE, history);
     final SchemeConsole schemeConsole = consoleView.getConsole();
-    schemeConsole.setPrompt("");
 
     // Create toolbar
     DefaultActionGroup toolbarActions = new DefaultActionGroup();

@@ -1,6 +1,5 @@
 package schemely.repl;
 
-import com.intellij.execution.console.LanguageConsoleViewImpl;
 import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.openapi.project.Project;
 

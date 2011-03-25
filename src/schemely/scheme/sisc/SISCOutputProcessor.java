@@ -1,6 +1,6 @@
 package schemely.scheme.sisc;
 
-import com.intellij.execution.console.LanguageConsoleImpl;
+import schemely.repl.LanguageConsoleImpl;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.util.text.StringUtil;
 import dk.brics.automaton.Automaton;

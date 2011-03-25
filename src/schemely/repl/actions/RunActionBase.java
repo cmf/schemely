@@ -1,6 +1,6 @@
 package schemely.repl.actions;
 
-import com.intellij.execution.console.LanguageConsoleImpl;
+import schemely.repl.LanguageConsoleImpl;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -36,7 +36,7 @@ public abstract class RunActionBase extends AnAction
     LOG.assertTrue(activeRepl != null);
 
     SchemeConsole languageConsole = activeRepl.getConsoleView().getConsole();
-    languageConsole.printToHistory(languageConsole.getPrompt(), ConsoleViewContentType.USER_INPUT.getAttributes());
+//    languageConsole.printToHistory(languageConsole.getPrompt(), ConsoleViewContentType.USER_INPUT.getAttributes());
     languageConsole.printToHistory(command + "\n", ConsoleViewContentType.NORMAL_OUTPUT.getAttributes());
     Editors.scrollDown(languageConsole.getHistoryViewer());
 

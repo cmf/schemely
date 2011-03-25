@@ -1,6 +1,5 @@
 package schemely.repl;
 
-import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.application.ApplicationManager;
@@ -74,10 +73,10 @@ public class SchemeConsole extends LanguageConsoleImpl
         addTextRangeToHistory(getConsoleEditor(), range);
         consoleHistoryModel.addToHistory(candidate);
         Editors.scrollDown(getHistoryViewer());
+
+        repl.execute(candidate);
       }
       setInputText("");
-
-      repl.execute(candidate);
 
       Editors.scrollDown(editor);
       return true;
@@ -90,7 +89,6 @@ public class SchemeConsole extends LanguageConsoleImpl
   public String addTextRangeToHistory(final EditorEx editor, final TextRange textRange)
   {
     final Ref<String> ref = Ref.create("");
-    boolean scrollToEnd = shouldScrollHistoryToEnd();
     ApplicationManager.getApplication().runWriteAction(new Runnable()
     {
       public void run()
@@ -98,7 +96,6 @@ public class SchemeConsole extends LanguageConsoleImpl
         ref.set(addTextRangeToHistoryImpl(editor, textRange));
       }
     });
-    queueUiUpdate(scrollToEnd);
     return ref.get();
   }
 
