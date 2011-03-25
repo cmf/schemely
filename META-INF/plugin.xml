@@ -4,7 +4,7 @@
   <id>schemely</id>
   <description>Plugin for Scheme language support</description>
   <category>Custom Languages</category>
-  <version>0.0.3</version>
+  <version>0.0.3.1</version>
   <vendor logo="/schemely/icons/lambda.png" url="https://github.com/cmf/">Colin Fleming</vendor>
   <idea-version since-build="103.72"/>
 
