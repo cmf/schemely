@@ -97,6 +97,18 @@ public abstract class REPLBase implements schemely.scheme.REPL
     });
   }
 
+  protected void setEditorEnabled(boolean enabled)
+  {
+    consoleView.getConsole().getConsoleEditor().setRendererMode(!enabled);
+    ApplicationManager.getApplication().invokeLater(new Runnable()
+    {
+      public void run()
+      {
+        consoleView.getConsole().getConsoleEditor().getComponent().updateUI();
+      }
+    });
+  }
+
   private class StopAction extends DumbAwareAction
   {
     private StopAction()

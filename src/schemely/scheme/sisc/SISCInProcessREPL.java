@@ -75,6 +75,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SISCInProcessREPL extends REPLBase
 {
   private SISCOutputProcessor outputProcessor;
+  private LocalREPLThread replThread = null;
 
   private enum State
   {
@@ -144,7 +145,7 @@ public class SISCInProcessREPL extends REPLBase
       };
 
       DynamicEnvironment dynamicEnvironment = new DynamicEnvironment(appContext, toREPL, fromREPL);
-      LocalREPLThread replThread = new LocalREPLThread(dynamicEnvironment, REPL.getCliProc(appContext));
+      replThread = new LocalREPLThread(dynamicEnvironment, REPL.getCliProc(appContext));
       REPL repl = new REPL(replThread);
       repl.go();
     }
@@ -161,7 +162,16 @@ public class SISCInProcessREPL extends REPLBase
   {
     verifyState(State.RUNNING);
 
-    execute("(exit)");
+    outputProcessor.ifExecuting(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        replThread.threadContext.interrupt = true;
+      }
+    });
+
+    toREPL.enqueue("(exit)\n");
 
     try
     {
@@ -179,6 +189,17 @@ public class SISCInProcessREPL extends REPLBase
   public void execute(String command)
   {
     verifyState(State.RUNNING);
+
+    setEditorEnabled(false);
+
+    outputProcessor.executing(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        setEditorEnabled(true);
+      }
+    });
 
     toREPL.enqueue(command + "\n");
   }
@@ -567,7 +588,6 @@ public class SISCInProcessREPL extends REPLBase
       this.decoder = charset.newDecoder();
     }
 
-    // TODO more efficient forms
     @Override
     public synchronized void write(int b) throws IOException
     {

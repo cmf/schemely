@@ -110,6 +110,17 @@ public class SISCProcessREPL extends REPLBase
   @Override
   public void execute(String command)
   {
+    setEditorEnabled(false);
+
+    outputProcessor.executing(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        setEditorEnabled(true);
+      }
+    });
+
     OutputStream outputStream = processHandler.getProcessInput();
     try
     {

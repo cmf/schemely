@@ -7,6 +7,7 @@ import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.RunAutomaton;
+import net.jcip.annotations.GuardedBy;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NonNls;
 import schemely.repl.SchemeConsole;
@@ -25,10 +26,15 @@ public class SISCOutputProcessor
 
   enum State
   {
-    STARTING, EXECUTING
+    STARTING, AT_PROMPT, EXECUTING
   }
 
+  @GuardedBy("lock")
   private State state = State.STARTING;
+  @GuardedBy("lock")
+  private Runnable onCommandExit;
+
+  private final Object lock = new Object();
 
   @NonNls
   @Language("RegExp")
@@ -60,31 +66,71 @@ public class SISCOutputProcessor
         matcher.reset(trimmed);
       }
 
-      if (sawPrompt)
+      synchronized (lock)
       {
-        if (state == State.STARTING)
+        if (sawPrompt)
         {
-          state = State.EXECUTING;
-        }
-        else
-        {
-          flush();
-        }
-        buffer.append(trimmed);
-      }
-      else
-      {
-        if (state == State.STARTING)
-        {
-          LanguageConsoleImpl.printToConsole(console, trimmed, ConsoleViewContentType.NORMAL_OUTPUT, null);
-          Editors.scrollDown(console.getHistoryViewer());
-        }
-        else
-        {
+          if (state == State.STARTING)
+          {
+            state = State.AT_PROMPT;
+          }
+          else
+          {
+            flush();
+
+            if (state == State.EXECUTING)
+            {
+              state = State.AT_PROMPT;
+              if (onCommandExit != null)
+              {
+                onCommandExit.run();
+                onCommandExit = null;
+              }
+            }
+          }
           buffer.append(trimmed);
+        }
+        else
+        {
+          if (state == State.STARTING)
+          {
+            LanguageConsoleImpl.printToConsole(console, trimmed, ConsoleViewContentType.NORMAL_OUTPUT, null);
+            Editors.scrollDown(console.getHistoryViewer());
+          }
+          else
+          {
+            buffer.append(trimmed);
+          }
         }
       }
     }
+  }
+
+  public void executing(Runnable onCommandExit)
+  {
+    synchronized (lock)
+    {
+      if (state != State.AT_PROMPT)
+      {
+        throw new IllegalStateException("Expected state AT_PROMPT, found " + state);
+      }
+
+      state = State.EXECUTING;
+      this.onCommandExit = onCommandExit;
+    }
+  }
+
+  public boolean ifExecuting(Runnable runnable)
+  {
+    synchronized (lock)
+    {
+      if (state == State.EXECUTING)
+      {
+        runnable.run();
+        return true;
+      }
+    }
+    return false;
   }
 
   public void flush()
