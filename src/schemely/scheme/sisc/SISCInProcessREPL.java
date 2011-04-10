@@ -211,6 +211,19 @@ public class SISCInProcessREPL extends REPLBase
   }
 
   @Override
+  public boolean isExecuting()
+  {
+    return outputProcessor.ifExecuting(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        // NOP
+      }
+    });
+  }
+
+  @Override
   public Collection<PsiNamedElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol)
   {
     GetCompletions getCompletions = new GetCompletions(manager);

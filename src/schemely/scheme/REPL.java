@@ -26,6 +26,8 @@ public interface REPL
 
   boolean isActive();
 
+  boolean isExecuting();
+
   SchemeConsoleView getConsoleView();
 
   // Guaranteed to be called after start()
