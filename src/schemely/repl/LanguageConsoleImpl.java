@@ -176,29 +176,9 @@ public class LanguageConsoleImpl implements Disposable, TypeSafeDataProvider
     myConsoleEditor.setHighlighter(EditorHighlighterFactory.getInstance()
                                      .createEditorHighlighter(myProject, myFile.getVirtualFile()));
     myHistoryViewer.setCaretEnabled(false);
-    myConsoleEditor.setHorizontalScrollbarVisible(true);
-    VisibleAreaListener areaListener = new VisibleAreaListener()
-    {
-      public void visibleAreaChanged(VisibleAreaEvent e)
-      {
-        int offset = myConsoleEditor.getScrollingModel().getHorizontalScrollOffset();
-        ScrollingModel model = myHistoryViewer.getScrollingModel();
-        int historyOffset = model.getHorizontalScrollOffset();
-        if (historyOffset != offset)
-        {
-          try
-          {
-            model.disableAnimation();
-            model.scrollHorizontally(offset);
-          }
-          finally
-          {
-            model.enableAnimation();
-          }
-        }
-      }
-    };
-    myConsoleEditor.getScrollingModel().addVisibleAreaListener(areaListener);
+
+    myConsoleEditor.getScrollingModel().addVisibleAreaListener(new ConsoleVisibleAreaListener(myConsoleEditor));
+    myHistoryViewer.getScrollingModel().addVisibleAreaListener(new ConsoleVisibleAreaListener(myHistoryViewer));
 
     myHistoryViewer.getContentComponent().addKeyListener(new KeyAdapter()
     {
@@ -226,7 +206,7 @@ public class LanguageConsoleImpl implements Disposable, TypeSafeDataProvider
   private static void setupEditorDefault(EditorEx editor)
   {
     editor.getContentComponent().setFocusCycleRoot(false);
-    editor.setHorizontalScrollbarVisible(false);
+    editor.setHorizontalScrollbarVisible(true);
     editor.setVerticalScrollbarVisible(true);
     editor.getColorsScheme().setColor(EditorColors.CARET_ROW_COLOR, null);
     editor.setBorder(null);
@@ -477,5 +457,34 @@ public class LanguageConsoleImpl implements Disposable, TypeSafeDataProvider
         console.printToHistory(string, attributes);
       }
     }, ModalityState.stateForComponent(console.getComponent()));
+  }
+
+  private class ConsoleVisibleAreaListener implements VisibleAreaListener
+  {
+    private final Editor editor;
+
+    public ConsoleVisibleAreaListener(Editor editor)
+    {
+      this.editor = editor;
+    }
+
+    public void visibleAreaChanged(VisibleAreaEvent e)
+    {
+      ScrollingModel model = editor.getScrollingModel();
+      int offset = model.getHorizontalScrollOffset();
+      int historyOffset = model.getHorizontalScrollOffset();
+      if (historyOffset != offset)
+      {
+        try
+        {
+          model.disableAnimation();
+          model.scrollHorizontally(offset);
+        }
+        finally
+        {
+          model.enableAnimation();
+        }
+      }
+    }
   }
 }
