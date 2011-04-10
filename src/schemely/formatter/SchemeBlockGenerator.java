@@ -106,7 +106,7 @@ public class SchemeBlockGenerator
           Alignment align = null;
           Indent indent;
 
-          if (Tokens.BRACES.contains(childNode.getElementType()))
+          if (Tokens.OPEN_BRACES.contains(childNode.getElementType()))
           {
             indent = Indent.getNoneIndent();
           }
