@@ -1,6 +1,5 @@
 package schemely.repl;
 
-import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.CaretModel;
@@ -32,6 +31,8 @@ public class SchemeConsole extends LanguageConsoleImpl
   private final ConsoleHistoryModel historyModel;
   private final String inputPrompt = "> ";
   private final String continuationPrompt = "  ";
+  private String currentREPLItem = null;
+  private int currentREPLOffset = 0;
 
   public SchemeConsole(Project project, String title, ConsoleHistoryModel historyModel)
   {
@@ -198,5 +199,23 @@ public class SchemeConsole extends LanguageConsoleImpl
   public ConsoleHistoryModel getHistoryModel()
   {
     return this.historyModel;
+  }
+
+  public void saveCurrentREPLItem()
+  {
+    Editor editor = getCurrentEditor();
+    Document document = editor.getDocument();
+    CaretModel caretModel = editor.getCaretModel();
+    currentREPLOffset = caretModel.getOffset();
+    currentREPLItem = document.getText();
+  }
+
+  // Assumed to be run in a write action
+  public void restoreCurrentREPLItem()
+  {
+    Editor editor = getCurrentEditor();
+    Document document = editor.getDocument();
+    document.setText(currentREPLItem == null ? "" : currentREPLItem);
+    editor.getCaretModel().moveToOffset(currentREPLItem == null ? 0 : currentREPLOffset);
   }
 }

@@ -1,6 +1,5 @@
 package schemely.repl;
 
-import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.openapi.project.Project;
 
 public class SchemeConsoleView extends LanguageConsoleViewImpl

@@ -1,7 +1,6 @@
 package schemely.repl;
 
 import com.intellij.execution.ExecutionHelper;
-import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.execution.runners.AbstractConsoleRunnerWithHistory;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -21,13 +20,13 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
-import com.intellij.util.PairProcessor;
 import schemely.repl.toolwindow.REPLToolWindowFactory;
 import schemely.scheme.REPL;
 import schemely.scheme.REPLException;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -131,36 +130,13 @@ public abstract class REPLProviderBase implements REPLProvider
     java.util.List<AnAction> actions = new ArrayList<AnAction>();
     actions.addAll(Arrays.asList(repl.getToolbarActions()));
 
-    final SchemeConsole console = repl.getConsoleView().getConsole();
-    PairProcessor<AnActionEvent, String> historyProcessor = new PairProcessor<AnActionEvent, String>()
-    {
-      @Override
-      public boolean process(AnActionEvent e, final String s)
-      {
-        new WriteCommandAction(console.getProject(), console.getFile())
-        {
-          @Override
-          protected void run(Result result) throws Throwable
-          {
-            console.getEditorDocument().setText(s == null ? "" : s);
-            console.getCurrentEditor().getCaretModel().moveToOffset(s == null ? 0 : s.length());
-          }
-        }.execute();
-
-        return true;
-      }
-    };
-
+    SchemeConsole console = repl.getConsoleView().getConsole();
     EditorEx consoleEditor = console.getConsoleEditor();
 
     Computable<Boolean> upComputable = AbstractConsoleRunnerWithHistory.createCanMoveUpComputable(consoleEditor);
-    actions.add(ConsoleHistoryModel.createConsoleHistoryUpAction(upComputable,
-                                                                 console.getHistoryModel(),
-                                                                 historyProcessor));
+    actions.add(createConsoleHistoryAction(upComputable, console, true, KeyEvent.VK_UP));
     Computable<Boolean> downComputable = AbstractConsoleRunnerWithHistory.createCanMoveDownComputable(consoleEditor);
-    actions.add(ConsoleHistoryModel.createConsoleHistoryDownAction(downComputable,
-                                                                   console.getHistoryModel(),
-                                                                   historyProcessor));
+    actions.add(createConsoleHistoryAction(downComputable, console, false, KeyEvent.VK_DOWN));
 
     return actions.toArray(new AnAction[actions.size()]);
   }
@@ -174,5 +150,59 @@ public abstract class REPLProviderBase implements REPLProvider
         action.registerCustomShortcutSet(action.getShortcutSet(), component);
       }
     }
+  }
+
+  public static AnAction createConsoleHistoryAction(final Computable<Boolean> canMoveInEditor,
+                                                    final SchemeConsole console,
+                                                    final boolean previous,
+                                                    int keyEvent)
+  {
+    AnAction action = new AnAction()
+    {
+      @Override
+      public void actionPerformed(AnActionEvent e)
+      {
+        ConsoleHistoryModel historyModel = console.getHistoryModel();
+        if (previous && historyModel.isEditingCurrentItem())
+        {
+          console.saveCurrentREPLItem();
+        }
+
+        final String text = previous ? historyModel.getHistoryPrev() : historyModel.getHistoryNext();
+        new WriteCommandAction(console.getProject(), console.getFile())
+        {
+          @Override
+          protected void run(Result result) throws Throwable
+          {
+            if (!previous && (text == null))
+            {
+              console.restoreCurrentREPLItem();
+            }
+            else
+            {
+              console.getEditorDocument().setText(text == null ? "" : text);
+              console.getCurrentEditor().getCaretModel().moveToOffset(text == null ? 0 : text.length());
+            }
+          }
+        }.execute();
+      }
+
+      @Override
+      public void update(AnActionEvent e)
+      {
+        // Check if we have anything in history
+        ConsoleHistoryModel historyModel = console.getHistoryModel();
+        boolean enabled = previous ? historyModel.hasPreviousHistory() : historyModel.hasNextHistory();
+        if (!enabled)
+        {
+          e.getPresentation().setEnabled(false);
+          return;
+        }
+        e.getPresentation().setEnabled(!canMoveInEditor.compute());
+      }
+    };
+    action.registerCustomShortcutSet(keyEvent, 0, null);
+    action.getTemplatePresentation().setVisible(false);
+    return action;
   }
 }

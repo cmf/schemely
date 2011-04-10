@@ -1,6 +1,6 @@
 package schemely.repl.toolwindow.actions;
 
-import com.intellij.execution.process.ConsoleHistoryModel;
+import schemely.repl.ConsoleHistoryModel;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.EmptyAction;
 import com.intellij.openapi.application.ApplicationManager;
@@ -36,7 +36,7 @@ public class HistoryPreviousAction extends DumbAwareAction
     {
       boolean active = repl.isActive();
       ConsoleHistoryModel model = console.getHistoryModel();
-      active = active && model.hasHistory(true);
+      active = active && model.hasPreviousHistory();
       e.getPresentation().setEnabled(active);
     }
   }
@@ -45,7 +45,12 @@ public class HistoryPreviousAction extends DumbAwareAction
   public void actionPerformed(AnActionEvent e)
   {
     ConsoleHistoryModel model = console.getHistoryModel();
-    final String next = model.getHistoryNext();
+    if (model.isEditingCurrentItem())
+    {
+      console.saveCurrentREPLItem();
+    }
+
+    final String next = model.getHistoryPrev();
     ApplicationManager.getApplication().runWriteAction(new Runnable()
     {
       @Override
