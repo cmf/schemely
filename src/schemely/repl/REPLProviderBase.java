@@ -23,6 +23,7 @@ import com.intellij.ui.content.ContentManager;
 import schemely.repl.toolwindow.REPLToolWindowFactory;
 import schemely.scheme.REPL;
 import schemely.scheme.REPLException;
+import schemely.settings.SchemeProjectSettings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -193,11 +194,16 @@ public abstract class REPLProviderBase implements REPLProvider
         // Check if we have anything in history
         ConsoleHistoryModel historyModel = console.getHistoryModel();
         boolean enabled = previous ? historyModel.hasPreviousHistory() : historyModel.hasNextHistory();
+
+        // Check if user has history navigation with arrow keys configured
+        enabled = enabled && SchemeProjectSettings.getInstance(console.getProject()).arrowKeysNavigateHistory;
+
         if (!enabled)
         {
           e.getPresentation().setEnabled(false);
           return;
         }
+
         e.getPresentation().setEnabled(!canMoveInEditor.compute());
       }
     };

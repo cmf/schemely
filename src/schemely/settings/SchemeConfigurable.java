@@ -8,28 +8,33 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
+import net.miginfocom.swing.MigLayout;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import schemely.SchemeIcons;
 import schemely.scheme.SchemeImplementation;
 
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 
 public class SchemeConfigurable extends AbstractProjectComponent implements Configurable
 {
   protected static final String PROJECT_SETTINGS = "SchemeProjectSettings";
-  private SchemeProjectSettingsForm settingsForm;
   private SchemeImplementation originalImplementation;
 
   private volatile Runnable reloadProjectRequest;
+
+  private SchemeProjectSettings settings = null;
+
+  private JPanel panel = null;
+  private JComboBox schemeImplementationComboBox;
+  private JCheckBox arrowKeysNavigateHistory;
 
   public SchemeConfigurable(Project project)
   {
     super(project);
     originalImplementation = SchemeProjectSettings.getInstance(myProject).schemeImplementation;
   }
-
-  // Configurable =============================================================
 
   @Override
   @Nls
@@ -53,44 +58,62 @@ public class SchemeConfigurable extends AbstractProjectComponent implements Conf
   @Override
   public JComponent createComponent()
   {
-    if (settingsForm == null)
+    if (panel == null)
     {
-      settingsForm = new SchemeProjectSettingsForm(myProject);
+      settings = SchemeProjectSettings.getInstance(myProject);
+
+      panel = new JPanel();
+      panel.setLayout(new MigLayout());
+
+      panel.add(new JLabel("Scheme Implementation: "));
+      schemeImplementationComboBox = new JComboBox(SchemeImplementation.values());
+      panel.add(schemeImplementationComboBox, "align right, wrap");
+
+      JPanel replPanel = new JPanel();
+      replPanel.setLayout(new MigLayout());
+      replPanel.setBorder(BorderFactory.createTitledBorder(new EtchedBorder(), "REPL"));
+
+      arrowKeysNavigateHistory = new JCheckBox("Arrow keys navigate in history");
+      replPanel.add(arrowKeysNavigateHistory, "wrap");
+
+      panel.add(replPanel, "growx, span, wrap");
+
+      reset();
     }
-    return settingsForm.getComponent();
+    return panel;
   }
 
   @Override
   public boolean isModified()
   {
-    return settingsForm.isModified();
+    boolean equal = schemeImplementationComboBox.getSelectedItem().equals(settings.schemeImplementation);
+    equal = equal && (arrowKeysNavigateHistory.isSelected() == settings.arrowKeysNavigateHistory);
+    return !equal;
   }
 
   @Override
   public void apply() throws ConfigurationException
   {
     SchemeProjectSettings settings = SchemeProjectSettings.getInstance(myProject);
-    SchemeImplementation implementation = settingsForm.getSchemeImplementation();
+    SchemeImplementation implementation = (SchemeImplementation) schemeImplementationComboBox.getSelectedItem();
     settings.schemeImplementation = implementation;
+    settings.arrowKeysNavigateHistory = arrowKeysNavigateHistory.isSelected();
+
     reloadProjectOnLanguageLevelChange(implementation, false);
   }
 
   @Override
   public void reset()
   {
-    if (settingsForm != null)
-    {
-      settingsForm.reset();
-    }
+    schemeImplementationComboBox.setSelectedItem(settings.schemeImplementation);
+    arrowKeysNavigateHistory.setSelected(settings.arrowKeysNavigateHistory);
   }
 
   @Override
   public void disposeUIResources()
   {
-    settingsForm = null;
+    panel = null;
   }
-
-  // ProjectComponent =========================================================
 
   @Override
   @NotNull

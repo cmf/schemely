@@ -18,6 +18,7 @@ import schemely.scheme.SchemeImplementation;
 public class SchemeProjectSettings implements PersistentStateComponent<SchemeProjectSettings>
 {
   public SchemeImplementation schemeImplementation = SchemeImplementation.SISC_1_16_6;
+  public boolean arrowKeysNavigateHistory = false;
 
   @Override
   public SchemeProjectSettings getState()
