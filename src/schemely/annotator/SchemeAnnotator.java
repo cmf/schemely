@@ -26,8 +26,6 @@ public class SchemeAnnotator implements Annotator
   Set<String>
     IMPLICIT_NAMES =
     new HashSet<String>(Arrays.asList("define",
-                                      "new",
-                                      "throw",
                                       "quote",
                                       "quasiquote",
                                       "unquote",
