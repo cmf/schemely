@@ -80,7 +80,9 @@ public class SchemeBlockGenerator
       {
         int parameters = 0;
         Alignment parameterAlignment = Alignment.createAlignment();
+        Alignment parameterChildAlignment = Alignment.createChildAlignment(parameterAlignment);
         Alignment bodyAlignment = Alignment.createAlignment();
+        Alignment bodyChildAlignment = Alignment.createChildAlignment(bodyAlignment);
 
         List<Block> subBlocks = new ArrayList<Block>();
 
@@ -112,21 +114,22 @@ public class SchemeBlockGenerator
           }
           else
           {
+            boolean isComment = Tokens.COMMENTS.contains(childNode.getElementType());
             if (childIndex == 0)
             {
               indent = Indent.getNormalIndent(true);
             }
             else if ((childIndex - 1) < parameters)
             {
-              align = parameterAlignment;
+              align = isComment ? parameterChildAlignment : parameterAlignment;
               indent = Indent.getContinuationIndent(true);
             }
             else
             {
-              align = bodyAlignment;
+              align = isComment ? bodyChildAlignment : bodyAlignment;
               indent = Indent.getNormalIndent(true);
             }
-            if (!Tokens.COMMENTS.contains(childNode.getElementType()))
+            if (!isComment)
             {
               childIndex++;
             }
