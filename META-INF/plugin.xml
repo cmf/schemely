@@ -129,7 +129,7 @@
       </action>
 
       <add-to-group group-id="ToolsMenu" anchor="last"/>
-
+      <add-to-group group-id="EditorPopupMenu" anchor="last"/>
     </group>
 
     <action id="schemely.repl.toolwindow.actions.NewInProcessConsoleAction"
