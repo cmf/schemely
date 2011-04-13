@@ -5,7 +5,7 @@
   <description>Plugin for Scheme language support</description>
   <category>Custom Languages</category>
   <version>0.0.3.2</version>
-  <vendor logo="/schemely/icons/lambda.png" url="https://github.com/cmf/">Colin Fleming</vendor>
+  <vendor logo="/schemely/icons/lambda.png" url="http://colinfleming.net">Colin Fleming</vendor>
   <idea-version since-build="103.72"/>
 
   <extensions defaultExtensionNs="com.intellij">
@@ -35,7 +35,8 @@
     <lang.namesValidator language="Scheme"
                          implementationClass="schemely.utils.SchemeNamesValidator"/>
     <completion.contributor language="Scheme"
-                            implementationClass="schemely.completion.SchemeCompletionContributor"/>
+                            implementationClass="schemely.completion.SchemeCompletionContributor"
+                            order="first"/>
     <!--<compilerSettingsFactory implementation="schemely.compiler.SchemeCompilerSettingsFactory"/>-->
     <fileTemplateGroup implementation="schemely.actions.SchemeTemplatesFactory"/>
     <fileTypeIndentOptionsProvider

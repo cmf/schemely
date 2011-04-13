@@ -111,7 +111,7 @@ public class SchemeIdentifierMatcher extends PrefixMatcher
       else if ((ch == '-') && previousWasNormalChar)
       {
         // All valid scheme subsequent chars except '-'
-        regexp.append("[A-Za-z!$%&*/:<=>?~_^@\\.+]*");
+        regexp.append("[A-Za-z0-9!$%&*/:<=>?~_^@\\.+]*");
         regexp.append("\\-");
         previousWasNormalChar = false;
       }
@@ -122,37 +122,16 @@ public class SchemeIdentifierMatcher extends PrefixMatcher
       }
     }
 
-    regexp.append(".*");
+    // All valid scheme subsequent chars
+    regexp.append("[-A-Za-z!$%&*/:<=>?~_^@\\\\.+]*");
 
-    Automaton auto = new RegExp(regexp.toString(), RegExp.NONE).toAutomaton();
-
-    try
-    {
-      FileWriter writer = new FileWriter("/Users/colin/strings.dot");
-      writer.write(auto.toDot());
-      writer.close();
-    }
-    catch (IOException ignore)
-    {
-    }
-
-    final RunAutomaton automaton = new RunAutomaton(auto);
+    final RunAutomaton automaton = new RunAutomaton(new RegExp(regexp.toString(), RegExp.NONE).toAutomaton());
     return new NameUtil.Matcher()
     {
       @Override
       public boolean matches(String name)
       {
-        int state = automaton.getInitialState();
-        for (int i = 0; i < name.length(); i++)
-        {
-          char ch = name.charAt(i);
-          state = automaton.step(state, ch);
-          if (state == -1)
-          {
-            return false;
-          }
-        }
-        return automaton.isAccept(state);
+        return automaton.run(name);
       }
     };
   }

@@ -17,7 +17,6 @@ import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiNamedElement;
-import schemely.psi.impl.symbols.SchemeIdentifier;
 import schemely.repl.REPLProviderBase;
 import schemely.repl.SchemeConsoleElement;
 import schemely.repl.SchemeConsoleView;
@@ -224,7 +223,7 @@ public class SISCInProcessREPL extends REPLBase
   }
 
   @Override
-  public Collection<PsiNamedElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol)
+  public Collection<PsiNamedElement> getSymbolVariants(PsiManager manager, PsiElement symbol)
   {
     GetCompletions getCompletions = new GetCompletions(manager);
     try
