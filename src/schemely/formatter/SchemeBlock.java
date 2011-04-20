@@ -13,7 +13,12 @@ import org.jetbrains.annotations.Nullable;
 import schemely.formatter.processors.SchemeSpacingProcessor;
 import schemely.parser.AST;
 import schemely.psi.impl.SchemeFile;
+import schemely.psi.impl.SchemeVector;
+import schemely.psi.impl.list.SchemeList;
+import schemely.psi.impl.symbols.SchemeIdentifier;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -24,35 +29,56 @@ public class SchemeBlock implements Block, AST
   final protected Indent indent;
   final protected Wrap wrap;
   final protected CodeStyleSettings settings;
-  protected Alignment childAlignment = Alignment.createAlignment();
 
   protected List<Block> subBlocks = null;
 
-
-  public SchemeBlock(@NotNull ASTNode node,
-                     @Nullable Alignment alignment,
-                     @NotNull Indent indent,
-                     @Nullable Wrap wrap,
-                     CodeStyleSettings settings)
+  protected SchemeBlock(@NotNull ASTNode node,
+                        @Nullable Alignment alignment,
+                        @NotNull Indent indent,
+                        @Nullable Wrap wrap,
+                        CodeStyleSettings settings)
   {
     this.node = node;
     this.alignment = alignment;
-    setAlignment(alignment);
     this.indent = indent;
     this.wrap = wrap;
     this.settings = settings;
+  }
+
+  public static SchemeBlock create(ASTNode childNode,
+                                   Alignment align,
+                                   Indent indent,
+                                   Wrap wrap,
+                                   CodeStyleSettings settings)
+  {
+    PsiElement blockPsi = childNode.getPsi();
+    if (blockPsi instanceof SchemeList)
+    {
+      SchemeList list = (SchemeList) blockPsi;
+      PsiElement first = list.getFirstNonLeafElement();
+      if (first instanceof SchemeIdentifier)
+      {
+        return new ApplicationBlock(childNode, align, indent, wrap, settings);
+      }
+      else
+      {
+        return new ListBlock(childNode, align, indent, wrap, settings);
+      }
+    }
+    else if (blockPsi instanceof SchemeVector)
+    {
+      return new ListBlock(childNode, align, indent, wrap, settings);
+    }
+    else
+    {
+      return new SchemeBlock(childNode, align, indent, wrap, settings);
+    }
   }
 
   @NotNull
   public ASTNode getNode()
   {
     return node;
-  }
-
-  @NotNull
-  public CodeStyleSettings getSettings()
-  {
-    return settings;
   }
 
   @NotNull
@@ -66,9 +92,38 @@ public class SchemeBlock implements Block, AST
   {
     if (subBlocks == null)
     {
-      subBlocks = SchemeBlockGenerator.generateSubBlocks(node, wrap, settings);
+      subBlocks = generateSubBlocks(node, wrap, settings);
     }
     return subBlocks;
+  }
+
+  protected List<Block> generateSubBlocks(ASTNode node, Wrap wrap, CodeStyleSettings settings)
+  {
+    List<Block> subBlocks = new ArrayList<Block>();
+    for (ASTNode childNode : getChildren(node))
+    {
+      subBlocks.add(create(childNode, null, Indent.getNoneIndent(), wrap, settings));
+    }
+    return subBlocks;
+  }
+
+  protected static Collection<ASTNode> getChildren(ASTNode node)
+  {
+    Collection<ASTNode> ret = new ArrayList<ASTNode>();
+    for (ASTNode astNode : node.getChildren(null))
+    {
+      if (nonEmptyBlock(astNode))
+      {
+        ret.add(astNode);
+      }
+    }
+    return ret;
+  }
+
+  protected static boolean nonEmptyBlock(ASTNode node)
+  {
+    String nodeText = node.getText().trim();
+    return (nodeText.length() > 0);
   }
 
   @Nullable
@@ -97,24 +152,19 @@ public class SchemeBlock implements Block, AST
   @NotNull
   public ChildAttributes getChildAttributes(int newChildIndex)
   {
-    return getAttributesByParent();
-  }
-
-  private ChildAttributes getAttributesByParent()
-  {
     ASTNode astNode = getNode();
     PsiElement psiParent = astNode.getPsi();
     if (psiParent instanceof SchemeFile)
     {
       return new ChildAttributes(Indent.getNoneIndent(), null);
     }
-    if (LIST_LIKE_FORMS.contains(astNode.getElementType()))
-    {
-      return new ChildAttributes(Indent.getNormalIndent(true), childAlignment);
-    }
-    return new ChildAttributes(Indent.getNoneIndent(), null);
+    return createChildAttributes(newChildIndex);
   }
 
+  protected ChildAttributes createChildAttributes(int newChildIndex)
+  {
+    return new ChildAttributes(Indent.getNoneIndent(), null);
+  }
 
   public boolean isIncomplete()
   {
@@ -133,17 +183,11 @@ public class SchemeBlock implements Block, AST
     {
       lastChild = lastChild.getTreePrev();
     }
-    return lastChild != null &&
-           (lastChild.getPsi() instanceof PsiErrorElement || isIncomplete(lastChild));
+    return lastChild != null && (lastChild.getPsi() instanceof PsiErrorElement || isIncomplete(lastChild));
   }
 
   public boolean isLeaf()
   {
     return node.getFirstChildNode() == null;
-  }
-
-  public void setAlignment(Alignment alignment)
-  {
-    childAlignment = alignment;
   }
 }
