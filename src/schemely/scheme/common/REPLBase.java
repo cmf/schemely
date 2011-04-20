@@ -10,10 +10,10 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.ui.content.Content;
-import schemely.psi.impl.symbols.SchemeIdentifier;
 import schemely.repl.SchemeConsole;
 import schemely.repl.SchemeConsoleView;
 import schemely.repl.toolwindow.actions.ExecuteImmediatelyAction;
@@ -73,7 +73,7 @@ public abstract class REPLBase implements schemely.scheme.REPL
   }
 
   @Override
-  public abstract Collection<PsiNamedElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol);
+  public abstract Collection<PsiNamedElement> getSymbolVariants(PsiManager manager, PsiElement symbol);
 
   protected void hideEditor()
   {

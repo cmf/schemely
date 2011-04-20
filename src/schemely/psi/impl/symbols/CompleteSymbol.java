@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class CompleteSymbol
 {
-  public static Object[] getVariants(SchemeIdentifier symbol)
+  public static Object[] getVariants(PsiElement symbol)
   {
     PsiElement lastParent = null;
     PsiElement current = symbol;

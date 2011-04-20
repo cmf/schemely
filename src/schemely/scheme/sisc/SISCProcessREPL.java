@@ -15,10 +15,10 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.CharsetToolkit;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiNamedElement;
 import schemely.SchemeBundle;
-import schemely.psi.impl.symbols.SchemeIdentifier;
 import schemely.repl.REPLProviderBase;
 import schemely.repl.SchemeConsoleView;
 import schemely.scheme.REPLException;
@@ -157,7 +157,7 @@ public class SISCProcessREPL extends REPLBase
   }
 
   @Override
-  public Collection<PsiNamedElement> getSymbolVariants(PsiManager manager, SchemeIdentifier symbol)
+  public Collection<PsiNamedElement> getSymbolVariants(PsiManager manager, PsiElement symbol)
   {
     // TODO
     return Collections.emptyList();

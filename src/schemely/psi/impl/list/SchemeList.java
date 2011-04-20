@@ -112,13 +112,10 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       return true;
     }
 
-    // Lambda formals resolve to the symbol itself
+    // Lambda formals do not resolve
     if (PsiTreeUtil.isAncestor(formals, place, false))
     {
-      if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) place))
-      {
-        return false;
-      }
+      return false;
     }
 
     // Process internal definitions first to get shadowing
@@ -168,13 +165,10 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       return true;
     }
 
-    // Define variables resolve to the symbol itself
+    // Define variables do not resolve
     if ((PsiTreeUtil.isAncestor(formals, place, false)))
     {
-      if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) place))
-      {
-        return false;
-      }
+      return false;
     }
 
     if (place.getContainingFile().equals(define.getContainingFile()) &&
@@ -187,10 +181,6 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
     if ((place != formals) && (formals instanceof SchemeIdentifier))
     {
       // (define x 3)
-      if (PsiTreeUtil.isAncestor(define, place, false))
-      {
-        return true;
-      }
       SchemeIdentifier identifier = (SchemeIdentifier) formals;
       if (!ResolveUtil.processElement(scopeProcessor, identifier))
       {
@@ -236,13 +226,10 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       return true;
     }
 
-    // Define variables resolve to the symbol itself
+    // Define variables do not resolve
     if ((PsiTreeUtil.isAncestor(formals, place, false)))
     {
-      if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) place))
-      {
-        return false;
-      }
+      return false;
     }
 
     if ((place != formals) && (formals instanceof SchemeIdentifier))
@@ -280,6 +267,12 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
     if (vars instanceof SchemeIdentifier && style.equals(LET))
     {
       namedLetName = (SchemeIdentifier) vars;
+      // Named let name does not resolve
+      if (place == namedLetName)
+      {
+        return false;
+      }
+
       vars = ResolveUtil.getNextNonLeafElement(vars);
 
       if (!ResolveUtil.processElement(scopeProcessor, namedLetName))
@@ -295,15 +288,12 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       if ((placeParent instanceof SchemeList) && (placeParent.getParent() == vars))
       {
         // If place is the first identifier in a list which is a sub-list of the let vars, it's a let-bound
-        // variable so it only resolves to itself
+        // variable so it does not resolve
         SchemeList parentList = (SchemeList) placeParent;
         SchemeIdentifier firstIdentifier = parentList.getFirstIdentifier();
         if (place == firstIdentifier)
         {
-          if (!ResolveUtil.processElement(scopeProcessor, firstIdentifier))
-          {
-            return false;
-          }
+          return false;
         }
       }
 
@@ -408,15 +398,12 @@ public class SchemeList extends SchemeListBase implements SchemeBraced
       if ((placeParent instanceof SchemeList) && (placeParent.getParent() == vars))
       {
         // If place is the first identifier in a list which is a sub-list of the do vars,
-        // it's a do-bound variable so it only resolves to itself
+        // it's a do-bound variable so it does not resolve
         SchemeList parentList = (SchemeList) placeParent;
 
         if (place == parentList.getFirstIdentifier())
         {
-          if (!ResolveUtil.processElement(scopeProcessor, (PsiNamedElement) place))
-          {
-            return false;
-          }
+          return false;
         }
 
         // Init expressions are not in scope
