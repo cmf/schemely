@@ -23,7 +23,7 @@ public class SchemeFormattingModelBuilder implements FormattingModelBuilder
     PsiFile containingFile = element.getContainingFile();
     ASTNode astNode = containingFile.getNode();
     assert astNode != null;
-    SchemeBlock schemeBlock = new SchemeBlock(astNode, null, Indent.getAbsoluteNoneIndent(), null, settings);
+    SchemeBlock schemeBlock = SchemeBlock.create(astNode, null, Indent.getAbsoluteNoneIndent(), null, settings);
     return FormattingModelProvider.createFormattingModelForPsiFile(containingFile, schemeBlock, settings);
   }
 

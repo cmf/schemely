@@ -16,6 +16,11 @@ import java.io.IOException;
  */
 public class FormatterTest extends LightCodeInsightTestCase
 {
+  public void testIndentQuoted() throws IOException
+  {
+    doTest();
+  }
+
   public void testInlineComment() throws IOException
   {
     doTest();
@@ -27,6 +32,11 @@ public class FormatterTest extends LightCodeInsightTestCase
   }
 
   public void testIssue18() throws IOException
+  {
+    doTest();
+  }
+
+  public void testListOfLists() throws IOException
   {
     doTest();
   }

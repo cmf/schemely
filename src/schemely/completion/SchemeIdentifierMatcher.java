@@ -3,14 +3,11 @@ package schemely.completion;
 import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.psi.codeStyle.NameUtil;
 import com.intellij.util.containers.hash.LinkedHashMap;
-import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.RunAutomaton;
 import net.jcip.annotations.GuardedBy;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -18,6 +15,11 @@ import java.util.Map;
  */
 public class SchemeIdentifierMatcher extends PrefixMatcher
 {
+  // All valid scheme subsequent chars
+  private static final String SCHEME_SUBSEQUENT = "[-A-Za-z0-9!$%&*/:<=>?~_^@\\.+]";
+  // All valid scheme subsequent chars except '-'
+  private static final String SCHEME_SUBSEQUENT_INTER_DASH = "[A-Za-z0-9!$%&*/:<=>?~_^@\\.+]";
+
   private static final int MAX_LENGTH = 40;
 
   @GuardedBy("patternCache")
@@ -105,13 +107,12 @@ public class SchemeIdentifierMatcher extends PrefixMatcher
       }
       else if (ch == '*')
       {
-        regexp.append(".*");
+        regexp.append(SCHEME_SUBSEQUENT + '*');
         previousWasNormalChar = false;
       }
       else if ((ch == '-') && previousWasNormalChar)
       {
-        // All valid scheme subsequent chars except '-'
-        regexp.append("[A-Za-z0-9!$%&*/:<=>?~_^@\\.+]*");
+        regexp.append(SCHEME_SUBSEQUENT_INTER_DASH + '*');
         regexp.append("\\-");
         previousWasNormalChar = false;
       }
@@ -122,8 +123,7 @@ public class SchemeIdentifierMatcher extends PrefixMatcher
       }
     }
 
-    // All valid scheme subsequent chars
-    regexp.append("[-A-Za-z!$%&*/:<=>?~_^@\\\\.+]*");
+    regexp.append(SCHEME_SUBSEQUENT + '*');
 
     final RunAutomaton automaton = new RunAutomaton(new RegExp(regexp.toString(), RegExp.NONE).toAutomaton());
     return new NameUtil.Matcher()
