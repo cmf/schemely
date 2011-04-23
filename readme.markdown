@@ -18,14 +18,13 @@ unstable and only suitable for enthusiastic alpha/beta testers*.
 
 Currently the code is undergoing some large changes, and lots of things don't work:
 
-- Kawa support is almost totally broken
-- Only an in-process SISC REPL can be used
+- Kawa support is almost totally broken *(in fact it's currently disabled)*
 - Symbol resolution doesn't work across files
 - Symbol resolution (which affects navigation, rename and find usages) is currently broken
   in the face of macros
 - Structure view is almost totally broken
 
-Fixing at least the first 3 of these is my top priority and hopefully won't take too long.
+Fixing at least the first 2 of these is my top priority and hopefully won't take too long.
 
 There is also a long list of planned features:
 
